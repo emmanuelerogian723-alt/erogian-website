@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EROGIAN — Building Digital Legacies | AI, Software & Creative Studio</title>
+<meta name="description" content="EROGIAN builds premium websites, AI agents, automation systems and brand identities for startups and businesses in Africa and beyond. AI-first. Design-obsessed. Results-driven.">
+<meta name="keywords" content="Erogian, AI agency Nigeria, website development, AI automation, Shazam AI, brand identity, Telegram bots, WhatsApp bots, SaaS development">
+<meta property="og:title" content="EROGIAN — Building Digital Legacies">
+<meta property="og:description" content="Helping startups, businesses and creators transform ideas into profitable digital products through AI, software and creativity.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://erogian.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "EROGIAN",
+  "url": "https://erogian.com",
+  "description": "AI, software and creative studio building digital legacies for startups and businesses.",
+  "founder": { "@type": "Person", "name": "Emmanuel Ene Rejoice" },
+  "sameAs": ["https://x.com/erogian"]
+}
+</script>
+<style>
+  :root{
+    --bg:#050505; --bg2:#0a0c10; --navy:#0b0f1a;
+    --blue:#3b82f6; --royal:#2b4bff; --purple:#8b5cf6; --gold:#d4af37; --orange:#ff8a3d;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:#f5f5f7; font-family:'Inter',sans-serif; overflow-x:hidden;}
+  h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+  ::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:#222; border-radius:8px;}
+
+  .grad-text{background:linear-gradient(90deg,#8b5cf6,#3b82f6 45%,#d4af37 90%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .glass{background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);}
+  .glow-border{position:relative;}
+  .glow-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+    background:linear-gradient(120deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:0.5; transition:opacity .4s;}
+  .glow-border:hover::before{opacity:1;}
+  .card-float{transition:transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;}
+  .card-float:hover{transform:translateY(-8px); box-shadow:0 25px 60px -15px rgba(59,130,246,.25);}
+
+  #particle-canvas{position:absolute; inset:0; width:100%; height:100%;}
+  .noise{position:fixed; inset:0; pointer-events:none; opacity:.03; z-index:60;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  .nav-link{position:relative;}
+  .nav-link::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .3s;}
+  .nav-link:hover::after{width:100%;}
+
+  .orbit{animation:orbit 14s linear infinite;}
+  @keyframes orbit{from{transform:rotate(0deg) translateX(160px) rotate(0deg);}to{transform:rotate(360deg) translateX(160px) rotate(-360deg));}}
+
+  .pulse-glow{animation:pg 3s ease-in-out infinite;}
+  @keyframes pg{0%,100%{box-shadow:0 0 20px rgba(139,92,246,.4);}50%{box-shadow:0 0 45px rgba(59,130,246,.6);}}
+
+  .marquee-track{display:flex; width:max-content; animation:marquee 30s linear infinite;}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  .chat-bubble-enter{animation:slideUp .4s ease both;}
+  @keyframes slideUp{from{opacity:0; transform:translateY(16px);}to{opacity:1; transform:translateY(0);}}
+
+  .counter{font-variant-numeric:tabular-nums;}
+
+  input,textarea,select{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); color:#fff;}
+  input:focus,textarea:focus,select:focus{outline:none; border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.2);}
+  input::placeholder,textarea::placeholder{color:#6b7280;}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- NAV -->
+<nav id="mainnav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#home" class="display text-xl font-bold tracking-tight">EROGIAN<span class="text-purple-400">.</span></a>
+    <div class="hidden lg:flex items-center gap-8 text-sm text-gray-300">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#portfolio" class="nav-link">Portfolio</a>
+      <a href="#ai-products" class="nav-link">AI Products</a>
+      <a href="#testimonials" class="nav-link">Testimonials</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    <a href="#contact" class="hidden md:inline-block px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black hover:bg-gray-200 transition">Book a Call</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="relative min-h-screen flex items-center justify-center px-6 pt-24 overflow-hidden">
+  <canvas id="particle-canvas" class="opacity-70"></canvas>
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10"></div>
+
+  <div class="relative z-20 max-w-5xl mx-auto text-center" data-hero>
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-gray-300 mb-8 opacity-0" data-hero-tag>
+      <span class="w-2 h-2 rounded-full bg-purple-400 pulse-glow"></span> AI-First Digital Studio · Nigeria & Global
+    </div>
+    <h1 class="display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight opacity-0" data-hero-title>
+      Building <span class="grad-text">Digital Legacies</span><br> Through AI, Software &amp; Creativity
+    </h1>
+    <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto opacity-0" data-hero-sub>
+      Helping startups, businesses and creators transform ideas into profitable digital products.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4 opacity-0" data-hero-cta>
+      <a href="#contact" class="px-7 py-3.5 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 transition shadow-lg shadow-purple-500/30">Start Your Project</a>
+      <a href="#portfolio" class="px-7 py-3.5 rounded-full font-semibold glass hover:bg-white/10 transition">View Portfolio</a>
+      <a href="#contact" class="px-7 py-3.5 rounded-full font-semibold text-gray-300 hover:text-white transition">Book Consultation →</a>
+    </div>
+  </div>
+
+  <!-- floating cards -->
+  <div class="hidden md:block absolute left-[8%] top-[30%] glass rounded-2xl p-4 w-44 card-float z-20" data-float="1">
+    <div class="text-xs text-gray-400 mb-1">AI Agent</div>
+    <div class="text-sm font-semibold">Shazam AI Online</div>
+    <div class="mt-2 h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full w-4/5 bg-gradient-to-r from-purple-400 to-blue-400"></div></div>
+  </div>
+  <div class="hidden md:block absolute right-[10%] top-[22%] glass rounded-2xl p-4 w-48 card-float z-20" data-float="2">
+    <div class="text-xs text-gray-400 mb-1">Analytics</div>
+    <div class="text-2xl font-bold grad-text">+248%</div>
+    <div class="text-xs text-gray-500">Client conversion lift</div>
+  </div>
+  <div class="hidden md:block absolute right-[14%] bottom-[18%] glass rounded-2xl p-4 w-44 card-float z-20" data-float="3">
+    <div class="text-xs text-gray-400">Now Building</div>
+    <div class="text-sm font-semibold">WhatsApp AI Bot</div>
+  </div>
+  <div class="hidden md:block absolute left-[12%] bottom-[24%] glass rounded-2xl p-4 w-40 card-float z-20" data-float="4">
+    <div class="text-xs text-gray-400">Deploy</div>
+    <div class="text-sm font-semibold">99.9% Uptime</div>
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-gray-500 text-xs animate-bounce">scroll ↓</div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="py-14 border-y border-white/5">
+  <div class="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+    <div><div class="counter display text-3xl md:text-4xl font-bold grad-text" data-count="40">0</div><div class="text-xs text-gray-500 mt-1">Projects Completed</div></div>
+    <div><div class="counter display text-3xl md:text-4xl font-bold grad-text" data-count="30">0</div><div class="text-xs text-gray-500 mt-1">Happy Clients</div></div>
+    <div><div class="counter display text-3xl md:text-4xl font-bold grad-text" data-count="6">0</div><div class="text-xs text-gray-500 mt-1">Countries Served</div></div>
+    <div><div class="counter display text-3xl md:text-4xl font-bold grad-text" data-count="3">0</div><div class="text-xs text-gray-500 mt-1">Years Experience</div></div>
+    <div><div class="counter display text-3xl md:text-4xl font-bold grad-text" data-count="98">0</div><div class="text-xs text-gray-500 mt-1">% Satisfaction</div></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="py-28 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">What We Do</div>
+      <h2 class="display text-4xl md:text-5xl font-bold">Full-Stack Digital Solutions</h2>
+      <p class="text-gray-400 mt-4 max-w-xl mx-auto">From brand identity to AI-powered software — everything your business needs to look and perform world-class.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" id="services-grid"></div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="py-28 px-6 bg-[#07080b]">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Selected Work</div>
+      <h2 class="display text-4xl md:text-5xl font-bold">Real Projects, Real Results</h2>
+      <p class="text-gray-400 mt-4 max-w-xl mx-auto">A look at brand, event and product design work delivered for real clients across Nigeria.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolio-grid"></div>
+  </div>
+</section>
+
+<!-- AI PRODUCTS -->
+<section id="ai-products" class="py-28 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="text-gold text-sm font-semibold tracking-widest uppercase mb-3" style="color:#d4af37;">AI Products</div>
+      <h2 class="display text-4xl md:text-5xl font-bold">Built By Erogian, Used Daily</h2>
+    </div>
+    <div class="glass glow-border rounded-3xl p-8 md:p-12 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-block px-3 py-1 rounded-full text-xs bg-purple-500/20 text-purple-300 mb-4">Flagship AI Agent</div>
+        <h3 class="display text-3xl font-bold mb-4">Shazam AI</h3>
+        <p class="text-gray-400 mb-6">A Telegram-based AI agent that generates images, videos, logos, scripts, and code, transcribes audio, does live research, and talks back with voice — all from one chat. Built on a resilient multi-provider engine so it never goes fully down.</p>
+        <ul class="space-y-2 text-sm text-gray-300 mb-8">
+          <li>✓ Image, video &amp; logo generation</li>
+          <li>✓ AI chat, code &amp; script writing</li>
+          <li>✓ Voice input/output &amp; live web research</li>
+          <li>✓ Paystack-powered subscriptions in Naira</li>
+        </ul>
+        <a href="https://t.me/ShazamAi_official_bot" target="_blank" class="inline-block px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 transition">Try Shazam AI on Telegram →</a>
+      </div>
+      <div class="relative">
+        <div class="aspect-square rounded-2xl bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center overflow-hidden">
+          <img src="https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/566a9369d_e9085c280_whatsapp_image_1600780008312807.jpg" class="w-2/3 opacity-90" alt="Shazam AI style visual">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE -->
+<section class="py-28 px-6 bg-[#07080b]">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+    <div>
+      <div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">Why Erogian</div>
+      <h2 class="display text-4xl font-bold mb-6">We Build Like It's Our Own Money On The Line</h2>
+      <p class="text-gray-400 mb-8">Every project is engineered for speed, scale, and conversion — not just to look good, but to make you money.</p>
+      <div class="space-y-5">
+        <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">⚡</div><div><div class="font-semibold">Speed</div><div class="text-sm text-gray-500">Fast delivery without cutting corners.</div></div></div>
+        <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">🧠</div><div><div class="font-semibold">AI-First Mindset</div><div class="text-sm text-gray-500">Every solution considers automation from day one.</div></div></div>
+        <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">🎯</div><div><div class="font-semibold">Business-Focused</div><div class="text-sm text-gray-500">Design and code that drive real revenue.</div></div></div>
+        <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">🛠️</div><div><div class="font-semibold">Premium Support</div><div class="text-sm text-gray-500">You're never left on read after payment.</div></div></div>
+      </div>
+    </div>
+    <div class="relative">
+      <img src="https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/cc40a727f_founder_3d.jpg" class="rounded-3xl w-full glow-border" alt="Emmanuel Ene Rejoice, Founder of Erogian">
+      <div class="absolute -bottom-6 -left-6 glass rounded-2xl p-4 pulse-glow">
+        <div class="text-xs text-gray-400">Founder & Lead Engineer</div>
+        <div class="font-semibold">Emmanuel Ene Rejoice</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="py-28 px-6">
+  <div class="max-w-5xl mx-auto text-center mb-16">
+    <div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Client Words</div>
+    <h2 class="display text-4xl md:text-5xl font-bold">Trusted By Real People &amp; Organizations</h2>
+  </div>
+  <div class="max-w-6xl mx-auto overflow-hidden">
+    <div class="marquee-track gap-6" id="testimonial-track"></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-28 px-6 bg-[#07080b]">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="text-gold text-sm font-semibold tracking-widest uppercase mb-3" style="color:#d4af37;">Pricing</div>
+      <h2 class="display text-4xl md:text-5xl font-bold">Simple Pricing In Naira</h2>
+      <p class="text-gray-400 mt-4">No hidden fees. Pick a tier or request a custom quote.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" id="pricing-grid"></div>
+  </div>
+</section>
+
+<!-- BLOG TEASER -->
+<section id="blog" class="py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12">
+      <div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">Insights</div>
+      <h2 class="display text-4xl font-bold">From The Blog</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-purple-300 mb-2">AI</div><div class="font-semibold mb-2">Why Every Small Business Needs an AI Agent in 2026</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
+      <a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-blue-300 mb-2">Branding</div><div class="font-semibold mb-2">How Good Design Increases Conversion Rates</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
+      <a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-yellow-300 mb-2">Automation</div><div class="font-semibold mb-2">Automating Client Follow-Ups With WhatsApp Bots</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="py-28 px-6 bg-[#07080b]">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="display text-4xl md:text-5xl font-bold mb-6">Let's Build Your Next Big Thing</h2>
+    <p class="text-gray-400 mb-10">Reach out directly, or use the assistant in the corner to get a fast, guided quote.</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="https://wa.me/2347045560291" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">WhatsApp</a>
+      <a href="https://t.me/ShazamAi_official_bot" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Telegram</a>
+      <a href="mailto:multipurposetalentedyounginven@gmail.com" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Email</a>
+      <a href="https://github.com/emmanuelerogian723-alt" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 px-6 border-t border-white/5 text-center text-sm text-gray-500">
+  © 2026 EROGIAN. Building Digital Legacies. · Enugu &amp; Lagos, Nigeria
+</footer>
+
+<!-- CHATBOT WIDGET -->
+<div id="chat-launcher" class="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center cursor-pointer shadow-xl shadow-purple-500/30 pulse-glow">
+  <span id="chat-launcher-icon" class="text-2xl">💬</span>
+</div>
+
+<div id="chat-window" class="fixed bottom-24 right-6 z-50 w-[92vw] max-w-sm glass rounded-3xl shadow-2xl hidden flex-col overflow-hidden" style="height:70vh; max-height:600px;">
+  <div class="p-4 bg-gradient-to-r from-purple-600/40 to-blue-600/40 flex items-center gap-3">
+    <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">🤖</div>
+    <div>
+      <div class="font-semibold text-sm">Erogian Assistant</div>
+      <div class="text-xs text-gray-300">Usually replies within minutes</div>
+    </div>
+  </div>
+  <div id="chat-body" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm"></div>
+  <div id="chat-input-area" class="p-3 border-t border-white/10 flex gap-2">
+    <input id="chat-input" type="text" placeholder="Type here..." class="flex-1 rounded-full px-4 py-2.5 text-sm">
+    <button id="chat-send" class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shrink-0">➤</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Particle hero canvas ---------- */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+window.addEventListener('resize',resize); resize();
+const N=90;
+for(let i=0;i<N;i++){particles.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+0.4,vx:(Math.random()-0.5)*.3,vy:(Math.random()-0.5)*.3,hue:Math.random()>0.5?'139,92,246':'59,130,246'});}
+let mouse={x:W/2,y:H/2};
+canvas.addEventListener('mousemove',e=>{const rect=canvas.getBoundingClientRect();mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;});
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  for(const p of particles){
+    p.x+=p.vx; p.y+=p.vy;
+    const dx=mouse.x-p.x, dy=mouse.y-p.y, dist=Math.hypot(dx,dy);
+    if(dist<160){p.x-=dx*0.003; p.y-=dy*0.003;}
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${p.hue},0.7)`; ctx.fill();
+  }
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const a=particles[i],b=particles[j]; const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<110){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(139,92,246,${0.12*(1-d/110)})`;ctx.stroke();}
+    }
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+
+/* ---------- Nav scroll bg ---------- */
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('mainnav');
+  if(window.scrollY>40){nav.classList.add('glass');}else{nav.classList.remove('glass');}
+});
+
+/* ---------- Hero entrance ---------- */
+gsap.timeline({defaults:{ease:'power3.out'}})
+  .to('[data-hero-tag]',{opacity:1,y:0,duration:.6})
+  .to('[data-hero-title]',{opacity:1,y:0,duration:.9},'-=.3')
+  .to('[data-hero-sub]',{opacity:1,y:0,duration:.8},'-=.5')
+  .to('[data-hero-cta]',{opacity:1,y:0,duration:.8},'-=.5');
+gsap.set('[data-hero-tag],[data-hero-title],[data-hero-sub],[data-hero-cta]',{y:24});
+
+gsap.to('[data-float="1"]',{y:-18,duration:3.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
+gsap.to('[data-float="2"]',{y:16,duration:2.6,repeat:-1,yoyo:true,ease:'sine.inOut',delay:.4});
+gsap.to('[data-float="3"]',{y:-14,duration:3.6,repeat:-1,yoyo:true,ease:'sine.inOut',delay:.2});
+gsap.to('[data-float="4"]',{y:14,duration:2.9,repeat:-1,yoyo:true,ease:'sine.inOut',delay:.6});
+
+/* ---------- Counters ---------- */
+gsap.registerPlugin(ScrollTrigger);
+document.querySelectorAll('.counter').forEach(el=>{
+  const target=+el.dataset.count;
+  ScrollTrigger.create({trigger:el,start:'top 90%',once:true,onEnter:()=>{
+    gsap.to(el,{innerText:target,duration:2,ease:'power1.out',snap:{innerText:1},onUpdate:function(){el.innerText=Math.round(this.targets()[0].innerText)+(target===98?'%':'+');}});
+  }});
+});
+
+/* ---------- Services data ---------- */
+const services=[
+ ['🌐','Website Development','Modern, blazing-fast websites that convert.'],
+ ['📱','Mobile Apps','iOS &amp; Android apps built for scale.'],
+ ['🤖','AI Automation','Automate repetitive work with custom AI.'],
+ ['🧠','AI Agents','Custom AI agents for your business, like Shazam AI.'],
+ ['✈️','Telegram Bots','Full-featured bots for community &amp; commerce.'],
+ ['💬','WhatsApp Bots','Automated sales &amp; support on WhatsApp.'],
+ ['🛠️','Custom Software','Bespoke systems built around your workflow.'],
+ ['🎨','Brand Identity','Complete visual identity systems.'],
+ ['🖋️','Logo Design','Memorable marks that scale across media.'],
+ ['🎬','Video Editing','Polished edits for social &amp; ads.'],
+ ['✨','Motion Graphics','Animated visuals that grab attention.'],
+ ['🧩','UI/UX Design','Interfaces people actually enjoy using.'],
+ ['🏢','Business Systems','Internal tools &amp; dashboards.'],
+ ['☁️','Cloud Deployment','Reliable, scalable infrastructure.'],
+ ['🔌','API Development','Robust APIs connecting your stack.'],
+ ['🛒','E-commerce','Stores built to sell, not just look good.'],
+ ['📄','Landing Pages','High-converting single pages for campaigns.'],
+ ['🚀','SaaS Development','Full SaaS products, start to scale.'],
+ ['🎓','Educational Platforms','LMS &amp; course platforms.'],
+ ['💳','Payment Integration','Paystack, Stripe &amp; Flutterwave, done right.'],
+];
+const grid=document.getElementById('services-grid');
+services.forEach(([icon,title,desc])=>{
+  grid.innerHTML+=`<div class="glass glow-border rounded-2xl p-6 card-float">
+    <div class="text-3xl mb-4">${icon}</div>
+    <div class="font-semibold mb-2">${title}</div>
+    <div class="text-sm text-gray-500 leading-relaxed">${desc}</div>
+  </div>`;
+});
+
+/* ---------- Portfolio data ---------- */
+const BASE='https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/';
+const portfolio=[
+  [BASE+'81409901a_b866a7493_whatsapp_image_989662273880892.jpg','WDS Nigeria — Youth Conference 2026','Full event branding &amp; flyer design'],
+  [BASE+'85f617b52_f534707b2_whatsapp_image_1530346825404106.jpg','Spice Kitchen Book','Complete book cover design, front &amp; back'],
+  [BASE+'d97c54327_6e42a3586_whatsapp_image_1773590597336939.jpg','Rainbow Palm Oil','Product packaging &amp; promotional design'],
+  [BASE+'404f5f9b9_3698b4fa8_whatsapp_image_1716239642906492.jpg','WDS Arts &amp; Culture Exhibition','Exhibition promo campaign design'],
+  [BASE+'566a9369d_e9085c280_whatsapp_image_1600780008312807.jpg','Velora AI Agent','Full brand &amp; logo design for AI startup'],
+  [BASE+'983f78b55_9b0b12657_whatsapp_image_1728823008155812.jpg','Arts &amp; Culture Campaign v1','Alternate campaign concept design'],
+];
+const pgrid=document.getElementById('portfolio-grid');
+portfolio.forEach(([img,title,desc])=>{
+  pgrid.innerHTML+=`<div class="glass rounded-2xl overflow-hidden card-float group">
+    <div class="aspect-[4/5] overflow-hidden"><img src="${img}" alt="${title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500"></div>
+    <div class="p-4"><div class="font-semibold text-sm mb-1">${title}</div><div class="text-xs text-gray-500">${desc}</div></div>
+  </div>`;
+});
+
+/* ---------- Testimonials ---------- */
+const testimonials=[
+  ['"It\\'s beautiful — exactly what we needed for the announcement."','WDS Nigeria GTA Team','Youth Conference Organizers'],
+  ['"Rainbow Palm Oil finally looks like the premium brand it is. Customers notice the difference."','Gladys Chekwube','Rainbow Palm Oil, Enugu'],
+  ['"The book cover captured exactly the warmth I wanted readers to feel before opening the first page."','Ebere Ugwu','Author, Spice Kitchen Book'],
+  ['"Fast, professional, and genuinely creative. Erogian gets the brief right the first time."','Event Committee','WDS Arts &amp; Culture Exhibition'],
+];
+const track=document.getElementById('testimonial-track');
+[...testimonials,...testimonials].forEach(([quote,name,role])=>{
+  track.innerHTML+=`<div class="glass rounded-2xl p-6 w-80 shrink-0">
+    <div class="text-yellow-400 text-sm mb-3">★★★★★</div>
+    <div class="text-sm text-gray-300 mb-4">${quote}</div>
+    <div class="font-semibold text-sm">${name}</div>
+    <div class="text-xs text-gray-500">${role}</div>
+  </div>`;
+});
+
+/* ---------- Pricing ---------- */
+const pricing=[
+ ['Starter Graphics','2,000',['Simple flyer','Social media post','Basic edits','48-hour delivery'],false],
+ ['Creative Pack','5,000',['Logo','Business flyer','Social media kit'],false],
+ ['Brand Starter','10,000',['Professional logo','Brand colors &amp; typography','Brand guide','Social graphics'],false],
+ ['Business Website','25,000',['Responsive website','SEO','Contact form','WhatsApp integration','Analytics'],true],
+ ['Business Pro','50,000',['Premium website','Dashboard &amp; CMS','Blog','Payment integration','SEO &amp; animations'],false],
+ ['AI Business','75,000',['Everything in Pro','AI chatbot','Automation','Booking system','CRM &amp; analytics'],false],
+ ['Enterprise','100,000+',['Everything','AI automation','Custom software','Admin dashboard','Dedicated support'],false],
+];
+const pricegrid=document.getElementById('pricing-grid');
+pricing.forEach(([title,price,features,highlight])=>{
+  pricegrid.innerHTML+=`<div class="rounded-2xl p-6 card-float ${highlight?'glow-border bg-gradient-to-b from-purple-500/10 to-blue-500/10 border border-purple-400/30':'glass'}">
+    ${highlight?'<div class="text-xs font-semibold text-purple-300 mb-2">MOST POPULAR</div>':''}
+    <div class="font-semibold mb-1">${title}</div>
+    <div class="display text-3xl font-bold mb-4">₦${price}</div>
+    <ul class="space-y-2 text-sm text-gray-400 mb-6">${features.map(f=>`<li>✓ ${f}</li>`).join('')}</ul>
+    <a href="#contact" class="block text-center py-2.5 rounded-full text-sm font-semibold ${highlight?'bg-gradient-to-r from-purple-500 to-blue-500':'bg-white/10 hover:bg-white/20'} transition">Get Started</a>
+  </div>`;
+});
+
+/* ---------- Chatbot logic ---------- */
+const FUNCTION_URL='https://superagent-3c6b0370.base44.app/functions/submitErogianLead';
+const chatLauncher=document.getElementById('chat-launcher');
+const chatWindow=document.getElementById('chat-window');
+const chatBody=document.getElementById('chat-body');
+const chatInput=document.getElementById('chat-input');
+const chatSend=document.getElementById('chat-send');
+
+let step=0;
+let lead={};
+const flow=[
+  {q:"Hi! 👋 I'm the Erogian assistant. What's your name?", key:'name'},
+  {q:"Nice to meet you! What's your email address?", key:'email'},
+  {q:"And a phone number (WhatsApp preferred) so we can reach you?", key:'phone'},
+  {q:"What's your business or brand name?", key:'business_name'},
+  {q:"Which service are you interested in? (e.g. Website, AI Agent, Branding, Logo, Automation)", key:'service'},
+  {q:"What's your budget range in Naira?", key:'budget'},
+  {q:"Tell me briefly about your project.", key:'project_description'},
+  {q:"Last one — what's your preferred day/time for a quick call?", key:'preferred_meeting_time'},
+];
+
+function addBot(msg){chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">${msg}</div>`;chatBody.scrollTop=chatBody.scrollHeight;}
+function addUser(msg){chatBody.innerHTML+=`<div class="chat-bubble-enter bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] ml-auto text-right">${msg}</div>`;chatBody.scrollTop=chatBody.scrollHeight;}
+
+function startChat(){
+  if(chatBody.children.length===0){
+    setTimeout(()=>addBot("Welcome to Erogian 🚀 I can answer questions, show pricing, or take your project details so the team gets back to you fast."),300);
+    setTimeout(()=>askNext(),1000);
+  }
+}
+function askNext(){
+  if(step<flow.length){addBot(flow[step].q);}
+  else{
+    addBot("Perfect — got everything I need! Sending this to the team on WhatsApp now. You'll hear back shortly. In the meantime, feel free to browse our portfolio or pricing above. 🙌");
+    submitLead();
+  }
+}
+async function submitLead(){
+  try{
+    await fetch(FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lead)});
+  }catch(e){ addBot("Hmm, I couldn't send that through — but no worries, message us directly on WhatsApp and we'll pick it up right away."); }
+}
+
+chatLauncher.addEventListener('click',()=>{
+  const isHidden=chatWindow.classList.contains('hidden');
+  chatWindow.classList.toggle('hidden');
+  chatWindow.classList.toggle('flex');
+  if(isHidden) startChat();
+});
+
+function handleSend(){
+  const val=chatInput.value.trim();
+  if(!val) return;
+  addUser(val);
+  chatInput.value='';
+  if(step<flow.length){
+    lead[flow[step].key]=val;
+    step++;
+    setTimeout(askNext,500);
+  } else {
+    setTimeout(()=>addBot("Thanks! We'll be in touch soon. You can also reach us anytime on WhatsApp via the Contact section below. 👇"),400);
+  }
+}
+chatSend.addEventListener('click',handleSend);
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSend();});
+</script>
+</body>
+</html>
