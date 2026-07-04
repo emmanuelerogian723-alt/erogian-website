@@ -75,6 +75,27 @@
   input:focus,textarea:focus,select:focus{outline:none; border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.2);}
   input::placeholder,textarea::placeholder{color:#6b7280;}
 </style>
+
+<script>
+(function(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    fetch('https://superagent-3c6b0370.base44.app/functions/logErogianVisit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        path: window.location.pathname,
+        referrer: document.referrer || 'direct',
+        utm_source: params.get('utm_source') || '',
+        utm_medium: params.get('utm_medium') || '',
+        utm_campaign: params.get('utm_campaign') || '',
+        user_agent: navigator.userAgent,
+        language: navigator.language
+      })
+    }).catch(function(){});
+  } catch(e) {}
+})();
+</script>
 </head>
 <body>
 <div class="noise"></div>
