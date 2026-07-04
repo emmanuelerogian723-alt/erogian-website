@@ -80,7 +80,7 @@
 (function(){
   try {
     var params = new URLSearchParams(window.location.search);
-    fetch('https://superagent-3c6b0370.base44.app/functions/logErogianVisit', {
+    fetch('https://base44.app/api/apps/6a3e3c3c76ad435fb80d320b/functions/logErogianVisit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -475,8 +475,8 @@ pricing.forEach(([title,price,features,highlight])=>{
 });
 
 /* ---------- Chatbot logic (AI-powered via Groq/OpenRouter + lead capture) ---------- */
-const LEAD_URL='https://superagent-3c6b0370.base44.app/functions/submitErogianLead';
-const CHAT_URL='https://superagent-3c6b0370.base44.app/functions/erogianChat';
+const LEAD_URL='https://base44.app/api/apps/6a3e3c3c76ad435fb80d320b/functions/submitErogianLead';
+const CHAT_URL='https://base44.app/api/apps/6a3e3c3c76ad435fb80d320b/functions/erogianChat';
 const chatLauncher=document.getElementById('chat-launcher');
 const chatWindow=document.getElementById('chat-window');
 const chatBody=document.getElementById('chat-body');
