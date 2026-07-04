@@ -54,7 +54,7 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 <a href="#home" class="display text-xl font-bold tracking-tight">EROGIAN<span class="text-purple-400">.</span></a>
 <div class="hidden lg:flex items-center gap-8 text-sm text-gray-300">
-<a href="#home" class="nav-link">Home</a><a href="#services" class="nav-link">Services</a><a href="#portfolio" class="nav-link">Portfolio</a><a href="#ai-products" class="nav-link">AI Products</a><a href="#estimator" class="nav-link">Estimator</a><a href="#testimonials" class="nav-link">Testimonials</a><a href="#pricing" class="nav-link">Pricing</a><a href="#contact" class="nav-link">Contact</a>
+<a href="#home" class="nav-link">Home</a><a href="#services" class="nav-link">Services</a><a href="#portfolio" class="nav-link">Portfolio</a><a href="#ai-products" class="nav-link">AI Products</a><a href="#estimator" class="nav-link">Estimator</a><a href="#testimonials" class="nav-link">Testimonials</a><a href="#pricing" class="nav-link">Pricing</a><a href="#book" class="nav-link">Book</a><a href="#contact" class="nav-link">Contact</a>
 </div>
 <a href="#contact" class="hidden md:inline-block px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black hover:bg-gray-200 transition">Book a Call</a>
 </div></nav>
@@ -167,7 +167,53 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-yellow-300 mb-2">Automation</div><div class="font-semibold mb-2">Automating Client Follow-Ups With WhatsApp Bots</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
 </div></div></section>
 
+
+<!-- APPOINTMENT BOOKING -->
+<section id="book" class="py-28 px-6 bg-[#07080b]"><div class="max-w-2xl mx-auto">
+<div class="text-center mb-12"><div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Book Appointment</div><h2 class="display text-4xl md:text-5xl font-bold">Schedule a <span class="grad-text">Free Consultation</span></h2><p class="text-gray-400 mt-4">Pick a date and time. We'll confirm on WhatsApp.</p></div>
+<div class="glass glow-border rounded-3xl p-8 md:p-10">
+<form id="appt-form" class="space-y-5">
+<div class="grid md:grid-cols-2 gap-5">
+<div><label class="text-sm text-gray-400 block mb-2">Your Name</label><input id="appt-name" type="text" placeholder="John Doe" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+<div><label class="text-sm text-gray-400 block mb-2">Phone / WhatsApp</label><input id="appt-phone" type="tel" placeholder="+234..." class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+</div>
+<div><label class="text-sm text-gray-400 block mb-2">Email</label><input id="appt-email" type="email" placeholder="you@email.com" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+<div><label class="text-sm text-gray-400 block mb-2">What do you need?</label><select id="appt-service" class="w-full rounded-xl px-4 py-3 text-sm">
+<option value="Website Development">Website Development</option>
+<option value="AI Agent / Chatbot">AI Agent / Chatbot</option>
+<option value="Branding & Logo Design">Branding & Logo Design</option>
+<option value="Automation">Automation</option>
+<option value="SaaS Product">SaaS Product</option>
+<option value="Other">Other</option>
+</select></div>
+<div class="grid md:grid-cols-2 gap-5">
+<div><label class="text-sm text-gray-400 block mb-2">Preferred Date</label><input id="appt-date" type="date" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+<div><label class="text-sm text-gray-400 block mb-2">Preferred Time</label><select id="appt-time" class="w-full rounded-xl px-4 py-3 text-sm">
+<option value="09:00 - 10:00">9:00 AM - 10:00 AM</option>
+<option value="10:00 - 11:00">10:00 AM - 11:00 AM</option>
+<option value="11:00 - 12:00">11:00 AM - 12:00 PM</option>
+<option value="12:00 - 13:00">12:00 PM - 1:00 PM</option>
+<option value="14:00 - 15:00">2:00 PM - 3:00 PM</option>
+<option value="15:00 - 16:00">3:00 PM - 4:00 PM</option>
+<option value="16:00 - 17:00">4:00 PM - 5:00 PM</option>
+</select></div>
+</div>
+<div><label class="text-sm text-gray-400 block mb-2">Project Notes (optional)</label><textarea id="appt-notes" rows="3" placeholder="Tell me briefly what you're looking for..." class="w-full rounded-xl px-4 py-3 text-sm"></textarea></div>
+<button type="submit" id="appt-submit" class="w-full py-3.5 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-[1.02] transition text-base">Book My Appointment</button>
+<div id="appt-result" class="hidden text-center py-4"></div>
+</form></div></div></section>
+
 <!-- CONTACT -->
+<section id="contact" class="py-28 px-6"><div class="max-w-4xl mx-auto text-center">
+<h2 class="display text-4xl md:text-5xl font-bold mb-6">Let's Build Your Next Big Thing</h2>
+<p class="text-gray-400 mb-10">Reach out directly, or book an appointment above.</p>
+<div class="flex flex-wrap justify-center gap-4">
+<a href="https://wa.me/2347045560291" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">WhatsApp</a>
+<a href="https://t.me/ShazamAi_official_bot" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Telegram</a>
+<a href="mailto:multipurposetalentedyounginven@gmail.com" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Email</a>
+<a href="https://github.com/emmanuelerogian723-alt" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">GitHub</a>
+<a href="https://x.com/Voscn247" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">X / Twitter</a>
+</div></div></section>
 <section id="contact" class="py-28 px-6"><div class="max-w-4xl mx-auto text-center">
 <h2 class="display text-4xl md:text-5xl font-bold mb-6">Let's Build Your Next Big Thing</h2>
 <p class="text-gray-400 mb-10">Reach out directly, or use the assistant in the corner to get a fast, guided quote.</p>
@@ -339,5 +385,26 @@ document.getElementById('chat-close').addEventListener('click',()=>{document.get
 function handleSend(){const v=chatInput.value.trim();if(!v)return;addUser(v);chatInput.value='';if(mode==='lead'){lead[flow[step].key]=v;step++;if(step<flow.length){setTimeout(()=>addBot(flow[step].q),500)}else{setTimeout(()=>{addBot("Perfect — got everything! 🙌 Sending to the team now. You'll hear back on WhatsApp shortly.");submitLead();mode='ai';setTimeout(()=>{addBot("Need anything else? I can help with pricing, payments, or reach Emmanuel on WhatsApp: "+WA_URL);addQR()},1500)},500)}}else{sendToAI(v)}}
 document.getElementById('chat-send').addEventListener('click',handleSend);
 chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSend()});
+
+/* Appointment form */
+document.getElementById('appt-form').addEventListener('submit',async(e)=>{
+e.preventDefault();
+const btn=document.getElementById('appt-submit');
+btn.textContent='Booking...';
+btn.disabled=true;
+const data={name:document.getElementById('appt-name').value,phone:document.getElementById('appt-phone').value,email:document.getElementById('appt-email').value,service:document.getElementById('appt-service').value,date:document.getElementById('appt-date').value,time_slot:document.getElementById('appt-time').value,notes:document.getElementById('appt-notes').value};
+try{
+const res=await fetch('https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/bookAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+const r=await res.json();
+if(r.status==='ok'){
+document.getElementById('appt-result').classList.remove('hidden');
+document.getElementById('appt-result').innerHTML='<div class="text-green-400 font-semibold text-lg">Appointment Booked!</div><div class="text-sm text-gray-400 mt-2">We will confirm on WhatsApp shortly.</div><a href="https://wa.me/2347045560291?text='+encodeURIComponent('Hi! I just booked an appointment for '+data.service+' on '+data.date+' at '+data.time_slot+'. My name is '+data.name)+'" target="_blank" class="inline-block mt-4 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-sm font-semibold">Confirm on WhatsApp</a>';
+document.getElementById('appt-form').querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=true);
+}else{alert('Something went wrong. WhatsApp: wa.me/2347045560291');btn.textContent='Book My Appointment';btn.disabled=false}
+}catch(err){alert('Connection error. WhatsApp: wa.me/2347045560291');btn.textContent='Book My Appointment';btn.disabled=false}
+});
+/* Set min date to today */
+const apptDate=document.getElementById('appt-date');
+if(apptDate){const today=new Date().toISOString().split('T')[0];apptDate.min=today}
 </script>
 </body></html>
