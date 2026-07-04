@@ -12,7 +12,7 @@ body{background:#050505;color:#eaeaea;font-family:-apple-system,Segoe UI,Roboto,
 .wrap{max-width:1100px;margin:0 auto;padding:30px 20px 80px}
 h1{font-size:26px;font-weight:700;margin-bottom:6px;background:linear-gradient(90deg,#3b82f6,#facc15);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:#888;font-size:13px;margin-bottom:24px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:26px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:26px}
 .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px}
 .card .num{font-size:28px;font-weight:800;color:#fff}
 .card .label{font-size:12px;color:#999;margin-top:4px}
@@ -20,30 +20,32 @@ h1{font-size:26px;font-weight:700;margin-bottom:6px;background:linear-gradient(9
 .panel h2{font-size:15px;margin-bottom:14px;color:#facc15}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;color:#888;font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
-td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.05);color:#ddd}
+td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.05);color:#ddd;word-break:break-word}
 .pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px}
 .pill-green{background:rgba(0,197,110,.15);color:#6ee7a0}
 .pill-yellow{background:rgba(250,204,21,.15);color:#facc15}
 .pill-blue{background:rgba(59,130,246,.15);color:#93c5fd}
 .pill-red{background:rgba(239,68,68,.15);color:#f87171}
+.pill-purple{background:rgba(139,92,246,.15);color:#c4b5fd}
 .locked{text-align:center;padding-top:120px}
 .locked input{background:#111;border:1px solid #333;color:#fff;padding:10px 14px;border-radius:8px;margin-top:14px;width:260px}
 .locked button{background:#3b82f6;color:#fff;border:none;padding:10px 18px;border-radius:8px;margin-left:8px;cursor:pointer}
 canvas{max-height:220px}
 .err{color:#f87171;text-align:center;padding:40px}
 .status-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.chat-msg{max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
 <div id="app" class="wrap">
 <div class="locked" id="lockScreen">
 <h1>Erogian Analytics</h1>
-<p class="sub">Enter your dashboard key to view visitor data</p>
+<p class="sub">Enter your dashboard key to view data</p>
 <div><input id="keyInput" type="password" placeholder="dashboard key" /><button onclick="unlock()">View</button></div>
 </div>
 </div>
 <script>
-const FN_URL='https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/getErogianAnalytics';
+const FN_URL='https://superagent-55bc0d3a.base44.app/functions/getErogianAnalytics';
 function unlock(){const key=document.getElementById('keyInput').value.trim();if(!key)return;localStorage.setItem('erogian_dash_key',key);load(key)}
 async function load(key){
 const app=document.getElementById('app');
@@ -55,35 +57,44 @@ const d=await res.json();render(d);
 }catch(e){app.innerHTML='<div class="err">Failed to load: '+e+'</div>'}
 }
 function row(n,c){return '<tr><td>'+n+'</td><td style="text-align:right"><span class="pill pill-blue">'+c+'</span></td></tr>'}
-function statusBadge(s){const m={pending:'pill-yellow',confirmed:'pill-green',completed:'pill-blue',cancelled:'pill-red'};return '<span class="status-badge '+m[s]+'">'+s+'</span>'}
+function statusBadge(s){const m={pending:'pill-yellow',confirmed:'pill-green',completed:'pill-blue',cancelled:'pill-red',new:'pill-purple'};return '<span class="status-badge '+(m[s]||'pill-blue')+'">'+s+'</span>'}
+function intentBadge(s){const m={pricing:'pill-yellow',payment:'pill-green',contact:'pill-blue',booking:'pill-purple',services:'pill-blue',greeting:'pill-green',fallback:'pill-red'};return '<span class="status-badge '+(m[s]||'pill-blue')+'">'+s+'</span>'}
+function esc(s){return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function render(d){
 const app=document.getElementById('app');
 const apptCount=d.totalAppointments||0;
 const apptByStatus=d.appointmentsByStatus||{};
-app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live visitor data for erogian website</div>'+
+const chatCount=d.totalChats||0;
+const chatsByIntent=d.chatsByIntent||{};
+const intentRows=Object.entries(chatsByIntent).sort((a,b)=>b[1]-a[1]).map(([n,c])=>row(n,c)).join('');
+app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live data for erogian website</div>'+
 '<div class="grid">'+
-'<div class="card"><div class="num">'+d.totalVisits+'</div><div class="label">Total Page Views</div></div>'+
-'<div class="card"><div class="num">'+d.totalLeads+'</div><div class="label">Leads Captured</div></div>'+
+'<div class="card"><div class="num">'+d.totalVisits+'</div><div class="label">Page Views</div></div>'+
+'<div class="card"><div class="num">'+d.totalLeads+'</div><div class="label">Leads</div></div>'+
 '<div class="card"><div class="num">'+apptCount+'</div><div class="label">Appointments</div></div>'+
-'<div class="card"><div class="num">'+(d.byDevice.find(x=>x.name==='mobile')?.count||0)+'</div><div class="label">Mobile Visits</div></div>'+
+'<div class="card"><div class="num">'+chatCount+'</div><div class="label">Chat Messages</div></div>'+
 '</div>'+
 '<div class="panel"><h2>Visits Over Time</h2><canvas id="dayChart"></canvas></div>'+
-'<div class="panel"><h2>Appointments Overview</h2><div class="grid" style="margin-bottom:0">'+
-'<div class="card"><div class="num" style="font-size:20px">'+(apptByStatus.pending||0)+'</div><div class="label">Pending</div></div>'+
+'<div class="grid" style="margin-bottom:20px">'+
+'<div class="card"><div class="num" style="font-size:20px">'+(apptByStatus.pending||0)+'</div><div class="label">Pending Appts</div></div>'+
 '<div class="card"><div class="num" style="font-size:20px">'+(apptByStatus.confirmed||0)+'</div><div class="label">Confirmed</div></div>'+
 '<div class="card"><div class="num" style="font-size:20px">'+(apptByStatus.completed||0)+'</div><div class="label">Completed</div></div>'+
 '<div class="card"><div class="num" style="font-size:20px">'+(apptByStatus.cancelled||0)+'</div><div class="label">Cancelled</div></div>'+
-'</div></div>'+
+'</div>'+
 '<div class="panel"><h2>Upcoming Appointments</h2><table><tr><th>Name</th><th>Service</th><th>Date</th><th>Time</th><th>Phone</th><th>Status</th></tr>'+
-(d.upcomingAppointments||[]).map(a=>'<tr><td>'+a.name+'</td><td>'+a.service+'</td><td>'+a.date+'</td><td>'+a.time_slot+'</td><td>'+a.phone+'</td><td>'+statusBadge(a.status)+'</td></tr>').join('')+
+(d.upcomingAppointments||[]).map(a=>'<tr><td>'+esc(a.name)+'</td><td>'+esc(a.service)+'</td><td>'+esc(a.date)+'</td><td>'+esc(a.time_slot)+'</td><td>'+esc(a.phone)+'</td><td>'+statusBadge(a.status)+'</td></tr>').join('')+
 '</table></div>'+
+'<div class="panel"><h2>Chatbot Conversations</h2><table><tr><th>Time</th><th>User Message</th><th>Intent</th><th>Bot Reply</th></tr>'+
+(d.recentChats||[]).map(c=>'<tr><td>'+new Date(c.date).toLocaleString()+'</td><td class="chat-msg" title="'+esc(c.user_message)+'">'+esc(c.user_message)+'</td><td>'+intentBadge(c.intent)+'</td><td class="chat-msg" title="'+esc(c.bot_reply)+'">'+esc(c.bot_reply)+'</td></tr>').join('')+
+'</table></div>'+
+'<div class="panel"><h2>Chat Intents Breakdown</h2><table><tr><th>Intent</th><th style="text-align:right">Count</th></tr>'+intentRows+'</table></div>'+
 '<div class="panel"><h2>Recent Leads</h2><table><tr><th>Name</th><th>Service</th><th>Budget</th><th>Email</th><th>Date</th></tr>'+
-(d.recentLeads||[]).map(l=>'<tr><td>'+l.name+'</td><td>'+l.service+'</td><td>'+l.budget+'</td><td>'+l.email+'</td><td>'+new Date(l.date).toLocaleDateString()+'</td></tr>').join('')+
+(d.recentLeads||[]).map(l=>'<tr><td>'+esc(l.name)+'</td><td>'+esc(l.service)+'</td><td>'+esc(l.budget)+'</td><td>'+esc(l.email)+'</td><td>'+new Date(l.date).toLocaleDateString()+'</td></tr>').join('')+
 '</table></div>'+
 '<div class="panel"><h2>Top Traffic Sources</h2><table><tr><th>Source</th><th style="text-align:right">Visits</th></tr>'+d.byReferrer.slice(0,10).map(r=>row(r.name,r.count)).join('')+'</table></div>'+
 '<div class="panel"><h2>Top Pages</h2><table><tr><th>Page</th><th style="text-align:right">Views</th></tr>'+d.byPage.slice(0,10).map(r=>row(r.name,r.count)).join('')+'</table></div>'+
 '<div class="panel"><h2>Device Breakdown</h2><table><tr><th>Device</th><th style="text-align:right">Visits</th></tr>'+d.byDevice.map(r=>row(r.name,r.count)).join('')+'</table></div>'+
-'<div class="panel"><h2>Recent Visits</h2><table><tr><th>Time</th><th>Page</th><th>From</th><th>Device</th></tr>'+d.recent.map(r=>'<tr><td>'+new Date(r.date).toLocaleString()+'</td><td>'+r.path+'</td><td>'+r.referrer+'</td><td>'+r.device+'</td></tr>').join('')+'</table></div>';
+'<div class="panel"><h2>Recent Visits</h2><table><tr><th>Time</th><th>Page</th><th>From</th><th>Device</th></tr>'+d.recent.map(r=>'<tr><td>'+new Date(r.date).toLocaleString()+'</td><td>'+esc(r.path)+'</td><td>'+esc(r.referrer)+'</td><td>'+esc(r.device)+'</td></tr>').join('')+'</table></div>';
 const ctx=document.getElementById('dayChart');
 new Chart(ctx,{type:'line',data:{labels:d.byDay.map(x=>x.name),datasets:[{label:'Visits',data:d.byDay.map(x=>x.count),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.15)',tension:0.3,fill:true}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EROGIAN — Building Digital Legacies | AI, Software & Creative Studio</title>
-<meta name="description" content="EROGIAN builds premium websites, AI agents, automation systems and brand identities for startups and businesses in Africa and beyond. AI-first. Design-obsessed. Results-driven.">
+<meta name="description" content="EROGIAN builds premium websites, AI agents, automation systems and brand identities for startups and businesses in Africa and beyond.">
 <meta name="keywords" content="Erogian, AI agency Nigeria, website development, AI automation, Shazam AI, brand identity, Telegram bots, WhatsApp bots, SaaS development">
 <meta property="og:title" content="EROGIAN — Building Digital Legacies">
 <meta property="og:description" content="Helping startups, businesses and creators transform ideas into profitable digital products through AI, software and creativity.">
@@ -12,7 +12,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://erogian.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -20,7 +20,7 @@
 {"@context":"https://schema.org","@type":"Organization","name":"EROGIAN","url":"https://erogian.com","description":"AI, software and creative studio building digital legacies.","founder":{"@type":"Person","name":"Emmanuel Ene Rejoice"},"sameAs":["https://x.com/erogian"]}
 </script>
 <style>
-:root{--bg:#050505;--bg2:#0a0c10;--navy:#0b0f1a;--blue:#3b82f6;--royal:#2b4bff;--purple:#8b5cf6;--gold:#d4af37;--orange:#ff8a3d;}
+:root{--bg:#050505;--purple:#8b5cf6;--blue:#3b82f6;--gold:#d4af37;}
 *{box-sizing:border-box;}html{scroll-behavior:smooth;}body{background:var(--bg);color:#f5f5f7;font-family:'Inter',sans-serif;overflow-x:hidden;}
 h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
 ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#222;border-radius:8px}
@@ -29,23 +29,27 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
 .glow-border{position:relative}.glow-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.5;transition:opacity .4s}.glow-border:hover::before{opacity:1}
 .card-float{transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}.card-float:hover{transform:translateY(-8px);box-shadow:0 25px 60px -15px rgba(59,130,246,.25)}
 #particle-canvas{position:absolute;inset:0;width:100%;height:100%}
-.noise{position:fixed;inset:0;pointer-events:none;opacity:.03;z-index:60;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.03;z-index:5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .nav-link{position:relative}.nav-link::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .3s}.nav-link:hover::after{width:100%}
 .pulse-glow{animation:pg 3s ease-in-out infinite}@keyframes pg{0%,100%{box-shadow:0 0 20px rgba(139,92,246,.4)}50%{box-shadow:0 0 45px rgba(59,130,246,.6)}}
 .marquee-track{display:flex;width:max-content;animation:marquee 30s linear infinite}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .chat-bubble-enter{animation:slideUp .4s ease both}@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .counter{font-variant-numeric:tabular-nums}
-input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff}
+input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff;position:relative;z-index:10;}
 input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.2)}
 input::placeholder,textarea::placeholder{color:#6b7280}
 .pay-btn{background:linear-gradient(135deg,#00C56E,#0C8B4B);color:#fff;border:none;cursor:pointer;transition:all .3s}.pay-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,197,110,.3)}
 .est-slider{-webkit-appearance:none;appearance:none;height:6px;border-radius:8px;background:rgba(255,255,255,.1);outline:none}.est-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);cursor:pointer;box-shadow:0 0 10px rgba(139,92,246,.5)}.est-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);cursor:pointer;border:none}
 .legal-link{color:#888;text-decoration:none;transition:color .2s}.legal-link:hover{color:#8b5cf6}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.hidden{display:none !important;}
+.modal-overlay:not(.hidden){display:flex !important;}
 .modal-content{background:#0a0c10;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:32px}
+.chip-active{background:linear-gradient(90deg,#8b5cf6,#3b82f6) !important;color:#fff !important;}
+.chat-link{color:#93c5fd;text-decoration:underline;}
 </style>
 <script>
-(function(){try{var p=new URLSearchParams(window.location.search);fetch('https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/logErogianVisit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:window.location.pathname,referrer:document.referrer||'direct',utm_source:p.get('utm_source')||'',utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',user_agent:navigator.userAgent,language:navigator.language})}).catch(function(){});}catch(e){}})();
+(function(){try{var p=new URLSearchParams(window.location.search);fetch('https://superagent-55bc0d3a.base44.app/functions/logErogianVisit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:window.location.pathname,referrer:document.referrer||'direct',utm_source:p.get('utm_source')||'',utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',user_agent:navigator.userAgent,language:navigator.language})}).catch(function(){});}catch(e){}})();
 </script>
 </head>
 <body>
@@ -56,20 +60,20 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <div class="hidden lg:flex items-center gap-8 text-sm text-gray-300">
 <a href="#home" class="nav-link">Home</a><a href="#services" class="nav-link">Services</a><a href="#portfolio" class="nav-link">Portfolio</a><a href="#ai-products" class="nav-link">AI Products</a><a href="#estimator" class="nav-link">Estimator</a><a href="#testimonials" class="nav-link">Testimonials</a><a href="#pricing" class="nav-link">Pricing</a><a href="#book" class="nav-link">Book</a><a href="#contact" class="nav-link">Contact</a>
 </div>
-<a href="#contact" class="hidden md:inline-block px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black hover:bg-gray-200 transition">Book a Call</a>
+<a href="#book" class="hidden md:inline-block px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black hover:bg-gray-200 transition">Book a Call</a>
 </div></nav>
 
 <section id="home" class="relative min-h-screen flex items-center justify-center px-6 pt-24 overflow-hidden">
 <canvas id="particle-canvas" class="opacity-70"></canvas>
-<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10 pointer-events-none"></div>
 <div class="relative z-20 max-w-5xl mx-auto text-center" data-hero>
-<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-gray-300 mb-8 opacity-0" data-hero-tag><span class="w-2 h-2 rounded-full bg-purple-400 pulse-glow"></span> AI-First Digital Studio · Nigeria & Global</div>
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-gray-300 mb-8 opacity-0" data-hero-tag><span class="w-2 h-2 rounded-full bg-purple-400 pulse-glow"></span> AI-First Digital Studio · Nigeria &amp; Global</div>
 <h1 class="display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight opacity-0" data-hero-title>Building <span class="grad-text">Digital Legacies</span><br> Through AI, Software &amp; Creativity</h1>
 <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto opacity-0" data-hero-sub>Helping startups, businesses and creators transform ideas into profitable digital products.</p>
 <div class="mt-10 flex flex-wrap items-center justify-center gap-4 opacity-0" data-hero-cta>
 <a href="#estimator" class="px-7 py-3.5 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 transition shadow-lg shadow-purple-500/30">Estimate Your Project</a>
 <a href="#portfolio" class="px-7 py-3.5 rounded-full font-semibold glass hover:bg-white/10 transition">View Portfolio</a>
-<a href="#contact" class="px-7 py-3.5 rounded-full font-semibold text-gray-300 hover:text-white transition">Book Consultation →</a>
+<a href="#book" class="px-7 py-3.5 rounded-full font-semibold text-gray-300 hover:text-white transition">Book Consultation →</a>
 </div></div>
 <div class="hidden md:block absolute left-[2%] top-[30%] glass rounded-2xl p-4 w-44 card-float z-20" data-float="1"><div class="text-xs text-gray-400 mb-1">AI Agent</div><div class="text-sm font-semibold">Shazam AI Online</div><div class="mt-2 h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full w-4/5 bg-gradient-to-r from-purple-400 to-blue-400"></div></div></div>
 <div class="hidden md:block absolute right-[2%] top-[22%] glass rounded-2xl p-4 w-48 card-float z-20" data-float="2"><div class="text-xs text-gray-400 mb-1">Analytics</div><div class="text-2xl font-bold grad-text">+248%</div><div class="text-xs text-gray-500">Client conversion lift</div></div>
@@ -118,33 +122,32 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">🎯</div><div><div class="font-semibold">Business-Focused</div><div class="text-sm text-gray-500">Design and code that drive real revenue.</div></div></div>
 <div class="flex gap-4"><div class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">🛠️</div><div><div class="font-semibold">Premium Support</div><div class="text-sm text-gray-500">You're never left on read after payment.</div></div></div>
 </div></div>
-<div class="relative"><img src="https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/cc40a727f_founder_3d.jpg" class="rounded-3xl w-full glow-border" alt="Emmanuel Ene Rejoice"><div class="absolute -bottom-6 -left-6 glass rounded-2xl p-4 pulse-glow"><div class="text-xs text-gray-400">Founder & Lead Engineer</div><div class="font-semibold">Emmanuel Ene Rejoice</div></div></div>
+<div class="relative"><img src="https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/cc40a727f_founder_3d.jpg" class="rounded-3xl w-full glow-border" alt="Emmanuel Ene Rejoice"><div class="absolute -bottom-6 -left-6 glass rounded-2xl p-4 pulse-glow"><div class="text-xs text-gray-400">Founder &amp; Lead Engineer</div><div class="font-semibold">Emmanuel Ene Rejoice</div></div></div>
 </div></section>
 
 <section id="testimonials" class="py-28 px-6"><div class="max-w-5xl mx-auto text-center mb-16"><div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Client Words</div><h2 class="display text-4xl md:text-5xl font-bold">Trusted By Real People &amp; Organizations</h2></div><div class="max-w-6xl mx-auto overflow-hidden"><div class="marquee-track gap-6" id="testimonial-track"></div></div></section>
 
-<!-- PROJECT ESTIMATOR -->
 <section id="estimator" class="py-28 px-6 bg-[#07080b]"><div class="max-w-3xl mx-auto">
-<div class="text-center mb-12"><div class="text-green-400 text-sm font-semibold tracking-widest uppercase mb-3">Smart Estimator</div><h2 class="display text-4xl md:text-5xl font-bold">Get an Instant <span class="grad-text">Project Estimate</span></h2><p class="text-gray-400 mt-4">Slide, pick, and get a ballpark price in seconds. No waiting, no back-and-forth.</p></div>
+<div class="text-center mb-12"><div class="text-green-400 text-sm font-semibold tracking-widest uppercase mb-3">Smart Estimator</div><h2 class="display text-4xl md:text-5xl font-bold">Get an Instant <span class="grad-text">Project Estimate</span></h2><p class="text-gray-400 mt-4">Slide, pick, and get a ballpark price in seconds.</p></div>
 <div class="glass glow-border rounded-3xl p-8 md:p-10"><div class="space-y-8">
 <div><label class="text-sm text-gray-400 block mb-3">What do you need? (Pick one or more)</label>
 <div class="flex flex-wrap gap-3" id="est-services">
-<button data-svc="website" data-price="25000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🌐 Website</button>
-<button data-svc="branding" data-price="10000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🎨 Branding</button>
-<button data-svc="ai" data-price="75000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🤖 AI Agent</button>
-<button data-svc="bot" data-price="30000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">💬 Chatbot</button>
-<button data-svc="logo" data-price="5000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🖋️ Logo</button>
-<button data-svc="automation" data-price="40000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">⚙️ Automation</button>
-<button data-svc="saas" data-price="100000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🚀 SaaS Product</button>
+<button type="button" data-svc="website" data-price="25000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🌐 Website</button>
+<button type="button" data-svc="branding" data-price="10000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🎨 Branding</button>
+<button type="button" data-svc="ai" data-price="75000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🤖 AI Agent</button>
+<button type="button" data-svc="bot" data-price="30000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">💬 Chatbot</button>
+<button type="button" data-svc="logo" data-price="5000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🖋️ Logo</button>
+<button type="button" data-svc="automation" data-price="40000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">⚙️ Automation</button>
+<button type="button" data-svc="saas" data-price="100000" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🚀 SaaS Product</button>
 </div></div>
 <div><label class="text-sm text-gray-400 block mb-3">Project complexity</label>
 <div class="flex items-center gap-4"><span class="text-xs text-gray-500">Simple</span><input type="range" min="1" max="5" value="3" class="est-slider flex-1" id="est-complexity"><span class="text-xs text-gray-500">Complex</span></div>
 <div class="text-xs text-gray-500 mt-2" id="est-complexity-label">Standard project</div></div>
 <div><label class="text-sm text-gray-400 block mb-3">How fast do you need it?</label>
 <div class="flex gap-3" id="est-timeline">
-<button data-speed="1.0" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">📅 Standard</button>
-<button data-speed="1.3" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">⚡ Rushed (+30%)</button>
-<button data-speed="1.6" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🔥 Express (+60%)</button>
+<button type="button" data-speed="1.0" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">📅 Standard</button>
+<button type="button" data-speed="1.3" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">⚡ Rushed (+30%)</button>
+<button type="button" data-speed="1.6" class="est-chip px-4 py-2 rounded-full glass text-sm hover:bg-white/10 transition">🔥 Express (+60%)</button>
 </div></div>
 <div class="border-t border-white/10 pt-8"><div class="flex items-center justify-between flex-wrap gap-4">
 <div><div class="text-sm text-gray-400">Estimated Total</div><div class="display text-4xl font-bold grad-text" id="est-total">₦0</div></div>
@@ -152,13 +155,11 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 </div><p class="text-xs text-gray-500 mt-4">This is a ballpark estimate. Final pricing depends on detailed requirements.</p></div>
 </div></div></div></section>
 
-<!-- PRICING -->
 <section id="pricing" class="py-28 px-6"><div class="max-w-6xl mx-auto">
 <div class="text-center mb-16"><div class="text-sm font-semibold tracking-widest uppercase mb-3" style="color:#d4af37;">Pricing</div><h2 class="display text-4xl md:text-5xl font-bold">Simple Pricing In Naira</h2><p class="text-gray-400 mt-4">No hidden fees. Pick a tier and pay instantly with Paystack.</p></div>
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" id="pricing-grid"></div>
 </div></section>
 
-<!-- BLOG -->
 <section id="blog" class="py-24 px-6 bg-[#07080b]"><div class="max-w-6xl mx-auto">
 <div class="text-center mb-12"><div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">Insights</div><h2 class="display text-4xl font-bold">From The Blog</h2></div>
 <div class="grid md:grid-cols-3 gap-6">
@@ -167,28 +168,26 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-yellow-300 mb-2">Automation</div><div class="font-semibold mb-2">Automating Client Follow-Ups With WhatsApp Bots</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
 </div></div></section>
 
-
-<!-- APPOINTMENT BOOKING -->
 <section id="book" class="py-28 px-6 bg-[#07080b]"><div class="max-w-2xl mx-auto">
 <div class="text-center mb-12"><div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Book Appointment</div><h2 class="display text-4xl md:text-5xl font-bold">Schedule a <span class="grad-text">Free Consultation</span></h2><p class="text-gray-400 mt-4">Pick a date and time. We'll confirm on WhatsApp.</p></div>
 <div class="glass glow-border rounded-3xl p-8 md:p-10">
 <form id="appt-form" class="space-y-5">
 <div class="grid md:grid-cols-2 gap-5">
-<div><label class="text-sm text-gray-400 block mb-2">Your Name</label><input id="appt-name" type="text" placeholder="John Doe" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
-<div><label class="text-sm text-gray-400 block mb-2">Phone / WhatsApp</label><input id="appt-phone" type="tel" placeholder="+234..." class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+<div><label class="text-sm text-gray-400 block mb-2">Your Name</label><input id="appt-name" name="appt-name" type="text" placeholder="John Doe" class="w-full rounded-xl px-4 py-3 text-sm" required autocomplete="name"></div>
+<div><label class="text-sm text-gray-400 block mb-2">Phone / WhatsApp</label><input id="appt-phone" name="appt-phone" type="tel" placeholder="+234..." class="w-full rounded-xl px-4 py-3 text-sm" required autocomplete="tel"></div>
 </div>
-<div><label class="text-sm text-gray-400 block mb-2">Email</label><input id="appt-email" type="email" placeholder="you@email.com" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
-<div><label class="text-sm text-gray-400 block mb-2">What do you need?</label><select id="appt-service" class="w-full rounded-xl px-4 py-3 text-sm">
+<div><label class="text-sm text-gray-400 block mb-2">Email</label><input id="appt-email" name="appt-email" type="email" placeholder="you@email.com" class="w-full rounded-xl px-4 py-3 text-sm" required autocomplete="email"></div>
+<div><label class="text-sm text-gray-400 block mb-2">What do you need?</label><select id="appt-service" name="appt-service" class="w-full rounded-xl px-4 py-3 text-sm">
 <option value="Website Development">Website Development</option>
 <option value="AI Agent / Chatbot">AI Agent / Chatbot</option>
-<option value="Branding & Logo Design">Branding & Logo Design</option>
+<option value="Branding &amp; Logo Design">Branding &amp; Logo Design</option>
 <option value="Automation">Automation</option>
 <option value="SaaS Product">SaaS Product</option>
 <option value="Other">Other</option>
 </select></div>
 <div class="grid md:grid-cols-2 gap-5">
-<div><label class="text-sm text-gray-400 block mb-2">Preferred Date</label><input id="appt-date" type="date" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
-<div><label class="text-sm text-gray-400 block mb-2">Preferred Time</label><select id="appt-time" class="w-full rounded-xl px-4 py-3 text-sm">
+<div><label class="text-sm text-gray-400 block mb-2">Preferred Date</label><input id="appt-date" name="appt-date" type="date" class="w-full rounded-xl px-4 py-3 text-sm" required></div>
+<div><label class="text-sm text-gray-400 block mb-2">Preferred Time</label><select id="appt-time" name="appt-time" class="w-full rounded-xl px-4 py-3 text-sm">
 <option value="09:00 - 10:00">9:00 AM - 10:00 AM</option>
 <option value="10:00 - 11:00">10:00 AM - 11:00 AM</option>
 <option value="11:00 - 12:00">11:00 AM - 12:00 PM</option>
@@ -198,12 +197,11 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <option value="16:00 - 17:00">4:00 PM - 5:00 PM</option>
 </select></div>
 </div>
-<div><label class="text-sm text-gray-400 block mb-2">Project Notes (optional)</label><textarea id="appt-notes" rows="3" placeholder="Tell me briefly what you're looking for..." class="w-full rounded-xl px-4 py-3 text-sm"></textarea></div>
+<div><label class="text-sm text-gray-400 block mb-2">Project Notes (optional)</label><textarea id="appt-notes" name="appt-notes" rows="3" placeholder="Tell me briefly what you're looking for..." class="w-full rounded-xl px-4 py-3 text-sm"></textarea></div>
 <button type="submit" id="appt-submit" class="w-full py-3.5 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-[1.02] transition text-base">Book My Appointment</button>
 <div id="appt-result" class="hidden text-center py-4"></div>
 </form></div></div></section>
 
-<!-- CONTACT -->
 <section id="contact" class="py-28 px-6"><div class="max-w-4xl mx-auto text-center">
 <h2 class="display text-4xl md:text-5xl font-bold mb-6">Let's Build Your Next Big Thing</h2>
 <p class="text-gray-400 mb-10">Reach out directly, or book an appointment above.</p>
@@ -214,197 +212,61 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <a href="https://github.com/emmanuelerogian723-alt" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">GitHub</a>
 <a href="https://x.com/Voscn247" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">X / Twitter</a>
 </div></div></section>
-<section id="contact" class="py-28 px-6"><div class="max-w-4xl mx-auto text-center">
-<h2 class="display text-4xl md:text-5xl font-bold mb-6">Let's Build Your Next Big Thing</h2>
-<p class="text-gray-400 mb-10">Reach out directly, or use the assistant in the corner to get a fast, guided quote.</p>
-<div class="flex flex-wrap justify-center gap-4">
-<a href="https://wa.me/2347045560291" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">WhatsApp</a>
-<a href="https://t.me/ShazamAi_official_bot" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Telegram</a>
-<a href="mailto:multipurposetalentedyounginven@gmail.com" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">Email</a>
-<a href="https://github.com/emmanuelerogian723-alt" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">GitHub</a>
-<a href="https://x.com/Voscn247" target="_blank" class="px-6 py-3 rounded-full glass hover:bg-white/10 transition">X / Twitter</a>
-</div></div></section>
 
 <footer class="py-10 px-6 border-t border-white/5 text-center text-sm text-gray-500">
 © 2026 EROGIAN. Building Digital Legacies. · Enugu &amp; Lagos, Nigeria<br>
-<a href="#" onclick="openModal('privacy');return false;" class="legal-link">Privacy Policy</a> · 
-<a href="#" onclick="openModal('terms');return false;" class="legal-link">Terms of Service</a> · 
-<a href="#" onclick="openModal('refund');return false;" class="legal-link">Refund Policy</a> · 
+<a href="#" onclick="openModal('privacy');return false;" class="legal-link">Privacy Policy</a> ·
+<a href="#" onclick="openModal('terms');return false;" class="legal-link">Terms of Service</a> ·
+<a href="#" onclick="openModal('refund');return false;" class="legal-link">Refund Policy</a> ·
 <a href="analytics.html" class="legal-link">Analytics</a>
 </footer>
 
-<!-- LEGAL MODALS -->
 <div id="modal-privacy" class="modal-overlay hidden"><div class="modal-content">
 <div class="flex justify-between items-center mb-6"><h2 class="display text-2xl font-bold">Privacy Policy</h2><button onclick="closeModal('privacy')" class="text-gray-400 hover:text-white text-2xl">×</button></div>
 <div class="space-y-4 text-sm text-gray-400">
 <p><strong class="text-gray-200">Last updated:</strong> July 2026</p>
 <p>EROGIAN ("we", "us") respects your privacy. This policy explains what data we collect and how we use it.</p>
-<p><strong class="text-gray-200">Data We Collect:</strong> When you visit our website, we log your page path, referring URL, browser type, device type, and language preference. When you use our chatbot to request a quote, we collect your name, email, phone number, business name, service interest, budget, project description, and preferred meeting time.</p>
-<p><strong class="text-gray-200">How We Use It:</strong> Visitor data is used anonymously to understand traffic patterns and improve our website. Lead data is used to contact you about your project inquiry and provide our services.</p>
-<p><strong class="text-gray-200">Payments:</strong> Payment processing is handled by Paystack. We do not store your card details. Paystack processes all transactions securely on their platform.</p>
-<p><strong class="text-gray-200">Data Retention:</strong> Visitor analytics are retained for up to 12 months. Lead information is retained for as long as needed to provide our services.</p>
-<p><strong class="text-gray-200">Third Parties:</strong> We use Paystack for payments and Base44 for hosting backend functions. These providers have their own privacy policies.</p>
-<p><strong class="text-gray-200">Your Rights:</strong> You may request access to, correction of, or deletion of your personal data by contacting us on WhatsApp at +2347045560291.</p>
-<p><strong class="text-gray-200">Cookies:</strong> This website does not use tracking cookies. We use localStorage only to remember your analytics dashboard key.</p>
-<p><strong class="text-gray-200">Contact:</strong> For privacy questions, reach us at multipurposetalentedyounginven@gmail.com or WhatsApp +2347045560291.</p>
+<p><strong class="text-gray-200">Data We Collect:</strong> Page path, referrer, browser/device type, language. Chatbot: name, email, phone, business name, service interest, budget, project description, meeting time. Booking: name, email, phone, service, date/time, notes.</p>
+<p><strong class="text-gray-200">Payments:</strong> Handled by Paystack. We never see or store your card details.</p>
+<p><strong class="text-gray-200">Your Rights:</strong> Request access, correction, or deletion by contacting us on WhatsApp at +2347045560291.</p>
+<p><strong class="text-gray-200">Contact:</strong> multipurposetalentedyounginven@gmail.com or WhatsApp +2347045560291.</p>
 </div></div></div>
 
 <div id="modal-terms" class="modal-overlay hidden"><div class="modal-content">
 <div class="flex justify-between items-center mb-6"><h2 class="display text-2xl font-bold">Terms of Service</h2><button onclick="closeModal('terms')" class="text-gray-400 hover:text-white text-2xl">×</button></div>
 <div class="space-y-4 text-sm text-gray-400">
 <p><strong class="text-gray-200">Last updated:</strong> July 2026</p>
-<p>By using the EROGIAN website and engaging our services, you agree to these terms.</p>
-<p><strong class="text-gray-200">Services:</strong> EROGIAN provides web development, AI automation, branding, design, and software development services. Specific deliverables, timelines, and pricing are agreed upon per project.</p>
-<p><strong class="text-gray-200">Payment:</strong> Pricing is in Nigerian Naira. Payments processed via Paystack. A 50% deposit is typically required before work begins, with balance due upon delivery.</p>
-<p><strong class="text-gray-200">Revisions:</strong> Each project includes a set number of revisions as agreed in the project scope. Additional revisions may incur extra charges.</p>
-<p><strong class="text-gray-200">Intellectual Property:</strong> Upon full payment, all deliverables become the client's property. EROGIAN retains the right to showcase completed work in our portfolio unless otherwise agreed.</p>
-<p><strong class="text-gray-200">Refunds:</strong> See our Refund Policy for details. Deposits cover initial work and are non-refundable once work has commenced.</p>
-<p><strong class="text-gray-200">AI Products:</strong> Shazam AI and other AI products are provided "as is" with no guarantee of uninterrupted service.</p>
-<p><strong class="text-gray-200">Contact:</strong> For questions about these terms, reach us on WhatsApp at +2347045560291.</p>
+<p><strong class="text-gray-200">Payment:</strong> Naira pricing, processed via Paystack. 50% deposit typically required before work begins.</p>
+<p><strong class="text-gray-200">Intellectual Property:</strong> Upon full payment, deliverables become the client's property. We retain the right to showcase work in our portfolio.</p>
+<p><strong class="text-gray-200">AI Products:</strong> Provided "as is" with no guarantee of uninterrupted service.</p>
+<p><strong class="text-gray-200">Contact:</strong> WhatsApp +2347045560291.</p>
 </div></div></div>
 
 <div id="modal-refund" class="modal-overlay hidden"><div class="modal-content">
 <div class="flex justify-between items-center mb-6"><h2 class="display text-2xl font-bold">Refund Policy</h2><button onclick="closeModal('refund')" class="text-gray-400 hover:text-white text-2xl">×</button></div>
 <div class="space-y-4 text-sm text-gray-400">
 <p><strong class="text-gray-200">Last updated:</strong> July 2026</p>
-<p>We want you to be happy with your project. Here's how refunds work:</p>
-<p><strong class="text-gray-200">Project Deposits:</strong> The 50% deposit covers initial design and development work. Once work has commenced, the deposit is non-refundable. If we haven't started yet, the deposit is fully refundable within 7 days.</p>
-<p><strong class="text-gray-200">Completed Projects:</strong> If you're unsatisfied with the final deliverable, we'll work with you to make revisions within the agreed scope. Refunds evaluated case-by-case.</p>
-<p><strong class="text-gray-200">AI Subscriptions:</strong> Monthly subscriptions are non-refundable once activated. You can cancel at any time and won't be charged for the next cycle.</p>
-<p><strong class="text-gray-200">Graphics &amp; Design:</strong> Due to the custom nature of design work, refunds are only available if no drafts have been provided.</p>
-<p><strong class="text-gray-200">How to Request:</strong> Contact us on WhatsApp at +2347045560291 or email multipurposetalentedyounginven@gmail.com with your payment reference.</p>
-<p><strong class="text-gray-200">Processing Time:</strong> Approved refunds are processed within 5-10 business days through Paystack.</p>
+<p><strong class="text-gray-200">Deposits:</strong> Non-refundable once work has commenced. Fully refundable within 7 days if work hasn't started.</p>
+<p><strong class="text-gray-200">AI Subscriptions:</strong> Non-refundable once activated; cancel anytime for the next cycle.</p>
+<p><strong class="text-gray-200">How to Request:</strong> WhatsApp +2347045560291 with your payment reference.</p>
 </div></div></div>
 
-<!-- PAYMENT MODAL -->
 <div id="modal-pay" class="modal-overlay hidden"><div class="modal-content" style="max-width:420px;text-align:center;">
 <div class="flex justify-between items-center mb-6"><h2 class="display text-xl font-bold">Pay for <span id="pay-plan-name"></span></h2><button onclick="closeModal('pay')" class="text-gray-400 hover:text-white text-2xl">×</button></div>
 <p class="text-gray-400 text-sm mb-6">Enter your email to receive a receipt and proceed to secure checkout.</p>
 <input id="pay-email" type="email" placeholder="your@email.com" class="w-full rounded-xl px-4 py-3 text-sm mb-4">
 <div class="display text-3xl font-bold grad-text mb-6" id="pay-amount-display"></div>
 <button id="pay-confirm-btn" onclick="initiatePayment()" class="w-full py-3.5 rounded-full font-semibold pay-btn text-base">Pay Securely with Paystack →</button>
-<p class="text-xs text-gray-500 mt-4">🔒 Your payment is processed securely by Paystack. We never see your card details.</p>
+<p class="text-xs text-gray-500 mt-4">🔒 Processed securely by Paystack. We never see your card details.</p>
 </div></div>
 
-<!-- CHATBOT -->
 <div id="chat-launcher" class="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center cursor-pointer shadow-xl shadow-purple-500/30 pulse-glow"><span class="text-2xl">💬</span></div>
 <div id="chat-window" class="fixed bottom-24 right-6 z-50 w-[92vw] max-w-sm glass rounded-3xl shadow-2xl hidden flex-col overflow-hidden" style="height:70vh;max-height:600px;">
 <div class="p-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-purple-500/10 to-blue-500/10">
 <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-lg">🤖</div><div><div class="font-semibold text-sm">Erogian AI Assistant</div><div class="text-xs text-green-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-400"></span> Online</div></div></div>
 <button id="chat-close" class="text-gray-400 hover:text-white text-xl">×</button></div>
 <div id="chat-body" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm"></div>
-<div class="p-3 border-t border-white/10 flex gap-2"><input id="chat-input" type="text" placeholder="Ask about pricing, services, payments..." class="flex-1 rounded-full px-4 py-2.5 text-sm"><button id="chat-send" class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shrink-0">➤</button></div>
+<div class="p-3 border-t border-white/10 flex gap-2"><input id="chat-input" type="text" placeholder="Ask about pricing, services, payments..." class="flex-1 rounded-full px-4 py-2.5 text-sm"><button id="chat-send" type="button" class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shrink-0">➤</button></div>
 </div>
-<script>
-/* Modal helpers */
-function openModal(n){document.getElementById('modal-'+n).classList.remove('hidden')}
-function closeModal(n){document.getElementById('modal-'+n).classList.add('hidden')}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden')}));
-
-/* Payment */
-let curPlan='',curAmt=0;
-function openPaymentModal(name,amt){curPlan=name;curAmt=amt;document.getElementById('pay-plan-name').textContent=name;document.getElementById('pay-amount-display').textContent='₦'+amt.toLocaleString();document.getElementById('pay-email').value='';openModal('pay')}
-async function initiatePayment(){
-const email=document.getElementById('pay-email').value.trim();
-if(!email||!email.includes('@')){alert('Please enter a valid email');return}
-const btn=document.getElementById('pay-confirm-btn');btn.textContent='Redirecting...';btn.disabled=true;
-try{const res=await fetch('https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/erogianPay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:curPlan,amount:curAmt,email:email})});
-const data=await res.json();
-if(data.status==='ok'&&data.authorization_url){window.location.href=data.authorization_url}
-else{alert(data.message||'Payment failed. WhatsApp: wa.me/2347045560291');btn.textContent='Pay Securely with Paystack →';btn.disabled=false}
-}catch(e){alert('Connection error. WhatsApp: wa.me/2347045560291');btn.textContent='Pay Securely with Paystack →';btn.disabled=false}}
-
-/* Payment success banner */
-if(new URLSearchParams(window.location.search).get('payment')==='success'){setTimeout(()=>{const b=document.createElement('div');b.className='fixed top-20 left-1/2 -translate-x-1/2 z-[60] glass rounded-2xl px-6 py-4 text-center';b.innerHTML='<div class="text-green-400 font-semibold">✅ Payment Successful!</div><div class="text-sm text-gray-400 mt-1">We\'ll reach out to you on WhatsApp shortly.</div>';document.body.appendChild(b);setTimeout(()=>b.remove(),6000)},1000)}
-
-/* Particles */
-(function(){const c=document.getElementById('particle-canvas');if(!c)return;const ctx=c.getContext('2d');let w,h,p=[];
-function r(){w=c.width=c.offsetWidth;h=c.height=c.offsetHeight}r();window.addEventListener('resize',r);
-for(let i=0;i<80;i++)p.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+.5});
-function loop(){ctx.clearRect(0,0,w,h);p.forEach(o=>{o.x+=o.vx;o.y+=o.vy;if(o.x<0||o.x>w)o.vx*=-1;if(o.y<0||o.y>h)o.vy*=-1;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fillStyle='rgba(139,92,246,'+(.3+Math.random()*.3)+')';ctx.fill()});
-for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.beginPath();ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.strokeStyle='rgba(59,130,246,'+(1-d/120)*.15+')';ctx.lineWidth=1;ctx.stroke()}}requestAnimationFrame(loop)}loop()})();
-
-/* Hero anim */
-gsap.registerPlugin(ScrollTrigger);
-gsap.timeline().to('[data-hero-tag]',{opacity:1,duration:.6}).to('[data-hero-title]',{opacity:1,duration:.8},'-.3').to('[data-hero-sub]',{opacity:1,duration:.6},'-.4').to('[data-hero-cta]',{opacity:1,duration:.5},'-.3');
-gsap.utils.toArray('[data-float]').forEach((el,i)=>gsap.to(el,{y:'+=12',duration:2+i,delay:i*.2,repeat:-1,yoyo:true,ease:'sine.inOut'}));
-
-/* Nav scroll */
-const nav=document.getElementById('mainnav');
-window.addEventListener('scroll',()=>{if(window.scrollY>60){nav.classList.add('glass');nav.style.paddingTop='8px';nav.style.paddingBottom='8px'}else{nav.classList.remove('glass');nav.style.paddingTop='';nav.style.paddingBottom=''}});
-
-/* Counters */
-document.querySelectorAll('.counter').forEach(el=>{const t=+el.dataset.count;ScrollTrigger.create({trigger:el,start:'top 90%',once:true,onEnter:()=>{gsap.to(el,{innerText:t,duration:2,ease:'power1.out',snap:{innerText:1},onUpdate:function(){el.innerText=Math.round(this.targets()[0].innerText)+(t===98?'%':'+')}})}})});
-
-/* Services */
-const services=[['🌐','Website Development','Modern, blazing-fast websites that convert.'],['📱','Mobile Apps','iOS &amp; Android apps built for scale.'],['🤖','AI Automation','Automate repetitive work with custom AI.'],['🧠','AI Agents','Custom AI agents for your business, like Shazam AI.'],['✈️','Telegram Bots','Full-featured bots for community &amp; commerce.'],['💬','WhatsApp Bots','Automated sales &amp; support on WhatsApp.'],['🛠️','Custom Software','Bespoke systems built around your workflow.'],['🎨','Brand Identity','Complete visual identity systems.'],['🖋️','Logo Design','Memorable marks that scale across media.'],['🎬','Video Editing','Polished edits for social &amp; ads.'],['✨','Motion Graphics','Animated visuals that grab attention.'],['🧩','UI/UX Design','Interfaces people actually enjoy using.'],['🏢','Business Systems','Internal tools &amp; dashboards.'],['☁️','Cloud Deployment','Reliable, scalable infrastructure.'],['🔌','API Development','Robust APIs connecting your stack.'],['🛒','E-commerce','Stores built to sell, not just look good.'],['📄','Landing Pages','High-converting single pages for campaigns.'],['🚀','SaaS Development','Full SaaS products, start to scale.'],['🎓','Educational Platforms','LMS &amp; course platforms.'],['💳','Payment Integration','Paystack, Stripe &amp; Flutterwave, done right.']];
-const sgrid=document.getElementById('services-grid');
-services.forEach(([i,t,d])=>{sgrid.innerHTML+=`<div class="glass glow-border rounded-2xl p-6 card-float"><div class="text-3xl mb-4">${i}</div><div class="font-semibold mb-2">${t}</div><div class="text-sm text-gray-500 leading-relaxed">${d}</div></div>`});
-
-/* Portfolio */
-const PB='https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/';
-const portfolio=[[PB+'81409901a_b866a7493_whatsapp_image_989662273880892.jpg','WDS Nigeria — Youth Conference 2026','Full event branding &amp; flyer design'],[PB+'85f617b52_f534707b2_whatsapp_image_1530346825404106.jpg','Spice Kitchen Book','Complete book cover design, front &amp; back'],[PB+'d97c54327_6e42a3586_whatsapp_image_1773590597336939.jpg','Rainbow Palm Oil','Product packaging &amp; promotional design'],[PB+'404f5f9b9_3698b4fa8_whatsapp_image_1716239642906492.jpg','WDS Arts &amp; Culture Exhibition','Exhibition promo campaign design'],[PB+'566a9369d_e9085c280_whatsapp_image_1600780008312807.jpg','Velora AI Agent','Full brand &amp; logo design for AI startup'],[PB+'983f78b55_9b0b12657_whatsapp_image_1728823008155812.jpg','Arts &amp; Culture Campaign v1','Alternate campaign concept design']];
-const pgrid=document.getElementById('portfolio-grid');
-portfolio.forEach(([img,t,d])=>{pgrid.innerHTML+=`<div class="glass rounded-2xl overflow-hidden card-float group"><div class="aspect-[4/5] overflow-hidden"><img src="${img}" alt="${t}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500"></div><div class="p-4"><div class="font-semibold text-sm mb-1">${t}</div><div class="text-xs text-gray-500">${d}</div></div></div>`});
-
-/* Testimonials */
-const testimonials=[["It's beautiful — exactly what we needed for the announcement.",'WDS Nigeria GTA Team','Youth Conference Organizers'],['"Rainbow Palm Oil finally looks like the premium brand it is."','Gladys Chekwube','Rainbow Palm Oil, Enugu'],['"The book cover captured exactly the warmth I wanted readers to feel."','Ebere Ugwu','Author, Spice Kitchen Book'],['"Fast, professional, and genuinely creative. Erogian gets the brief right."','Event Committee','WDS Arts &amp; Culture Exhibition']];
-const track=document.getElementById('testimonial-track');
-[...testimonials,...testimonials].forEach(([q,n,r])=>{track.innerHTML+=`<div class="glass rounded-2xl p-6 w-80 shrink-0"><div class="text-yellow-400 text-sm mb-3">★★★★★</div><div class="text-sm text-gray-300 mb-4">${q}</div><div class="font-semibold text-sm">${n}</div><div class="text-xs text-gray-500">${r}</div></div>`});
-
-/* Pricing with Paystack */
-const pricing=[['Starter Graphics','2,000',2000,['Simple flyer','Social media post','Basic edits','48-hour delivery'],false],['Creative Pack','5,000',5000,['Logo','Business flyer','Social media kit'],false],['Brand Starter','10,000',10000,['Professional logo','Brand colors &amp; typography','Brand guide','Social graphics'],false],['Business Website','25,000',25000,['Responsive website','SEO','Contact form','WhatsApp integration','Analytics'],true],['Business Pro','50,000',50000,['Premium website','Dashboard &amp; CMS','Blog','Payment integration','SEO &amp; animations'],false],['AI Business','75,000',75000,['Everything in Pro','AI chatbot','Automation','Booking system','CRM &amp; analytics'],false],['Enterprise','100,000+',100000,['Everything','AI automation','Custom software','Admin dashboard','Dedicated support'],false]];
-const pricegrid=document.getElementById('pricing-grid');
-pricing.forEach(([title,dp,np,f,h])=>{const ent=title==='Enterprise';pricegrid.innerHTML+=`<div class="rounded-2xl p-6 card-float ${h?'glow-border bg-gradient-to-b from-purple-500/10 to-blue-500/10 border border-purple-400/30':'glass'}">${h?'<div class="text-xs font-semibold text-purple-300 mb-2">MOST POPULAR</div>':''}<div class="font-semibold mb-1">${title}</div><div class="display text-3xl font-bold mb-4">₦${dp}</div><ul class="space-y-2 text-sm text-gray-400 mb-6">${f.map(x=>`<li>✓ ${x}</li>`).join('')}</ul>${ent?`<a href="https://wa.me/2347045560291" target="_blank" class="block text-center py-2.5 rounded-full text-sm font-semibold bg-white/10 hover:bg-white/20 transition">Contact Us</a>`:`<button onclick="openPaymentModal('${title}',${np})" class="pay-btn block w-full text-center py-2.5 rounded-full text-sm font-semibold transition">Pay Now with Paystack</button>`}</div>`});
-
-/* Estimator */
-let estSel={},estCx=3,estSp=1.0;const cxLabels=['','Basic','Simple','Standard','Advanced','Complex'];
-function updEst(){let base=0;Object.values(estSel).forEach(p=>base+=p);const mult=(0.6+estCx*0.2)*estSp;const total=Math.round(base*mult);document.getElementById('est-total').textContent='₦'+total.toLocaleString();const svc=Object.keys(estSel).join(', ')||'No services selected';const msg=`Hi Erogian! I used your estimator. Services: ${svc}. Complexity: ${cxLabels[estCx]}. Estimated: ₦${total.toLocaleString()}. I'd like to discuss my project.`;document.getElementById('est-whatsapp').href='https://wa.me/2347045560291?text='+encodeURIComponent(msg)}
-document.querySelectorAll('#est-services .est-chip').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.svc,p=+b.dataset.price;if(estSel[s]){delete estSel[s];b.classList.remove('bg-gradient-to-r','from-purple-500','to-blue-500');b.classList.add('glass')}else{estSel[s]=p;b.classList.remove('glass');b.classList.add('bg-gradient-to-r','from-purple-500','to-blue-500')}updEst()}));
-document.querySelectorAll('#est-timeline .est-chip').forEach(b=>b.addEventListener('click',()=>{estSp=+b.dataset.speed;document.querySelectorAll('#est-timeline .est-chip').forEach(x=>{x.classList.remove('bg-gradient-to-r','from-purple-500','to-blue-500');x.classList.add('glass')});b.classList.remove('glass');b.classList.add('bg-gradient-to-r','from-purple-500','to-blue-500');updEst()}));
-document.getElementById('est-complexity').addEventListener('input',e=>{estCx=+e.target.value;document.getElementById('est-complexity-label').textContent=cxLabels[estCx]+' project';updEst()});
-document.querySelector('#est-timeline .est-chip').click();updEst();
-
-/* Chatbot */
-const LEAD_URL='https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/submitErogianLead';
-const CHAT_URL='https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/erogianChat';
-const WA_URL='https://wa.me/2347045560291';
-const chatBody=document.getElementById('chat-body'),chatInput=document.getElementById('chat-input');
-let mode='ai',aiHist=[],step=0,lead={};
-const flow=[{q:"Great — let's get your project details. What's your name?",key:'name'},{q:"Nice to meet you! What's your email address?",key:'email'},{q:"And a phone number (WhatsApp preferred) so we can reach you?",key:'phone'},{q:"What's your business or brand name?",key:'business_name'},{q:"Which service are you interested in? (e.g. Website, AI Agent, Branding, Logo, Automation)",key:'service'},{q:"What's your budget range in Naira?",key:'budget'},{q:"Tell me briefly about your project.",key:'project_description'},{q:"Last one — what's your preferred day/time for a quick call?",key:'preferred_meeting_time'}];
-function addBot(m){chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">${m}</div>`;chatBody.scrollTop=chatBody.scrollHeight}
-function addUser(m){chatBody.innerHTML+=`<div class="chat-bubble-enter bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] ml-auto text-right">${m}</div>`;chatBody.scrollTop=chatBody.scrollHeight}
-function addQR(){const qr=document.createElement('div');qr.className='chat-bubble-enter flex flex-wrap gap-2';qr.innerHTML=`<button class="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition" onclick="chatQR('pricing')">💰 Pricing</button><button class="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition" onclick="chatQR('payment')">💳 Pay Now</button><button class="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition" onclick="chatQR('whatsapp')">💬 WhatsApp</button><button class="text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition" onclick="chatQR('services')">🛠️ Services</button>`;chatBody.appendChild(qr);chatBody.scrollTop=chatBody.scrollHeight}
-function chatQR(t){const m={pricing:'How much do your services cost?',payment:'I want to pay now',whatsapp:'What is your WhatsApp number?',services:'What services do you offer?'};if(m[t]){addUser(m[t]);sendToAI(m[t])}}
-function addQuote(){chatBody.innerHTML+=`<div class="chat-bubble-enter"><button id="quote-btn" class="text-xs px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 font-semibold">📋 Get a Project Quote</button></div>`;chatBody.scrollTop=chatBody.scrollHeight;document.getElementById('quote-btn').addEventListener('click',()=>{mode='lead';step=0;lead={};addBot(flow[0].q)})}
-function startChat(){if(chatBody.children.length===0){setTimeout(()=>addBot("Hey! 👋 I'm the Erogian AI assistant. I can help with pricing, payments, services, or connect you with the team."),300);setTimeout(addQR,800);setTimeout(addQuote,1200)}}
-async function sendToAI(msg){const tid='t'+Date.now();chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%] text-gray-400" id="${tid}">typing…</div>`;chatBody.scrollTop=chatBody.scrollHeight;try{const res=await fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:aiHist})});const data=await res.json();document.getElementById(tid)?.remove();addBot(data.reply||"Sorry, could you rephrase?");setTimeout(addQR,500);aiHist.push({role:'user',content:msg});aiHist.push({role:'assistant',content:data.reply});if(aiHist.length>12)aiHist=aiHist.slice(-12)}catch(e){document.getElementById(tid)?.remove();addBot("I'm having trouble. Reach Emmanuel directly: "+WA_URL)}}
-async function submitLead(){try{await fetch(LEAD_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lead)})}catch(e){}}
-document.getElementById('chat-launcher').addEventListener('click',()=>{const h=document.getElementById('chat-window').classList.contains('hidden');document.getElementById('chat-window').classList.toggle('hidden');document.getElementById('chat-window').classList.toggle('flex');if(h)startChat()});
-document.getElementById('chat-close').addEventListener('click',()=>{document.getElementById('chat-window').classList.add('hidden');document.getElementById('chat-window').classList.remove('flex')});
-function handleSend(){const v=chatInput.value.trim();if(!v)return;addUser(v);chatInput.value='';if(mode==='lead'){lead[flow[step].key]=v;step++;if(step<flow.length){setTimeout(()=>addBot(flow[step].q),500)}else{setTimeout(()=>{addBot("Perfect — got everything! 🙌 Sending to the team now. You'll hear back on WhatsApp shortly.");submitLead();mode='ai';setTimeout(()=>{addBot("Need anything else? I can help with pricing, payments, or reach Emmanuel on WhatsApp: "+WA_URL);addQR()},1500)},500)}}else{sendToAI(v)}}
-document.getElementById('chat-send').addEventListener('click',handleSend);
-chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSend()});
-
-/* Appointment form */
-document.getElementById('appt-form').addEventListener('submit',async(e)=>{
-e.preventDefault();
-const btn=document.getElementById('appt-submit');
-btn.textContent='Booking...';
-btn.disabled=true;
-const data={name:document.getElementById('appt-name').value,phone:document.getElementById('appt-phone').value,email:document.getElementById('appt-email').value,service:document.getElementById('appt-service').value,date:document.getElementById('appt-date').value,time_slot:document.getElementById('appt-time').value,notes:document.getElementById('appt-notes').value};
-try{
-const res=await fetch('https://app.base44.com/api/apps/6a37c01bd442f2d055bc0d3a/functions/bookAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-const r=await res.json();
-if(r.status==='ok'){
-document.getElementById('appt-result').classList.remove('hidden');
-document.getElementById('appt-result').innerHTML='<div class="text-green-400 font-semibold text-lg">Appointment Booked!</div><div class="text-sm text-gray-400 mt-2">We will confirm on WhatsApp shortly.</div><a href="https://wa.me/2347045560291?text='+encodeURIComponent('Hi! I just booked an appointment for '+data.service+' on '+data.date+' at '+data.time_slot+'. My name is '+data.name)+'" target="_blank" class="inline-block mt-4 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-sm font-semibold">Confirm on WhatsApp</a>';
-document.getElementById('appt-form').querySelectorAll('input,textarea,select,button').forEach(el=>el.disabled=true);
-}else{alert('Something went wrong. WhatsApp: wa.me/2347045560291');btn.textContent='Book My Appointment';btn.disabled=false}
-}catch(err){alert('Connection error. WhatsApp: wa.me/2347045560291');btn.textContent='Book My Appointment';btn.disabled=false}
-});
-/* Set min date to today */
-const apptDate=document.getElementById('appt-date');
-if(apptDate){const today=new Date().toISOString().split('T')[0];apptDate.min=today}
-</script>
+<script src="app.js"></script>
 </body></html>

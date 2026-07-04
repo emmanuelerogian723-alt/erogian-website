@@ -1,9 +1,16 @@
-[build]
-  publish = "."
-  command = ""
-
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+
+[[redirects]]
+  from = "/analytics"
+  to = "/analytics.html"
+  status = 301
