@@ -453,18 +453,21 @@ pricing.forEach(([title,price,features,highlight])=>{
   </div>`;
 });
 
-/* ---------- Chatbot logic ---------- */
-const FUNCTION_URL='https://superagent-3c6b0370.base44.app/functions/submitErogianLead';
+/* ---------- Chatbot logic (AI-powered via Groq/OpenRouter + lead capture) ---------- */
+const LEAD_URL='https://superagent-3c6b0370.base44.app/functions/submitErogianLead';
+const CHAT_URL='https://superagent-3c6b0370.base44.app/functions/erogianChat';
 const chatLauncher=document.getElementById('chat-launcher');
 const chatWindow=document.getElementById('chat-window');
 const chatBody=document.getElementById('chat-body');
 const chatInput=document.getElementById('chat-input');
 const chatSend=document.getElementById('chat-send');
 
+let mode='ai'; // 'ai' or 'lead'
+let aiHistory=[];
 let step=0;
 let lead={};
 const flow=[
-  {q:"Hi! 👋 I'm the Erogian assistant. What's your name?", key:'name'},
+  {q:"Great — let's get your project details. What's your name?", key:'name'},
   {q:"Nice to meet you! What's your email address?", key:'email'},
   {q:"And a phone number (WhatsApp preferred) so we can reach you?", key:'phone'},
   {q:"What's your business or brand name?", key:'business_name'},
@@ -474,25 +477,48 @@ const flow=[
   {q:"Last one — what's your preferred day/time for a quick call?", key:'preferred_meeting_time'},
 ];
 
-function addBot(msg){chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">${msg}</div>`;chatBody.scrollTop=chatBody.scrollHeight;}
+function addBot(msg,isTyping){chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]" ${isTyping?'id="typing-bubble"':''}>${msg}</div>`;chatBody.scrollTop=chatBody.scrollHeight;}
 function addUser(msg){chatBody.innerHTML+=`<div class="chat-bubble-enter bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] ml-auto text-right">${msg}</div>`;chatBody.scrollTop=chatBody.scrollHeight;}
+function addQuoteButton(){
+  chatBody.innerHTML+=`<div class="chat-bubble-enter"><button id="quote-btn" class="text-xs px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 font-semibold">📋 Get a Project Quote</button></div>`;
+  chatBody.scrollTop=chatBody.scrollHeight;
+  document.getElementById('quote-btn').addEventListener('click',startLeadFlow);
+}
 
 function startChat(){
   if(chatBody.children.length===0){
-    setTimeout(()=>addBot("Welcome to Erogian 🚀 I can answer questions, show pricing, or take your project details so the team gets back to you fast."),300);
-    setTimeout(()=>askNext(),1000);
+    setTimeout(()=>addBot("Hey! 👋 I'm the Erogian AI assistant — ask me anything about our services, pricing, or Shazam AI. Or tap below to get a quick project quote."),300);
+    setTimeout(()=>addQuoteButton(),900);
   }
 }
-function askNext(){
-  if(step<flow.length){addBot(flow[step].q);}
-  else{
-    addBot("Perfect — got everything I need! Sending this to the team on WhatsApp now. You'll hear back shortly. In the meantime, feel free to browse our portfolio or pricing above. 🙌");
-    submitLead();
+
+function startLeadFlow(){
+  mode='lead'; step=0; lead={};
+  addBot(flow[0].q);
+}
+
+async function sendToAI(userMsg){
+  const typingId='typing-'+Date.now();
+  chatBody.innerHTML+=`<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%] text-gray-400" id="${typingId}">typing…</div>`;
+  chatBody.scrollTop=chatBody.scrollHeight;
+  try{
+    const res=await fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,history:aiHistory})});
+    const data=await res.json();
+    document.getElementById(typingId)?.remove();
+    const reply=data.reply || "Sorry, I didn't quite catch that — could you rephrase?";
+    addBot(reply);
+    aiHistory.push({role:'user',content:userMsg});
+    aiHistory.push({role:'assistant',content:reply});
+    if(aiHistory.length>12) aiHistory=aiHistory.slice(-12);
+  }catch(e){
+    document.getElementById(typingId)?.remove();
+    addBot("Hmm, I'm having connection trouble. You can reach the team directly on WhatsApp — link in the Contact section below.");
   }
 }
+
 async function submitLead(){
   try{
-    await fetch(FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lead)});
+    await fetch(LEAD_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lead)});
   }catch(e){ addBot("Hmm, I couldn't send that through — but no worries, message us directly on WhatsApp and we'll pick it up right away."); }
 }
 
@@ -508,12 +534,20 @@ function handleSend(){
   if(!val) return;
   addUser(val);
   chatInput.value='';
-  if(step<flow.length){
+  if(mode==='lead'){
     lead[flow[step].key]=val;
     step++;
-    setTimeout(askNext,500);
+    if(step<flow.length){
+      setTimeout(()=>addBot(flow[step].q),500);
+    } else {
+      setTimeout(()=>{
+        addBot("Perfect — got everything I need! Sending this to the team on WhatsApp now. You'll hear back shortly. 🙌");
+        submitLead();
+        mode='ai';
+      },500);
+    }
   } else {
-    setTimeout(()=>addBot("Thanks! We'll be in touch soon. You can also reach us anytime on WhatsApp via the Contact section below. 👇"),400);
+    sendToAI(val);
   }
 }
 chatSend.addEventListener('click',handleSend);
