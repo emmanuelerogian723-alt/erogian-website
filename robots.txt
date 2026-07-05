@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /blog.html
+Disallow: /analytics.html
+
+Sitemap: https://erogian.vercel.app/sitemap.xml

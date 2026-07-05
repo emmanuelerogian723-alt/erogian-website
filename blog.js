@@ -181,8 +181,8 @@ async function openPost(slug) {
     html += '<div class="article-content">' + parseMD(p.content) + '</div>';
     if (tagArr.length > 0) html += '<div class="flex flex-wrap gap-2 mt-10 pt-8 border-t border-white/10">' + tagArr.map(function(t) { return '<span class="px-3 py-1 rounded-full text-xs bg-white/5 text-gray-400">' + esc(t.trim()) + '</span>'; }).join('') + '</div>';
     html += '<div class="flex items-center gap-4 mt-8"><span class="text-sm text-gray-500">Share:</span>';
-    html += '<a href="https://wa.me/?text=' + encodeURIComponent(p.title + ' — https://emmanuelerogian723-alt.github.io/erogian-website/blog.html#/post/' + p.slug) + '" target="_blank" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">💬</a>';
-    html += '<a href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(p.title) + '&url=' + encodeURIComponent('https://emmanuelerogian723-alt.github.io/erogian-website/blog.html#/post/' + p.slug) + '" target="_blank" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">𝕏</a>';
+    html += '<a href="https://wa.me/?text=' + encodeURIComponent(p.title + ' — https://erogian.vercel.app/blog.html#/post/' + p.slug) + '" target="_blank" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">💬</a>';
+    html += '<a href="https://twitter.com/intent/tweet?text=' + encodeURIComponent(p.title) + '&url=' + encodeURIComponent('https://erogian.vercel.app/blog.html#/post/' + p.slug) + '" target="_blank" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">𝕏</a>';
     html += '<button onclick="copyLink(\'' + p.slug + '\')" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">🔗</button></div>';
     if (data.related && data.related.length > 0) {
       html += '<div class="mt-16 pt-10 border-t border-white/10"><h3 class="display text-xl font-bold mb-6">Related Articles</h3><div class="grid sm:grid-cols-3 gap-4">';
@@ -199,7 +199,7 @@ async function openPost(slug) {
 }
 
 function backToList() { window.location.hash=''; document.getElementById('blog-article-view').classList.add('hidden'); document.getElementById('blog-list-view').classList.remove('hidden'); window.scrollTo(0,0); }
-function copyLink(slug) { navigator.clipboard.writeText('https://emmanuelerogian723-alt.github.io/erogian-website/blog.html#/post/' + slug).then(function(){ alert('Link copied!'); }); }
+function copyLink(slug) { navigator.clipboard.writeText('https://erogian.vercel.app/blog.html#/post/' + slug).then(function(){ alert('Link copied!'); }); }
 
 /* ===== Admin / Writer Studio ===== */
 function openAdmin() { document.getElementById('modal-admin').classList.add('active'); if (localStorage.getItem('erogian_blog_key')) showAdminPanel(); }
