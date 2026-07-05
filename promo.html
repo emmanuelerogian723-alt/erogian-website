@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EROGIAN — Promo Video</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;overflow:hidden;font-family:'Inter',sans-serif;}
+#video-container{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1.2s ease-in-out;background-size:cover;background-position:center;}
+.slide.active{opacity:1;}
+.slide::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,5,5,0.7),rgba(5,5,5,0.5));z-index:1;}
+.slide-content{position:relative;z-index:2;text-align:center;padding:40px;max-width:900px;}
+.slide-content h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.5rem,8vw,5.5rem);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:20px;opacity:0;transform:translateY(30px);animation:fadeUp 1.5s ease forwards 0.5s;}
+.slide-content p{font-size:clamp(1rem,3vw,1.8rem);color:rgba(255,255,255,0.85);font-weight:300;letter-spacing:1px;opacity:0;transform:translateY(20px);animation:fadeUp 1.5s ease forwards 1s;}
+.grad-text{background:linear-gradient(90deg,#8b5cf6,#3b82f6 45%,#d4af37 90%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+@keyframes scaleIn{from{transform:scale(1.1);}to{transform:scale(1);}}
+.slide.active{animation:scaleIn 6s ease forwards;}
+.progress-bar{position:fixed;bottom:0;left:0;height:4px;background:linear-gradient(90deg,#8b5cf6,#3b82f6,#d4af37);z-index:100;transition:width 0.1s linear;width:0%;}
+.logo-watermark{position:fixed;top:30px;left:30px;z-index:50;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.5rem;color:rgba(255,255,255,0.6);letter-spacing:2px;}
+.cta-slide{background:radial-gradient(ellipse at center,#1a1a2e 0%,#050505 70%) !important;}
+.cta-slide::before{background:none !important;}
+.cta-btn{display:inline-block;margin-top:30px;padding:18px 50px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);color:#fff;text-decoration:none;font-weight:700;font-size:1.3rem;border-radius:50px;letter-spacing:1px;box-shadow:0 0 40px rgba(139,92,246,0.5);opacity:0;transform:translateY(20px);animation:fadeUp 1.5s ease forwards 1.5s;}
+.replay-btn{position:fixed;bottom:30px;right:30px;z-index:100;padding:12px 30px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:30px;cursor:pointer;font-size:0.9rem;backdrop-filter:blur(10px);display:none;}
+.replay-btn:hover{background:rgba(255,255,255,0.2);}
+.tag{display:inline-block;padding:6px 18px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);border-radius:20px;font-size:0.85rem;color:#a78bfa;margin-bottom:16px;letter-spacing:2px;text-transform:uppercase;font-weight:600;opacity:0;animation:fadeUp 1s ease forwards 0.3s;}
+</style>
+</head>
+<body>
+<div class="logo-watermark"><span class="grad-text">EROGIAN</span></div>
+<div id="video-container">
+<div class="slide active" style="background-image:url('https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/228310268_generated_image.png')">
+<div class="slide-content">
+<div class="tag">AI • Software • Creative Studio</div>
+<h1><span class="grad-text">EROGIAN</span></h1>
+<p>Building Digital Legacies</p>
+</div>
+</div>
+<div class="slide" style="background-image:url('https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/730b2efac_generated_image.png')">
+<div class="slide-content">
+<div class="tag">Web Development</div>
+<h1>Premium <span class="grad-text">Websites</span></h1>
+<p>That convert visitors into customers</p>
+</div>
+</div>
+<div class="slide" style="background-image:url('https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/72a972f80_generated_image.png')">
+<div class="slide-content">
+<div class="tag">AI Automation</div>
+<h1>Smart <span class="grad-text">AI Solutions</span></h1>
+<p>Chatbots, automation & intelligent systems</p>
+</div>
+</div>
+<div class="slide" style="background-image:url('https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/72f41002b_generated_image.png')">
+<div class="slide-content">
+<div class="tag">Brand Identity</div>
+<h1>Creative <span class="grad-text">Branding</span></h1>
+<p>Logos, identities & visual stories</p>
+</div>
+</div>
+<div class="slide cta-slide">
+<div class="slide-content">
+<div class="tag">Let's Build Together</div>
+<h1>Your Vision.<br><span class="grad-text">Our Expertise.</span></h1>
+<p>Visit erogian.vercel.app to start</p>
+<a href="https://erogian.vercel.app" class="cta-btn">Get Started Today</a>
+</div>
+</div>
+</div>
+<div class="progress-bar" id="progress"></div>
+<button class="replay-btn" id="replay" onclick="restartVideo()">↻ Replay</button>
+<script>
+const slides=document.querySelectorAll('.slide');const totalDuration=30000;const slideDuration=6000;let currentSlide=0;let progress=0;let interval;
+function showSlide(n){slides.forEach(s=>s.classList.remove('active'));slides[n].classList.add('active');}
+function nextSlide(){currentSlide++;if(currentSlide>=slides.length){currentSlide=slides.length-1;document.getElementById('replay').style.display='block';return;}showSlide(currentSlide);}
+function startVideo(){currentSlide=0;showSlide(0);document.getElementById('replay').style.display='none';progress=0;const startTime=Date.now();clearInterval(interval);interval=setInterval(()=>{const elapsed=Date.now()-startTime;progress=(elapsed/totalDuration)*100;if(progress>=100){progress=100;clearInterval(interval);}document.getElementById('progress').style.width=progress+'%';},50);for(let i=1;i<slides.length;i++){setTimeout(()=>nextSlide(),i*slideDuration);}}
+function restartVideo(){startVideo();}
+startVideo();
+</script>
+</body>
+</html>
