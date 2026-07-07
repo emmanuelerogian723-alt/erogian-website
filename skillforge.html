@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="DwCZtKUV6W8t6YC-G-bM1n7yqymmRHp2zUSapUN6th4" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillForge by EROGIAN — Learn Tech Skills That Actually Pay</title>
+<meta name="description" content="SkillForge by EROGIAN: practical, hands-on video classes in web development, AI, and automation. Some lessons are free, advanced tracks are affordable and built by working developers.">
+<link rel="canonical" href="https://erogian.vercel.app/skillforge.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#050505;--purple:#8b5cf6;--blue:#3b82f6;--gold:#d4af37;}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--bg);color:#f5f5f7;font-family:'Inter',sans-serif;overflow-x:hidden}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#222;border-radius:8px}
+.grad-text{background:linear-gradient(90deg,#8b5cf6,#3b82f6 45%,#d4af37 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
+.glow-border{position:relative}.glow-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.5;transition:opacity .4s}.glow-border:hover::before{opacity:1}
+.card-float{transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}.card-float:hover{transform:translateY(-6px);box-shadow:0 20px 50px -15px rgba(59,130,246,.25)}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.03;z-index:5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.nav-link{position:relative}.nav-link::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .3s}.nav-link:hover::after{width:100%}
+.chip{padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#999}
+.chip:hover{border-color:#8b5cf6;color:#fff}
+.chip-active{background:linear-gradient(90deg,#8b5cf6,#3b82f6);color:#fff;border-color:transparent}
+.fade-in{animation:fadeIn .5s ease both}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+input::placeholder,textarea::placeholder{color:#6b7280}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal-content{background:#0a0c10;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:32px}
+.admin-link{color:#666;text-decoration:none;transition:color .2s}.admin-link:hover{color:#8b5cf6}
+.badge-free{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.badge-pro{background:rgba(212,175,55,.15);color:#d4af37;border:1px solid rgba(212,175,55,.3)}
+.lock-overlay{position:absolute;inset:0;background:rgba(5,5,8,.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<nav class="fixed top-0 inset-x-0 z-50 transition-all duration-300" id="mainnav" style="background:rgba(5,5,5,.7);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)">
+<div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+<a href="index.html" class="display text-xl font-bold tracking-tight">EROGIAN<span class="text-purple-400">.</span></a>
+<div class="hidden md:flex items-center gap-7 text-sm text-gray-300">
+<a href="index.html" class="nav-link">Home</a>
+<a href="index.html#services" class="nav-link">Services</a>
+<a href="blog.html" class="nav-link">Blog</a>
+<a href="skillforge.html" class="nav-link text-purple-300">SkillForge</a>
+<a href="index.html#pricing" class="nav-link">Pricing</a>
+<a href="index.html#contact" class="nav-link">Contact</a>
+</div>
+<a href="https://wa.me/2347045560291" target="_blank" class="px-5 py-2 rounded-full text-sm font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Talk to Us</a>
+</div>
+</nav>
+
+<section class="pt-36 pb-16 px-6"><div class="max-w-5xl mx-auto text-center">
+<div class="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-6" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.4);">
+<span class="text-sm font-bold text-purple-300">🎓 New — Learn By Watching, Build By Doing</span></div>
+<h1 class="display text-4xl md:text-6xl font-bold leading-tight">Skill<span class="grad-text">Forge</span></h1>
+<p class="text-gray-400 mt-5 text-lg max-w-2xl mx-auto">Practical tech classes taught by people who actually build for a living. A few lessons are completely free. The rest are affordable, no-fluff, project-based tracks that get you job-ready or business-ready.</p>
+<div class="flex flex-wrap justify-center gap-4 mt-8">
+<a href="#courses" class="px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Browse Free Classes</a>
+<a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20to%20know%20more%20about%20SkillForge%20courses" target="_blank" class="px-8 py-4 rounded-full font-bold text-sm glass">Ask a Question</a>
+</div>
+</div></section>
+
+<section class="px-6 pb-8"><div class="max-w-6xl mx-auto flex flex-wrap gap-3 justify-center" id="filter-chips"></div></section>
+
+<section id="courses" class="px-6 pb-24"><div class="max-w-6xl mx-auto">
+<div class="grid md:grid-cols-3 gap-6" id="course-grid">
+<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500">Loading courses...</div></div>
+</div>
+</div></section>
+
+<section class="px-6 pb-24"><div class="max-w-4xl mx-auto glass glow-border rounded-3xl p-10 text-center">
+<h2 class="display text-2xl md:text-3xl font-bold mb-3">Want a Custom Class For Your Team?</h2>
+<p class="text-gray-400 mb-6">We can build a private course track for your staff or students — web dev, AI tools, or automation, tailored to your business.</p>
+<a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20a%20custom%20SkillForge%20training%20for%20my%20team" target="_blank" class="inline-block px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Request Custom Training</a>
+</div></section>
+
+<footer class="py-10 px-6 border-t border-white/5 text-center text-sm text-gray-500">
+© 2026 EROGIAN. Building Digital Legacies. · Enugu &amp; Lagos, Nigeria<br>
+<a href="index.html" class="admin-link">Home</a> ·
+<a href="blog.html" class="admin-link">Blog</a> ·
+<a href="#" onclick="openAdmin();return false;" class="admin-link">Upload Studio</a>
+</footer>
+
+<!-- Enroll Modal -->
+<div class="modal-overlay" id="enroll-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold" id="enroll-title">Enroll</h3><button onclick="closeEnroll()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
+<div id="enroll-body"></div>
+</div>
+</div>
+
+<!-- Admin Login -->
+<div class="modal-overlay" id="admin-login-modal">
+<div class="modal-content" style="max-width:400px">
+<h3 class="display text-xl font-bold mb-4">Upload Studio Access</h3>
+<input id="admin-key-input" type="password" placeholder="Enter admin key" class="w-full rounded-xl px-4 py-3 text-sm mb-4">
+<button onclick="checkAdminKey()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Enter</button>
+<button onclick="closeAdminLogin()" class="w-full py-2 mt-2 text-sm text-gray-400">Cancel</button>
+</div>
+</div>
+
+<!-- Admin Studio -->
+<div class="modal-overlay" id="admin-studio-modal">
+<div class="modal-content" style="max-width:800px">
+<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold">🎬 SkillForge Upload Studio</h3><button onclick="closeAdminStudio()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
+<div class="grid md:grid-cols-2 gap-4">
+<div><label class="text-xs text-gray-400 block mb-1">Title</label><input id="cf-title" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="Course title"></div>
+<div><label class="text-xs text-gray-400 block mb-1">Category</label><input id="cf-category" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="Web Development, AI, Automation..."></div>
+<div><label class="text-xs text-gray-400 block mb-1">Level</label><select id="cf-level" class="w-full rounded-xl px-4 py-3 text-sm"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
+<div><label class="text-xs text-gray-400 block mb-1">Duration</label><input id="cf-duration" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="e.g. 45 min"></div>
+<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Video URL (YouTube, Vimeo, or direct .mp4 link)</label><input id="cf-video" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="https://..."></div>
+<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Description</label><textarea id="cf-description" rows="3" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="What will students learn?"></textarea></div>
+<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Thumbnail Image (upload)</label><input id="cf-thumb-file" type="file" accept="image/*" class="w-full rounded-xl px-4 py-3 text-sm"><div id="cf-thumb-preview" class="mt-2 text-xs text-gray-500"></div></div>
+<div class="flex items-center gap-2"><input type="checkbox" id="cf-is-free" class="w-4 h-4"><label for="cf-is-free" class="text-sm text-gray-300">Free Class</label></div>
+<div><label class="text-xs text-gray-400 block mb-1">Price (₦, if paid)</label><input id="cf-price" type="number" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="8000"></div>
+</div>
+<div class="flex gap-3 mt-6">
+<button onclick="saveCourse()" id="cf-save-btn" class="flex-1 py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Publish Class</button>
+</div>
+<div class="mt-8 border-t border-white/10 pt-6">
+<h4 class="font-semibold mb-3 text-sm text-gray-300">Manage Existing Classes</h4>
+<div id="admin-course-list" class="space-y-2 text-sm"></div>
+</div>
+</div>
+</div>
+
+<script src="skillforge.js"></script>
+</body></html>
