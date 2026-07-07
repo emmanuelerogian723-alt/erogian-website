@@ -180,7 +180,6 @@ input::placeholder,textarea::placeholder{color:#6b7280}
     .then(function(r){ return r.json(); })
     .then(function(data){
       var posts = data.posts || (Array.isArray(data) ? data : []);
-      posts = posts.filter(function(p){ return p.status === 'published'; });
       posts.sort(function(a,b){ return new Date(b.created_date||0) - new Date(a.created_date||0); });
       posts = posts.slice(0,3);
       if (!posts.length) { grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500">New posts coming soon.</div></div>'; return; }
