@@ -165,12 +165,33 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 </div></section>
 
 <section id="blog" class="py-24 px-6 bg-[#07080b]"><div class="max-w-6xl mx-auto">
-<div class="text-center mb-12"><div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">Insights</div><h2 class="display text-4xl font-bold">From The Blog</h2></div>
-<div class="grid md:grid-cols-3 gap-6">
-<a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-purple-300 mb-2">AI</div><div class="font-semibold mb-2">Why Every Small Business Needs an AI Agent in 2026</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
-<a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-blue-300 mb-2">Branding</div><div class="font-semibold mb-2">How Good Design Increases Conversion Rates</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
-<a href="#contact" class="glass rounded-2xl p-6 card-float block"><div class="text-xs text-yellow-300 mb-2">Automation</div><div class="font-semibold mb-2">Automating Client Follow-Ups With WhatsApp Bots</div><div class="text-sm text-gray-500">Coming soon — subscribe via WhatsApp for updates.</div></a>
-</div></div></section>
+<div class="text-center mb-12"><div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">Insights</div><h2 class="display text-4xl font-bold">From The Blog</h2><p class="text-gray-400 mt-4">Fresh reads on AI, automation and business growth.</p></div>
+<div class="grid md:grid-cols-3 gap-6" id="home-blog-grid">
+<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500">Loading latest posts...</div></div>
+</div>
+<div class="text-center mt-10"><a href="blog.html" class="inline-block px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6);">Read All Articles →</a></div>
+</div></section>
+<script>
+(function() {
+  var BLOG_API = 'https://superagent-55bc0d3a.base44.app/functions/erogianBlog';
+  var grid = document.getElementById('home-blog-grid');
+  function esc(s){ return (s||'').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  fetch(BLOG_API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'list' }) })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var posts = data.posts || (Array.isArray(data) ? data : []);
+      posts = posts.filter(function(p){ return p.status === 'published'; });
+      posts.sort(function(a,b){ return new Date(b.created_date||0) - new Date(a.created_date||0); });
+      posts = posts.slice(0,3);
+      if (!posts.length) { grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500">New posts coming soon.</div></div>'; return; }
+      grid.innerHTML = posts.map(function(p){
+        var cover = p.cover_image ? '<img src="'+esc(p.cover_image)+'" class="w-full h-40 object-cover rounded-xl mb-4" loading="lazy">' : '';
+        return '<a href="blog.html#/post/'+esc(p.slug)+'" class="glass rounded-2xl p-6 card-float block">'+cover+'<div class="text-xs text-purple-300 mb-2">'+esc(p.category||'AI')+'</div><div class="font-semibold mb-2">'+esc(p.title)+'</div><div class="text-sm text-gray-500">'+esc(p.excerpt||'').slice(0,90)+'...</div></a>';
+      }).join('');
+    })
+    .catch(function(){ grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500"><a href="blog.html" class="legal-link">Visit the blog →</a></div></div>'; });
+})();
+</script>
 
 <section id="book" class="py-28 px-6 bg-[#07080b]"><div class="max-w-2xl mx-auto">
 <div class="text-center mb-12"><div class="text-blue-400 text-sm font-semibold tracking-widest uppercase mb-3">Book Appointment</div><h2 class="display text-4xl md:text-5xl font-bold">Schedule a <span class="grad-text">Free Consultation</span></h2><p class="text-gray-400 mt-4">Pick a date and time. We'll confirm on WhatsApp.</p></div>
