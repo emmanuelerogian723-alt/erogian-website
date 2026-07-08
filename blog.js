@@ -2,6 +2,7 @@
 var BLOG_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianBlog';
 var UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianUpload';
 var ADMIN_KEY = 'erogian_blog_admin_2026';
+var editingPostId = null;
 var allPosts = [];
 var currentFilter = 'all';
 
@@ -212,7 +213,14 @@ function adminLogin() {
   else alert('Wrong key. Hint: erogian_blog_admin_2026');
 }
 function showAdminPanel() { document.getElementById('admin-login-view').classList.add('hidden'); document.getElementById('admin-panel-view').classList.remove('hidden'); }
-function showNewPost() { document.getElementById('admin-new-post').classList.remove('hidden'); document.getElementById('admin-posts-list').classList.add('hidden'); document.getElementById('edit-area').classList.add('hidden'); }
+function showNewPost() {
+  editingPostId = null;
+  document.getElementById('admin-new-post').classList.remove('hidden');
+  document.getElementById('admin-posts-list').classList.add('hidden');
+  document.getElementById('edit-area').classList.add('hidden');
+  document.getElementById('ai-topic').value = '';
+  var pb = document.getElementById('publish-btn'); if (pb) pb.textContent = 'Publish';
+}
 
 /* ===== AI Generate ===== */
 async function generateAI() {
@@ -325,20 +333,56 @@ async function saveDraft() { var t=document.getElementById('edit-title').value.t
 async function savePost(status) {
   var title = document.getElementById('edit-title').value.trim();
   var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  var payload = {
+    action:'save', admin_key:ADMIN_KEY, title:title, slug:slug,
+    excerpt:document.getElementById('edit-excerpt').value,
+    content:document.getElementById('edit-content').value,
+    category:document.getElementById('edit-category').value,
+    tags:document.getElementById('edit-tags').value,
+    cover_image:document.getElementById('edit-cover').value,
+    meta_description: document.getElementById('edit-meta-desc').value || document.getElementById('edit-excerpt').value,
+    read_time:'5 min read', status:status,
+    featured: document.getElementById('edit-featured').checked,
+    author:'Emmanuel Ene Rejoice'
+  };
+  if (editingPostId) payload.id = editingPostId;
   try {
-    var res = await fetch(BLOG_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
-      action:'save', admin_key:ADMIN_KEY, title:title, slug:slug,
-      excerpt:document.getElementById('edit-excerpt').value,
-      content:document.getElementById('edit-content').value,
-      category:document.getElementById('edit-category').value,
-      tags:document.getElementById('edit-tags').value,
-      cover_image:document.getElementById('edit-cover').value,
-      read_time:'5 min read', status:status, featured:false, author:'Emmanuel Ene Rejoice'
-    }) });
+    var res = await fetch(BLOG_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     var data = await res.json();
     if (data.status === 'ok') { alert(status==='published' ? 'Published! 🎉' : 'Draft saved!'); closeAdmin(); window.location.reload(); }
     else alert('Error: ' + data.message);
   } catch(e) { alert('Connection error'); }
+}
+
+function cancelEdit() {
+  editingPostId = null;
+  document.getElementById('edit-area').classList.add('hidden');
+  document.getElementById('admin-new-post').classList.add('hidden');
+  loadAdminPosts();
+}
+
+async function editPost(id) {
+  try {
+    var res = await fetch(BLOG_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_list', admin_key:ADMIN_KEY }) });
+    var data = await res.json();
+    var p = (data.posts||[]).find(function(x){ return x.id === id; });
+    if (!p) { alert('Could not load post'); return; }
+    editingPostId = id;
+    document.getElementById('admin-posts-list').classList.add('hidden');
+    document.getElementById('admin-new-post').classList.remove('hidden');
+    document.getElementById('gen-status').classList.add('hidden');
+    document.getElementById('edit-area').classList.remove('hidden');
+    document.getElementById('edit-title').value = p.title || '';
+    document.getElementById('edit-excerpt').value = p.excerpt || '';
+    document.getElementById('edit-category').value = p.category || '';
+    document.getElementById('edit-tags').value = p.tags || '';
+    document.getElementById('edit-cover').value = p.cover_image || '';
+    document.getElementById('edit-meta-desc').value = p.meta_description || '';
+    document.getElementById('edit-featured').checked = !!p.featured;
+    document.getElementById('edit-content').value = p.content || '';
+    previewCover(p.cover_image || '');
+    var pb = document.getElementById('publish-btn'); if (pb) pb.textContent = 'Save Changes';
+  } catch (e) { alert('Could not load post for editing'); }
 }
 
 /* ===== Admin Posts List ===== */
@@ -352,7 +396,7 @@ async function loadAdminPosts() {
     if (data.status === 'ok') {
       c.innerHTML = data.posts.map(function(p) {
         var cover = p.cover_image ? '<img src="'+escAttr(p.cover_image)+'" class="w-12 h-12 rounded-lg object-cover">' : '<div class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center">📄</div>';
-        return '<div class="glass rounded-xl p-4 flex items-center gap-4"><div>'+cover+'</div><div class="flex-1"><div class="font-semibold text-sm">'+esc(p.title)+'</div><div class="text-xs text-gray-500 mt-1">'+esc(p.category)+' · '+esc(p.status)+' · '+(p.views||0)+' views</div></div><div class="flex gap-2"><button onclick="deletePost(\''+p.id+'\',\''+esc(p.title)+'\')" class="px-3 py-1.5 rounded-lg text-xs bg-red-500/20 text-red-300">Delete</button></div></div>';
+        return '<div class="glass rounded-xl p-4 flex items-center gap-4"><div>'+cover+'</div><div class="flex-1"><div class="font-semibold text-sm">'+(p.featured?'⭐ ':'')+esc(p.title)+'</div><div class="text-xs text-gray-500 mt-1">'+esc(p.category)+' · '+esc(p.status)+' · '+(p.views||0)+' views</div></div><div class="flex gap-2"><button onclick="editPost(\''+p.id+'\')" class="px-3 py-1.5 rounded-lg text-xs bg-blue-500/20 text-blue-300">Edit</button><button onclick="deletePost(\''+p.id+'\',\''+esc(p.title)+'\')" class="px-3 py-1.5 rounded-lg text-xs bg-red-500/20 text-red-300">Delete</button></div></div>';
       }).join('');
     }
   } catch(e) { c.innerHTML = '<div class="text-red-400 text-sm">Failed to load</div>'; }

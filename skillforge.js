@@ -11,6 +11,8 @@ var currentFilter = 'all';
 var uploadedThumbUrl = '';
 var uploadedVideoFileUrl = '';
 var cfQuizData = [];
+var cfLessons = [];
+var activeLessonIndex = 0;
 var currentEnrollment = null; // {id, name, email, course}
 
 function esc(s) { return (s||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -123,23 +125,41 @@ async function startFreeClass(slug) {
   renderVideoStep(course);
 }
 
-function renderVideoStep(course) {
-  var body = document.getElementById('enroll-body');
-  var player = '';
-  if (course.video_file_url) {
-    player = '<div class="rounded-xl overflow-hidden mb-4"><video src="'+esc(course.video_file_url)+'" controls class="w-full"></video></div>';
-  } else {
-    var embed = toEmbedUrl(course.video_url);
-    if (embed) player = '<div class="aspect-video rounded-xl overflow-hidden mb-4"><iframe src="'+esc(embed)+'" class="w-full h-full" allowfullscreen frameborder="0"></iframe></div>';
+function getLessons(course) {
+  var lessons = [];
+  try { lessons = JSON.parse(course.lessons || '[]'); } catch(e) {}
+  if (!lessons.length && (course.video_url || course.video_file_url)) {
+    lessons = [{ title: course.title, video_url: course.video_url, video_file_url: course.video_file_url }];
   }
-  if (!player) {
+  return lessons;
+}
+
+function renderVideoStep(course, lessonIdx) {
+  activeLessonIndex = lessonIdx || 0;
+  var body = document.getElementById('enroll-body');
+  var lessons = getLessons(course);
+  if (!lessons.length) {
     body.innerHTML = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">This class video is being added soon! We\'ll notify you on WhatsApp the moment it\'s live. <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline block mt-2">Message us</a></div>';
     return;
   }
+  var lesson = lessons[activeLessonIndex] || lessons[0];
+  var player = '';
+  if (lesson.video_file_url) {
+    player = '<div class="rounded-xl overflow-hidden mb-3"><video src="'+esc(lesson.video_file_url)+'" controls class="w-full"></video></div>';
+  } else {
+    var embed = toEmbedUrl(lesson.video_url);
+    if (embed) player = '<div class="aspect-video rounded-xl overflow-hidden mb-3"><iframe src="'+esc(embed)+'" class="w-full h-full" allowfullscreen frameborder="0"></iframe></div>';
+  }
+  var lessonNav = '';
+  if (lessons.length > 1) {
+    lessonNav = '<div class="flex flex-wrap gap-2 mb-3">' + lessons.map(function(l, i) {
+      return '<button onclick="renderVideoStep(currentEnrollment.course, ' + i + ')" class="chip ' + (i === activeLessonIndex ? 'chip-active' : '') + '">' + (i+1) + '. ' + esc(l.title || ('Lesson ' + (i+1))) + '</button>';
+    }).join('') + '</div>';
+  }
   var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
-  var quizBtn = quiz.length ? '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">✅ I\'ve watched it — Take the Quiz (' + quiz.length + ' questions)</button>' :
+  var quizBtn = quiz.length ? '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">✅ I\'ve watched ' + (lessons.length > 1 ? 'these lessons' : 'it') + ' — Take the Quiz (' + quiz.length + ' questions)</button>' :
     '<div class="text-center text-xs text-gray-500">Enjoy the class! Have questions? <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline">Message us on WhatsApp</a>.</div>';
-  body.innerHTML = player + quizBtn;
+  body.innerHTML = lessonNav + player + quizBtn;
 }
 
 function showQuiz() {
@@ -202,32 +222,27 @@ function downloadCertificate() {
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
     var cx = canvas.width / 2;
-
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#d4af37';
-    ctx.font = 'bold ' + Math.round(canvas.width * 0.032) + 'px Georgia, serif';
-    ctx.fillText('CERTIFICATE OF COMPLETION', cx, canvas.height * 0.36);
 
-    ctx.fillStyle = '#cfcfcf';
-    ctx.font = 'italic ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
-    ctx.fillText('This certifies that', cx, canvas.height * 0.45);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold ' + Math.round(canvas.width * 0.038) + 'px Georgia, serif';
+    // Student name — bold, dark navy, high contrast against the cream certificate background
+    ctx.fillStyle = '#12213f';
+    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+    ctx.shadowBlur = 2;
+    ctx.font = '900 ' + Math.round(canvas.width * 0.042) + 'px Georgia, serif';
     ctx.fillText(name, cx, canvas.height * 0.54);
+    ctx.shadowBlur = 0;
 
-    ctx.fillStyle = '#cfcfcf';
-    ctx.font = 'italic ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
-    ctx.fillText('has successfully completed the course', cx, canvas.height * 0.61);
+    // Course title — deep bold gold, unique from name color
+    ctx.fillStyle = '#8a6a00';
+    ctx.font = 'bold ' + Math.round(canvas.width * 0.024) + 'px Georgia, serif';
+    wrapText(ctx, courseTitle, cx, canvas.height * 0.665, canvas.width * 0.7, canvas.width * 0.028);
 
-    ctx.fillStyle = '#d4af37';
-    ctx.font = 'bold ' + Math.round(canvas.width * 0.022) + 'px Georgia, serif';
-    wrapText(ctx, courseTitle, cx, canvas.height * 0.67, canvas.width * 0.7, canvas.width * 0.026);
-
+    // Date — placed on the dedicated "DATE" line near the signature/seal row, bold + dark for clarity
     var today = new Date().toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
-    ctx.fillStyle = '#999';
-    ctx.font = Math.round(canvas.width * 0.014) + 'px Arial, sans-serif';
-    ctx.fillText('Issued on ' + today + ' · SkillForge by EROGIAN', cx, canvas.height * 0.88);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#12213f';
+    ctx.font = 'bold ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
+    ctx.fillText(today, canvas.width * 0.745, canvas.height * 0.718);
 
     try {
       var link = document.createElement('a');
@@ -272,6 +287,8 @@ function checkAdminKey() {
   if (key === ADMIN_KEY) {
     closeAdminLogin();
     document.getElementById('admin-studio-modal').classList.add('active');
+    cfLessons = [];
+    renderLessonsEditor();
     loadAdminCourses();
     loadAdminEnrollments();
   } else {
@@ -326,9 +343,9 @@ document.addEventListener('change', function(e) {
 });
 
 async function generateQuizFromVideo() {
-  var video = document.getElementById('cf-video').value.trim();
+  var video = (cfLessons[0] && cfLessons[0].video_url) || '';
   var title = document.getElementById('cf-title').value.trim();
-  if (!video) { alert('Paste the YouTube video URL first.'); return; }
+  if (!video) { alert('Add a YouTube video link to Lesson 1 first.'); return; }
   var out = document.getElementById('cf-quiz-editor');
   out.innerHTML = '<div class="text-sm text-gray-400">🧠 Watching & analyzing the video, generating questions...</div>';
   try {
@@ -353,21 +370,68 @@ function renderQuizEditor() {
     }).join('');
 }
 
+function addLessonRow(title, video_url, video_file_url) {
+  cfLessons.push({ title: title || ('Lesson ' + (cfLessons.length + 1)), video_url: video_url || '', video_file_url: video_file_url || '' });
+  renderLessonsEditor();
+}
+
+function removeLessonRow(idx) {
+  cfLessons.splice(idx, 1);
+  renderLessonsEditor();
+}
+
+function updateLessonField(idx, field, value) {
+  if (!cfLessons[idx]) return;
+  cfLessons[idx][field] = value;
+}
+
+function renderLessonsEditor() {
+  var el = document.getElementById('cf-lessons-list');
+  if (!cfLessons.length) addLessonRow();
+  el.innerHTML = cfLessons.map(function(l, i) {
+    return '<div class="glass rounded-lg p-3">' +
+      '<div class="flex justify-between items-center mb-2"><span class="text-xs font-semibold text-purple-300">Lesson ' + (i+1) + (i===0 ? ' (main preview)' : '') + '</span>' + (cfLessons.length > 1 ? '<button type="button" onclick="removeLessonRow(' + i + ')" class="text-red-400 text-xs">Remove</button>' : '') + '</div>' +
+      '<input value="' + esc(l.title) + '" oninput="updateLessonField(' + i + ',\'title\',this.value)" placeholder="Lesson title" class="w-full rounded-lg px-3 py-2 text-xs mb-2">' +
+      '<input value="' + esc(l.video_url) + '" oninput="updateLessonField(' + i + ',\'video_url\',this.value)" placeholder="YouTube URL" class="w-full rounded-lg px-3 py-2 text-xs mb-2">' +
+      '<input type="file" accept="video/*" onchange="uploadLessonVideo(' + i + ', this)" class="w-full rounded-lg px-3 py-2 text-xs">' +
+      '<div class="mt-1 text-xs text-gray-500" id="lesson-video-status-' + i + '">' + (l.video_file_url ? 'Video file uploaded ✓' : '') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+async function uploadLessonVideo(idx, inputEl) {
+  var file = inputEl.files[0];
+  if (!file) return;
+  var statusEl = document.getElementById('lesson-video-status-' + idx);
+  if (file.size > 20 * 1024 * 1024) { statusEl.textContent = 'Too large (max 20MB) — use a YouTube link instead.'; return; }
+  statusEl.textContent = 'Uploading...';
+  var reader = new FileReader();
+  reader.onload = async function() {
+    try {
+      var base64 = reader.result.split(',')[1];
+      var res = await fetch(VIDEO_UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, video:base64, filename:file.name, mime:file.type }) });
+      var data = await res.json();
+      if (data.status === 'ok') { cfLessons[idx].video_file_url = data.url; statusEl.textContent = 'Video uploaded ✓'; }
+      else { statusEl.textContent = 'Upload failed: ' + (data.message||''); }
+    } catch (err) { statusEl.textContent = 'Upload failed'; }
+  };
+  reader.readAsDataURL(file);
+}
+
 async function saveCourse() {
   var title = document.getElementById('cf-title').value.trim();
-  var video = document.getElementById('cf-video').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
   var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   var btn = document.getElementById('cf-save-btn');
   btn.textContent = 'Publishing...'; btn.disabled = true;
+  var validLessons = cfLessons.filter(function(l){ return l.video_url || l.video_file_url; });
   try {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
       action:'save', admin_key:ADMIN_KEY, title:title, slug:slug,
       description: document.getElementById('cf-description').value.trim(),
       category: document.getElementById('cf-category').value.trim() || 'General',
       level: document.getElementById('cf-level').value,
-      video_url: video,
-      video_file_url: uploadedVideoFileUrl,
+      lessons: JSON.stringify(validLessons),
       thumbnail: uploadedThumbUrl,
       duration: document.getElementById('cf-duration').value.trim(),
       is_free: document.getElementById('cf-is-free').checked,
@@ -410,6 +474,87 @@ async function loadAdminEnrollments() {
 async function deleteCourse(id) {
   if (!confirm('Delete this class?')) return;
   try { await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'delete', admin_key:ADMIN_KEY, id:id }) }); loadAdminCourses(); } catch(e){}
+}
+
+/* ===== Student Dashboard ===== */
+function openDashboard() {
+  document.getElementById('dashboard-modal').classList.add('active');
+  var saved = localStorage.getItem('sf_student_email');
+  if (saved) { document.getElementById('dash-email').value = saved; loadDashboard(); }
+}
+function closeDashboard() { document.getElementById('dashboard-modal').classList.remove('active'); }
+
+async function loadDashboard() {
+  var email = document.getElementById('dash-email').value.trim();
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) { alert('Please enter a valid email.'); return; }
+  localStorage.setItem('sf_student_email', email);
+  var body = document.getElementById('dashboard-body');
+  document.getElementById('dashboard-login').classList.add('hidden');
+  body.classList.remove('hidden');
+  body.innerHTML = '<div class="text-center py-8 text-sm text-gray-400">Loading your dashboard...</div>';
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'student_dashboard', email:email }) });
+    var data = await res.json();
+    renderDashboard(data, email);
+  } catch (e) {
+    body.innerHTML = '<div class="text-center py-8 text-sm text-red-400">Could not load your dashboard. Try again.</div>';
+  }
+}
+
+function renderDashboard(data, email) {
+  var body = document.getElementById('dashboard-body');
+  var my = data.myCourses || [];
+  var more = (data.moreCourses || []).slice(0, 6);
+  var completedCount = my.filter(function(c){ return c.completed; }).length;
+
+  var myHTML = !my.length
+    ? '<div class="glass rounded-xl p-6 text-center text-sm text-gray-500">No classes yet. Browse the classes below to get started 👇</div>'
+    : my.map(function(c) {
+        var progressPct = c.completed ? 100 : (c.quiz_total ? Math.round((c.quiz_score/c.quiz_total)*100) : 0);
+        var statusChip = c.completed
+          ? '<span class="badge-free text-xs px-3 py-1 rounded-full font-semibold">🎓 Completed</span>'
+          : (c.payment_status === 'pending' ? '<span class="badge-pro text-xs px-3 py-1 rounded-full font-semibold">Payment Pending</span>' : '<span class="text-xs px-3 py-1 rounded-full font-semibold" style="background:rgba(59,130,246,.15);color:#93c5fd">In Progress</span>');
+        return '<div class="glass rounded-xl p-4 mb-3">' +
+          '<div class="flex justify-between items-center mb-2"><span class="font-semibold text-sm">'+esc(c.course_title)+'</span>'+statusChip+'</div>' +
+          '<div class="w-full h-2 rounded-full bg-white/10 mb-2 overflow-hidden"><div class="h-full rounded-full" style="width:'+progressPct+'%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div></div>' +
+          '<div class="flex justify-between items-center">' +
+          '<span class="text-xs text-gray-500">' + (c.quiz_total ? 'Quiz: ' + c.quiz_score + '/' + c.quiz_total : 'Not started yet') + '</span>' +
+          '<div class="flex gap-2">' +
+          (c.course ? '<button onclick="resumeCourse(\''+esc(c.course_slug)+'\',\''+esc(c.name)+'\',\''+esc(email)+'\')" class="px-3 py-1.5 rounded-lg text-xs glass">Resume</button>' : '') +
+          (c.completed ? '<button onclick="redownloadCertificate(\''+esc(c.name)+'\',\''+esc(c.course_title)+'\')" class="px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:linear-gradient(90deg,#d4af37,#8b5cf6)">🎓 Certificate</button>' : '') +
+          '</div></div></div>';
+      }).join('');
+
+  var moreHTML = !more.length ? '' : '<div class="grid md:grid-cols-3 gap-3 mt-2">' + more.map(function(c) {
+    return '<div class="glass rounded-xl overflow-hidden cursor-pointer card-float" onclick="closeDashboard();openCourse(\''+esc(c.slug)+'\')">' +
+      (c.thumbnail ? '<img src="'+esc(c.thumbnail)+'" class="w-full h-24 object-cover">' : '<div class="w-full h-24 bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center text-2xl">🎬</div>') +
+      '<div class="p-3"><div class="text-xs font-semibold mb-1">'+esc(c.title)+'</div><div class="text-xs text-gray-500">'+(c.is_free?'Free':'₦'+Number(c.price_ngn||0).toLocaleString())+'</div></div></div>';
+  }).join('') + '</div>';
+
+  body.innerHTML =
+    '<div class="grid grid-cols-3 gap-3 mb-5 text-center">' +
+    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+my.length+'</div><div class="text-xs text-gray-500">Enrolled</div></div>' +
+    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+completedCount+'</div><div class="text-xs text-gray-500">Completed</div></div>' +
+    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+completedCount+'</div><div class="text-xs text-gray-500">Certificates</div></div>' +
+    '</div>' +
+    '<h4 class="font-semibold text-sm mb-2 text-gray-300">My Classes</h4>' + myHTML +
+    (more.length ? '<h4 class="font-semibold text-sm mb-2 mt-5 text-gray-300">🔥 Explore More Classes</h4>' + moreHTML : '') +
+    '<button onclick="document.getElementById(\'dashboard-login\').classList.remove(\'hidden\');document.getElementById(\'dashboard-body\').classList.add(\'hidden\')" class="w-full py-2 mt-5 text-xs text-gray-500">Switch email</button>';
+}
+
+function resumeCourse(slug, name, email) {
+  closeDashboard();
+  var course = allCourses.find(function(c){ return c.slug === slug; });
+  if (!course) { alert('Class not found — it may have been removed.'); return; }
+  currentEnrollment = { id: null, name: name, email: email, course: course };
+  document.getElementById('enroll-title').textContent = course.title;
+  document.getElementById('enroll-modal').classList.add('active');
+  renderVideoStep(course);
+}
+
+function redownloadCertificate(name, courseTitle) {
+  currentEnrollment = { name: name, course: { title: courseTitle } };
+  downloadCertificate();
 }
 
 loadCourses();

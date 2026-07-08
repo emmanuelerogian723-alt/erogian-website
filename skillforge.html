@@ -62,6 +62,7 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <p class="text-gray-400 mt-5 text-lg max-w-2xl mx-auto">Practical tech classes taught by people who actually build for a living. A few lessons are completely free. The rest are affordable, no-fluff, project-based tracks that get you job-ready or business-ready.</p>
 <div class="flex flex-wrap justify-center gap-4 mt-8">
 <a href="#courses" class="px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Browse Free Classes</a>
+<a href="#" onclick="openDashboard();return false;" class="px-8 py-4 rounded-full font-bold text-sm glass">🎓 My Dashboard</a>
 <a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20to%20know%20more%20about%20SkillForge%20courses" target="_blank" class="px-8 py-4 rounded-full font-bold text-sm glass">Ask a Question</a>
 </div>
 </div></section>
@@ -84,7 +85,7 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 © 2026 EROGIAN. Building Digital Legacies. · Enugu &amp; Lagos, Nigeria<br>
 <a href="index.html" class="admin-link">Home</a> ·
 <a href="blog.html" class="admin-link">Blog</a> ·
-<a href="#" onclick="openAdmin();return false;" class="admin-link">Upload Studio</a>
+<a href="#" onclick="openAdmin();return false;" class="admin-link">Upload Studio</a> · <a href="#" onclick="openDashboard();return false;" class="admin-link">🎓 My Dashboard</a>
 </footer>
 
 <!-- Enroll Modal -->
@@ -114,8 +115,11 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <div><label class="text-xs text-gray-400 block mb-1">Category</label><input id="cf-category" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="Web Development, AI, Automation..."></div>
 <div><label class="text-xs text-gray-400 block mb-1">Level</label><select id="cf-level" class="w-full rounded-xl px-4 py-3 text-sm"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
 <div><label class="text-xs text-gray-400 block mb-1">Duration</label><input id="cf-duration" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="e.g. 45 min"></div>
-<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Video URL (paste your YouTube link here — students will watch this)</label><input id="cf-video" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="https://youtube.com/watch?v=..."></div>
-<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Or Upload a Video File Directly (max 20MB — for longer lessons, use YouTube Unlisted + paste link above instead)</label><input id="cf-video-file" type="file" accept="video/*" class="w-full rounded-xl px-4 py-3 text-sm"><div id="cf-video-preview" class="mt-2 text-xs text-gray-500"></div></div>
+<div class="md:col-span-2 glass rounded-xl p-4">
+<div class="flex justify-between items-center mb-3"><label class="text-xs text-gray-400 font-semibold">🎬 Course Videos (add one or many lessons)</label><button type="button" onclick="addLessonRow()" class="px-4 py-2 rounded-full text-xs font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">+ Add Another Video</button></div>
+<div id="cf-lessons-list" class="space-y-3"></div>
+<div class="text-xs text-gray-500 mt-2">First video is used as the main preview. Each extra video becomes a new lesson students unlock in order. Files max 20MB — for longer lessons, use YouTube Unlisted + paste the link instead.</div>
+</div>
 <div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Description</label><textarea id="cf-description" rows="3" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="What will students learn?"></textarea></div>
 <div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Thumbnail Image (upload — shows on course card)</label><input id="cf-thumb-file" type="file" accept="image/*" class="w-full rounded-xl px-4 py-3 text-sm"><div id="cf-thumb-preview" class="mt-2 text-xs text-gray-500"></div></div>
 <div class="flex items-center gap-2"><input type="checkbox" id="cf-is-free" class="w-4 h-4"><label for="cf-is-free" class="text-sm text-gray-300">Free Class</label></div>
@@ -139,5 +143,17 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 </div>
 </div>
 
-<script src="skillforge.js?v=20260708c"></script>
+<!-- Student Dashboard -->
+<div class="modal-overlay" id="dashboard-modal">
+<div class="modal-content" style="max-width:800px">
+<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold">🎓 My SkillForge Dashboard</h3><button onclick="closeDashboard()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
+<div id="dashboard-login">
+<p class="text-sm text-gray-400 mb-3">Enter the email you used to enroll to see your classes, quiz scores, and certificates.</p>
+<div class="flex gap-2"><input id="dash-email" type="email" placeholder="you@email.com" class="flex-1 rounded-xl px-4 py-3 text-sm"><button onclick="loadDashboard()" class="px-6 py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">View</button></div>
+</div>
+<div id="dashboard-body" class="hidden"></div>
+</div>
+</div>
+
+<script src="skillforge.js?v=20260708d"></script>
 </body></html>
