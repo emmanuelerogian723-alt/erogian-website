@@ -13,6 +13,11 @@ body{background:#050505;color:#eaeaea;font-family:-apple-system,Segoe UI,Roboto,
 .wrap{max-width:1100px;margin:0 auto;padding:30px 20px 80px}
 h1{font-size:26px;font-weight:700;margin-bottom:6px;background:linear-gradient(90deg,#3b82f6,#facc15);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:#888;font-size:13px;margin-bottom:24px}
+.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.tab{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#aaa;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer}
+.tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.section{display:none}
+.section.active{display:block}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:26px}
 .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px}
 .card .num{font-size:28px;font-weight:800;color:#fff}
@@ -60,7 +65,12 @@ const d=await res.json();render(d);
 function row(n,c){return '<tr><td>'+n+'</td><td style="text-align:right"><span class="pill pill-blue">'+c+'</span></td></tr>'}
 function statusBadge(s){const m={pending:'pill-yellow',confirmed:'pill-green',completed:'pill-blue',cancelled:'pill-red',new:'pill-purple'};return '<span class="status-badge '+(m[s]||'pill-blue')+'">'+s+'</span>'}
 function intentBadge(s){const m={pricing:'pill-yellow',payment:'pill-green',contact:'pill-blue',booking:'pill-purple',services:'pill-blue',greeting:'pill-green',fallback:'pill-red'};return '<span class="status-badge '+(m[s]||'pill-blue')+'">'+s+'</span>'}
+function payBadge(s){const m={free:'pill-blue',paid:'pill-green',pending:'pill-yellow'};return '<span class="status-badge '+(m[s]||'pill-blue')+'">'+s+'</span>'}
 function esc(s){return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function switchTab(name){
+document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+name));
+}
 function render(d){
 const app=document.getElementById('app');
 const apptCount=d.totalAppointments||0;
@@ -68,7 +78,8 @@ const apptByStatus=d.appointmentsByStatus||{};
 const chatCount=d.totalChats||0;
 const chatsByIntent=d.chatsByIntent||{};
 const intentRows=Object.entries(chatsByIntent).sort((a,b)=>b[1]-a[1]).map(([n,c])=>row(n,c)).join('');
-app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live data for erogian website</div>'+
+
+const siteSection=
 '<div class="grid">'+
 '<div class="card"><div class="num">'+d.totalVisits+'</div><div class="label">Page Views</div></div>'+
 '<div class="card"><div class="num">'+d.totalLeads+'</div><div class="label">Leads</div></div>'+
@@ -96,6 +107,33 @@ app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live data for erogian 
 '<div class="panel"><h2>Top Pages</h2><table><tr><th>Page</th><th style="text-align:right">Views</th></tr>'+d.byPage.slice(0,10).map(r=>row(r.name,r.count)).join('')+'</table></div>'+
 '<div class="panel"><h2>Device Breakdown</h2><table><tr><th>Device</th><th style="text-align:right">Visits</th></tr>'+d.byDevice.map(r=>row(r.name,r.count)).join('')+'</table></div>'+
 '<div class="panel"><h2>Recent Visits</h2><table><tr><th>Time</th><th>Page</th><th>From</th><th>Device</th></tr>'+d.recent.map(r=>'<tr><td>'+new Date(r.date).toLocaleString()+'</td><td>'+esc(r.path)+'</td><td>'+esc(r.referrer)+'</td><td>'+esc(r.device)+'</td></tr>').join('')+'</table></div>';
+
+const skillForgeSection=
+'<div class="grid">'+
+'<div class="card"><div class="num">'+(d.totalStudents||0)+'</div><div class="label">Total Students</div></div>'+
+'<div class="card"><div class="num">'+(d.totalCompleted||0)+'</div><div class="label">Completed Courses</div></div>'+
+'<div class="card"><div class="num">'+(d.completionRate||0)+'%</div><div class="label">Completion Rate</div></div>'+
+'<div class="card"><div class="num">'+(d.avgQuizScore||0)+'%</div><div class="label">Avg Quiz Score</div></div>'+
+'</div>'+
+'<div class="grid" style="margin-bottom:20px">'+
+'<div class="card"><div class="num" style="font-size:20px">'+(d.freeEnrollments||0)+'</div><div class="label">Free Enrollments</div></div>'+
+'<div class="card"><div class="num" style="font-size:20px">'+(d.paidEnrollments||0)+'</div><div class="label">Paid Enrollments</div></div>'+
+'<div class="card"><div class="num" style="font-size:20px">'+(d.pendingEnrollments||0)+'</div><div class="label">Pending Payment</div></div>'+
+'<div class="card"><div class="num" style="font-size:20px">'+(d.publishedCourses||0)+' / '+(d.totalCourses||0)+'</div><div class="label">Published Courses</div></div>'+
+'</div>'+
+'<div class="panel"><h2>Most Popular Courses</h2><table><tr><th>Course</th><th style="text-align:right">Students</th></tr>'+(d.topCourses||[]).map(r=>row(esc(r.name),r.count)).join('')+'</table></div>'+
+'<div class="panel"><h2>Recent Students</h2><table><tr><th>Name</th><th>Email</th><th>Course</th><th>Status</th><th>Quiz Score</th><th>Completed</th><th>Certificate</th><th>Date</th></tr>'+
+(d.recentEnrollments||[]).map(e=>'<tr><td>'+esc(e.name)+'</td><td>'+esc(e.email)+'</td><td>'+esc(e.course_title)+'</td><td>'+payBadge(e.payment_status)+'</td><td>'+(e.quiz_total?e.quiz_score+'/'+e.quiz_total:'—')+'</td><td>'+(e.completed?'<span class="status-badge pill-green">Yes</span>':'<span class="status-badge pill-yellow">No</span>')+'</td><td>'+(e.certificate_issued?'<span class="status-badge pill-green">Issued</span>':'—')+'</td><td>'+new Date(e.date).toLocaleDateString()+'</td></tr>').join('')+
+'</table></div>';
+
+app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live data for erogian website</div>'+
+'<div class="tabs">'+
+'<div class="tab active" data-tab="site" onclick="switchTab(\'site\')">🌐 Website</div>'+
+'<div class="tab" data-tab="skillforge" onclick="switchTab(\'skillforge\')">🎓 SkillForge Students</div>'+
+'</div>'+
+'<div class="section active" id="sec-site">'+siteSection+'</div>'+
+'<div class="section" id="sec-skillforge">'+skillForgeSection+'</div>';
+
 const ctx=document.getElementById('dayChart');
 new Chart(ctx,{type:'line',data:{labels:d.byDay.map(x=>x.name),datasets:[{label:'Visits',data:d.byDay.map(x=>x.count),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.15)',tension:0.3,fill:true}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
