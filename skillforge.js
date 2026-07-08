@@ -1,12 +1,17 @@
 /* ===== Config ===== */
 var SKILLFORGE_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianSkillForge';
 var UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianUpload';
+var VIDEO_UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianVideoUpload';
 var ADMIN_KEY = 'erogian_skillforge_admin_2026';
 var UPLOAD_ADMIN_KEY = 'erogian_blog_admin_2026'; // shared upload utility uses the blog admin key
 var WHATSAPP_NUMBER = '2347045560291';
+var CERTIFICATE_TEMPLATE = 'https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/a13447e10_generated_image.png';
 var allCourses = [];
 var currentFilter = 'all';
 var uploadedThumbUrl = '';
+var uploadedVideoFileUrl = '';
+var cfQuizData = [];
+var currentEnrollment = null; // {id, name, email, course}
 
 function esc(s) { return (s||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -50,13 +55,14 @@ function renderGrid() {
     var thumb = c.thumbnail ? '<img src="'+esc(c.thumbnail)+'" class="w-full h-40 object-cover" loading="lazy">' : '<div class="w-full h-40 bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center text-4xl">🎬</div>';
     var badge = c.is_free ? '<span class="badge-free text-xs px-3 py-1 rounded-full font-semibold">FREE</span>' : '<span class="badge-pro text-xs px-3 py-1 rounded-full font-semibold">₦'+Number(c.price_ngn||0).toLocaleString()+'</span>';
     var lock = c.is_free ? '' : '<div class="lock-overlay"><div class="text-3xl">🔒</div><div class="text-xs text-gray-300">Premium Class</div></div>';
+    var hasQuiz = (function(){ try { return JSON.parse(c.quiz||'[]').length > 0; } catch(e){ return false; } })();
     return '<div class="glass rounded-2xl overflow-hidden card-float cursor-pointer group" onclick="openCourse(\''+esc(c.slug)+'\')">' +
       '<div class="relative">' + thumb + lock + '</div>' +
       '<div class="p-5">' +
       '<div class="flex items-center justify-between mb-2"><span class="text-xs text-purple-300">'+esc(c.category)+' · '+esc(c.level)+'</span>'+badge+'</div>' +
       '<div class="font-semibold mb-2">'+esc(c.title)+'</div>' +
       '<div class="text-xs text-gray-500 mb-3">'+esc((c.description||'').slice(0,90))+'...</div>' +
-      '<div class="text-xs text-gray-600">⏱ '+esc(c.duration||'')+' · '+ (c.enrolled_count||0) +' enrolled</div>' +
+      '<div class="text-xs text-gray-600">⏱ '+esc(c.duration||'')+' · '+ (c.enrolled_count||0) +' enrolled'+(hasQuiz?' · 🧠 Quiz + 🎓 Certificate':'')+'</div>' +
       '</div></div>';
   }).join('');
 }
@@ -66,39 +72,194 @@ function openCourse(slug) {
   if (!course) return;
   document.getElementById('enroll-title').textContent = course.title;
   var body = document.getElementById('enroll-body');
-  if (course.is_free) {
-    body.innerHTML =
-      '<p class="text-sm text-gray-400 mb-4">'+esc(course.description)+'</p>' +
-      '<div class="space-y-3 mb-4">' +
-      '<input id="ef-name" placeholder="Your name" class="w-full rounded-xl px-4 py-3 text-sm">' +
-      '<input id="ef-phone" placeholder="WhatsApp number" class="w-full rounded-xl px-4 py-3 text-sm">' +
-      '</div>' +
-      '<button onclick="startFreeClass(\''+esc(slug)+'\')" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Start Free Class →</button>';
-  } else {
-    var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge.');
-    body.innerHTML =
-      '<p class="text-sm text-gray-400 mb-4">'+esc(course.description)+'</p>' +
-      '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access</div></div>' +
-      '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="block text-center w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Unlock on WhatsApp →</a>';
-  }
+  body.innerHTML =
+    '<p class="text-sm text-gray-400 mb-4">'+esc(course.description)+'</p>' +
+    (course.is_free ? '' : '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate</div></div>') +
+    '<div class="space-y-3 mb-4">' +
+    '<input id="ef-name" placeholder="Your full name (for your certificate)" class="w-full rounded-xl px-4 py-3 text-sm">' +
+    '<input id="ef-email" type="email" placeholder="Your email address" class="w-full rounded-xl px-4 py-3 text-sm">' +
+    '<input id="ef-phone" placeholder="WhatsApp number" class="w-full rounded-xl px-4 py-3 text-sm">' +
+    '</div>' +
+    '<button onclick="'+(course.is_free ? 'startFreeClass' : 'startPaidClass')+'(\''+esc(slug)+'\')" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">'+(course.is_free ? 'Start Free Class →' : 'Continue →')+'</button>';
   document.getElementById('enroll-modal').classList.add('active');
 }
 
-async function startFreeClass(slug) {
+function validateEnrollForm() {
   var name = document.getElementById('ef-name').value.trim();
+  var email = document.getElementById('ef-email').value.trim();
   var phone = document.getElementById('ef-phone').value.trim();
-  if (!name || !phone) { alert('Please enter your name and WhatsApp number.'); return; }
+  if (!name || !email) { alert('Please enter your name and email to continue.'); return null; }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { alert('Please enter a valid email address.'); return null; }
+  return { name: name, email: email, phone: phone };
+}
+
+async function startPaidClass(slug) {
+  var info = validateEnrollForm();
+  if (!info) return;
   var course = allCourses.find(function(c){ return c.slug === slug; });
   try {
-    await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:name, phone:phone, course_slug:slug, is_free:true }) });
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:false, amount_ngn: course.price_ngn }) });
+    var data = await res.json();
+    currentEnrollment = { id: data.enrollment ? data.enrollment.id : null, name: info.name, email: info.email, course: course };
   } catch(e) {}
-  var embed = toEmbedUrl(course.video_url);
+  var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge. My name: '+info.name+', email: '+info.email);
   var body = document.getElementById('enroll-body');
-  if (embed) {
-    body.innerHTML = '<div class="aspect-video rounded-xl overflow-hidden mb-4"><iframe src="'+esc(embed)+'" class="w-full h-full" allowfullscreen frameborder="0"></iframe></div><p class="text-sm text-gray-400">Enjoy the class! Have questions? <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline">Message us on WhatsApp</a>.</p>';
+  body.innerHTML =
+    '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate on completion</div></div>' +
+    '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="block text-center w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Unlock on WhatsApp →</a>';
+}
+
+async function startFreeClass(slug) {
+  var info = validateEnrollForm();
+  if (!info) return;
+  var course = allCourses.find(function(c){ return c.slug === slug; });
+  var enrollmentId = null;
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:true }) });
+    var data = await res.json();
+    if (data.enrollment) enrollmentId = data.enrollment.id;
+  } catch(e) {}
+  currentEnrollment = { id: enrollmentId, name: info.name, email: info.email, course: course };
+  renderVideoStep(course);
+}
+
+function renderVideoStep(course) {
+  var body = document.getElementById('enroll-body');
+  var player = '';
+  if (course.video_file_url) {
+    player = '<div class="rounded-xl overflow-hidden mb-4"><video src="'+esc(course.video_file_url)+'" controls class="w-full"></video></div>';
   } else {
-    body.innerHTML = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">This class video is being added soon! We\'ll notify you on WhatsApp the moment it\'s live. <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline block mt-2">Message us</a></div>';
+    var embed = toEmbedUrl(course.video_url);
+    if (embed) player = '<div class="aspect-video rounded-xl overflow-hidden mb-4"><iframe src="'+esc(embed)+'" class="w-full h-full" allowfullscreen frameborder="0"></iframe></div>';
   }
+  if (!player) {
+    body.innerHTML = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">This class video is being added soon! We\'ll notify you on WhatsApp the moment it\'s live. <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline block mt-2">Message us</a></div>';
+    return;
+  }
+  var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
+  var quizBtn = quiz.length ? '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">✅ I\'ve watched it — Take the Quiz (' + quiz.length + ' questions)</button>' :
+    '<div class="text-center text-xs text-gray-500">Enjoy the class! Have questions? <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline">Message us on WhatsApp</a>.</div>';
+  body.innerHTML = player + quizBtn;
+}
+
+function showQuiz() {
+  var course = currentEnrollment.course;
+  var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div class="text-sm text-gray-400 mb-4">Answer these to confirm you understood the lesson. You need 70% to pass and unlock your certificate.</div>' +
+    quiz.map(function(q, i) {
+      return '<div class="glass rounded-xl p-4 mb-3"><div class="font-semibold text-sm mb-2">'+(i+1)+'. '+esc(q.question)+'</div>' +
+        q.options.map(function(opt, oi) {
+          return '<label class="flex items-center gap-2 text-sm text-gray-300 mb-1 cursor-pointer"><input type="radio" name="quiz-q'+i+'" value="'+oi+'"> '+esc(opt)+'</label>';
+        }).join('') + '</div>';
+    }).join('') +
+    '<button onclick="submitQuiz()" class="w-full py-3 rounded-full font-semibold mt-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Submit Answers</button>';
+}
+
+async function submitQuiz() {
+  var course = currentEnrollment.course;
+  var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
+  var answers = quiz.map(function(q, i) {
+    var checked = document.querySelector('input[name="quiz-q'+i+'"]:checked');
+    return checked ? parseInt(checked.value) : -1;
+  });
+  if (answers.indexOf(-1) !== -1) { alert('Please answer every question.'); return; }
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div class="text-center py-8 text-sm text-gray-400">Grading your answers...</div>';
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'submit_quiz', course_slug: course.slug, answers: answers, enrollment_id: currentEnrollment.id }) });
+    var data = await res.json();
+    if (data.passed) {
+      body.innerHTML = '<div class="text-center py-6">' +
+        '<div class="text-4xl mb-3">🎉</div>' +
+        '<div class="font-bold text-lg mb-1">You passed! '+data.correct+'/'+data.total+'</div>' +
+        '<div class="text-sm text-gray-400 mb-5">Great job, '+esc(currentEnrollment.name)+'! Your certificate is ready.</div>' +
+        '<button onclick="downloadCertificate()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#d4af37,#8b5cf6)">🎓 Download Your Certificate</button>' +
+        '</div>';
+    } else {
+      body.innerHTML = '<div class="text-center py-6">' +
+        '<div class="text-4xl mb-3">📚</div>' +
+        '<div class="font-bold text-lg mb-1">'+data.correct+'/'+data.total+' — Almost there!</div>' +
+        '<div class="text-sm text-gray-400 mb-5">Rewatch the video and try the quiz again to unlock your certificate.</div>' +
+        '<button onclick="renderVideoStep(currentEnrollment.course)" class="w-full py-3 rounded-full font-semibold glass">Rewatch & Retry</button>' +
+        '</div>';
+    }
+  } catch (e) {
+    body.innerHTML = '<div class="text-center py-8 text-sm text-red-400">Something went wrong grading your quiz. Please try again.</div>';
+  }
+}
+
+/* ===== Certificate generation (client-side canvas) ===== */
+function downloadCertificate() {
+  var name = currentEnrollment.name;
+  var courseTitle = currentEnrollment.course.title;
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    var cx = canvas.width / 2;
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold ' + Math.round(canvas.width * 0.032) + 'px Georgia, serif';
+    ctx.fillText('CERTIFICATE OF COMPLETION', cx, canvas.height * 0.36);
+
+    ctx.fillStyle = '#cfcfcf';
+    ctx.font = 'italic ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
+    ctx.fillText('This certifies that', cx, canvas.height * 0.45);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold ' + Math.round(canvas.width * 0.038) + 'px Georgia, serif';
+    ctx.fillText(name, cx, canvas.height * 0.54);
+
+    ctx.fillStyle = '#cfcfcf';
+    ctx.font = 'italic ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
+    ctx.fillText('has successfully completed the course', cx, canvas.height * 0.61);
+
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold ' + Math.round(canvas.width * 0.022) + 'px Georgia, serif';
+    wrapText(ctx, courseTitle, cx, canvas.height * 0.67, canvas.width * 0.7, canvas.width * 0.026);
+
+    var today = new Date().toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
+    ctx.fillStyle = '#999';
+    ctx.font = Math.round(canvas.width * 0.014) + 'px Arial, sans-serif';
+    ctx.fillText('Issued on ' + today + ' · SkillForge by EROGIAN', cx, canvas.height * 0.88);
+
+    try {
+      var link = document.createElement('a');
+      link.download = 'SkillForge-Certificate-' + name.replace(/\s+/g,'-') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      alert('Your browser blocked the certificate download. Please screenshot this page instead, or message us on WhatsApp and we\'ll send your certificate directly.');
+    }
+  };
+  img.onerror = function() {
+    alert('Could not load the certificate template. Please message us on WhatsApp and we\'ll send your certificate directly.');
+  };
+  img.src = CERTIFICATE_TEMPLATE;
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  var words = text.split(' ');
+  var line = '';
+  var lines = [];
+  for (var n = 0; n < words.length; n++) {
+    var testLine = line + words[n] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      lines.push(line);
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line);
+  var startY = y - ((lines.length - 1) * lineHeight) / 2;
+  lines.forEach(function(l, i) { ctx.fillText(l.trim(), x, startY + i * lineHeight); });
 }
 
 function closeEnroll() { document.getElementById('enroll-modal').classList.remove('active'); }
@@ -112,6 +273,7 @@ function checkAdminKey() {
     closeAdminLogin();
     document.getElementById('admin-studio-modal').classList.add('active');
     loadAdminCourses();
+    loadAdminEnrollments();
   } else {
     alert('Incorrect key.');
   }
@@ -122,23 +284,74 @@ document.addEventListener('change', function(e) {
   if (e.target && e.target.id === 'cf-thumb-file') {
     var file = e.target.files[0];
     if (!file) return;
+    var preview = document.getElementById('cf-thumb-preview');
+    preview.innerHTML = '<img src="'+URL.createObjectURL(file)+'" class="h-20 rounded-lg mb-1">';
     var reader = new FileReader();
     reader.onload = async function() {
-      document.getElementById('cf-thumb-preview').textContent = 'Uploading...';
       try {
         var base64 = reader.result.split(',')[1];
-        if (file.size > 500000) { document.getElementById('cf-thumb-preview').textContent = 'Image too large (max 500KB)'; return; }
+        if (file.size > 800000) { preview.innerHTML += '<div class="text-red-400">Image too large (max 800KB)</div>'; return; }
+        preview.innerHTML += '<div>Uploading...</div>';
         var res = await fetch(UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, image:base64, filename:file.name, mime:file.type }) });
         var data = await res.json();
-        if (data.status === 'ok') { uploadedThumbUrl = data.url; document.getElementById('cf-thumb-preview').textContent = 'Uploaded ✓'; }
-        else { document.getElementById('cf-thumb-preview').textContent = 'Upload failed: ' + (data.message||''); }
+        if (data.status === 'ok') { uploadedThumbUrl = data.url; preview.innerHTML = '<img src="'+esc(data.url)+'" class="h-20 rounded-lg mb-1"><div class="text-green-400">Uploaded ✓</div>'; }
+        else { preview.innerHTML += '<div class="text-red-400">Upload failed: ' + (data.message||'') + '</div>'; }
       } catch (err) {
-        document.getElementById('cf-thumb-preview').textContent = 'Upload failed';
+        preview.innerHTML += '<div class="text-red-400">Upload failed</div>';
       }
     };
     reader.readAsDataURL(file);
   }
+
+  if (e.target && e.target.id === 'cf-video-file') {
+    var vfile = e.target.files[0];
+    if (!vfile) return;
+    var vpreview = document.getElementById('cf-video-preview');
+    if (vfile.size > 20 * 1024 * 1024) { vpreview.innerHTML = '<div class="text-red-400">Video too large (max 20MB). For longer lessons, upload as Unlisted on YouTube and paste the link above instead.</div>'; return; }
+    vpreview.innerHTML = '<div>Uploading video... this may take a moment</div>';
+    var vreader = new FileReader();
+    vreader.onload = async function() {
+      try {
+        var vbase64 = vreader.result.split(',')[1];
+        var vres = await fetch(VIDEO_UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, video:vbase64, filename:vfile.name, mime:vfile.type }) });
+        var vdata = await vres.json();
+        if (vdata.status === 'ok') { uploadedVideoFileUrl = vdata.url; vpreview.innerHTML = '<div class="text-green-400">Video uploaded ✓ — will be used instead of the URL above</div>'; }
+        else { vpreview.innerHTML = '<div class="text-red-400">Upload failed: ' + (vdata.message||'') + '</div>'; }
+      } catch (err) {
+        vpreview.innerHTML = '<div class="text-red-400">Upload failed</div>';
+      }
+    };
+    vreader.readAsDataURL(vfile);
+  }
 });
+
+async function generateQuizFromVideo() {
+  var video = document.getElementById('cf-video').value.trim();
+  var title = document.getElementById('cf-title').value.trim();
+  if (!video) { alert('Paste the YouTube video URL first.'); return; }
+  var out = document.getElementById('cf-quiz-editor');
+  out.innerHTML = '<div class="text-sm text-gray-400">🧠 Watching & analyzing the video, generating questions...</div>';
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'generate_quiz', admin_key:ADMIN_KEY, video_url:video, course_title:title }) });
+    var data = await res.json();
+    cfQuizData = data.quiz || [];
+    renderQuizEditor();
+  } catch (e) {
+    out.innerHTML = '<div class="text-sm text-red-400">Could not generate quiz. Try again.</div>';
+  }
+}
+
+function renderQuizEditor() {
+  var out = document.getElementById('cf-quiz-editor');
+  if (!cfQuizData.length) { out.innerHTML = '<div class="text-sm text-gray-500">No quiz yet — generate one from the video above.</div>'; return; }
+  out.innerHTML = '<div class="text-xs text-gray-400 mb-2">Review the auto-generated quiz (correct answer highlighted). Regenerate if needed.</div>' +
+    cfQuizData.map(function(q, i) {
+      return '<div class="glass rounded-lg p-3 mb-2 text-sm"><div class="font-semibold mb-1">'+(i+1)+'. '+esc(q.question)+'</div>' +
+        q.options.map(function(opt, oi) {
+          return '<div class="'+(oi === q.correct_index ? 'text-green-400' : 'text-gray-400')+'">'+(oi === q.correct_index ? '✓ ' : '· ')+esc(opt)+'</div>';
+        }).join('') + '</div>';
+    }).join('');
+}
 
 async function saveCourse() {
   var title = document.getElementById('cf-title').value.trim();
@@ -154,15 +367,20 @@ async function saveCourse() {
       category: document.getElementById('cf-category').value.trim() || 'General',
       level: document.getElementById('cf-level').value,
       video_url: video,
+      video_file_url: uploadedVideoFileUrl,
       thumbnail: uploadedThumbUrl,
       duration: document.getElementById('cf-duration').value.trim(),
       is_free: document.getElementById('cf-is-free').checked,
       price_ngn: parseInt(document.getElementById('cf-price').value) || 0,
+      quiz: JSON.stringify(cfQuizData),
       status: 'published'
     })});
     var data = await res.json();
-    if (data.status === 'ok') { alert('Class published! 🎉'); closeAdminStudio(); window.location.reload(); }
-    else { alert('Error: ' + (data.message||'unknown')); btn.textContent='Publish Class'; btn.disabled=false; }
+    if (data.status === 'ok') {
+      alert('Class published! 🎉');
+      closeAdminStudio();
+      window.location.reload();
+    } else { alert('Error: ' + (data.message||'unknown')); btn.textContent='Publish Class'; btn.disabled=false; }
   } catch (e) { alert('Network error'); btn.textContent='Publish Class'; btn.disabled=false; }
 }
 
@@ -172,8 +390,20 @@ async function loadAdminCourses() {
     var data = await res.json();
     var list = document.getElementById('admin-course-list');
     list.innerHTML = (data.courses||[]).map(function(c) {
-      return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2"><span>'+esc(c.title)+' <span class="text-gray-600">('+(c.is_free?'Free':'₦'+c.price_ngn)+')</span></span><button onclick="deleteCourse(\''+c.id+'\')" class="text-red-400 text-xs">Delete</button></div>';
+      return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2"><span>'+esc(c.title)+' <span class="text-gray-600">('+(c.is_free?'Free':'₦'+c.price_ngn)+' · '+(c.enrolled_count||0)+' students)</span></span><button onclick="deleteCourse(\''+c.id+'\')" class="text-red-400 text-xs">Delete</button></div>';
     }).join('') || '<div class="text-gray-600 text-xs">No classes yet.</div>';
+  } catch (e) {}
+}
+
+async function loadAdminEnrollments() {
+  var el = document.getElementById('admin-enrollments-list');
+  if (!el) return;
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_enrollments', admin_key:ADMIN_KEY }) });
+    var data = await res.json();
+    el.innerHTML = (data.enrollments||[]).slice(0,30).map(function(e) {
+      return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2 text-xs"><span>'+esc(e.name)+' · '+esc(e.email)+' · '+esc(e.course_title)+'</span><span>'+(e.completed?'🎓 Completed':(e.quiz_total?e.quiz_score+'/'+e.quiz_total:'In progress'))+'</span></div>';
+    }).join('') || '<div class="text-gray-600 text-xs">No students yet.</div>';
   } catch (e) {}
 }
 
