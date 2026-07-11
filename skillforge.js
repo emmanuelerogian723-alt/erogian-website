@@ -423,29 +423,35 @@ async function saveCourse() {
   if (!title) { alert('Please enter a title.'); return; }
   var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   var btn = document.getElementById('cf-save-btn');
-  btn.textContent = 'Publishing...'; btn.disabled = true;
+  var isEditing = !!cfEditingId;
+  btn.textContent = isEditing ? 'Updating...' : 'Publishing...'; btn.disabled = true;
   var validLessons = cfLessons.filter(function(l){ return l.video_url || l.video_file_url; });
+  var payload = {
+    action: isEditing ? 'update' : 'save',
+    admin_key: ADMIN_KEY,
+    title: title, slug: slug,
+    description: document.getElementById('cf-description').value.trim(),
+    category: document.getElementById('cf-category').value.trim() || 'General',
+    level: document.getElementById('cf-level').value,
+    lessons: JSON.stringify(validLessons),
+    thumbnail: uploadedThumbUrl,
+    duration: document.getElementById('cf-duration').value.trim(),
+    is_free: document.getElementById('cf-is-free').checked,
+    price_ngn: parseInt(document.getElementById('cf-price').value) || 0,
+    quiz: JSON.stringify(cfQuizData),
+    status: 'published'
+  };
+  if (isEditing) payload.id = cfEditingId;
   try {
-    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
-      action:'save', admin_key:ADMIN_KEY, title:title, slug:slug,
-      description: document.getElementById('cf-description').value.trim(),
-      category: document.getElementById('cf-category').value.trim() || 'General',
-      level: document.getElementById('cf-level').value,
-      lessons: JSON.stringify(validLessons),
-      thumbnail: uploadedThumbUrl,
-      duration: document.getElementById('cf-duration').value.trim(),
-      is_free: document.getElementById('cf-is-free').checked,
-      price_ngn: parseInt(document.getElementById('cf-price').value) || 0,
-      quiz: JSON.stringify(cfQuizData),
-      status: 'published'
-    })});
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     var data = await res.json();
     if (data.status === 'ok') {
-      alert('Class published! 🎉');
+      alert(isEditing ? 'Class updated! ✅' : 'Class published! 🎉');
+      resetCourseForm();
       closeAdminStudio();
       window.location.reload();
-    } else { alert('Error: ' + (data.message||'unknown')); btn.textContent='Publish Class'; btn.disabled=false; }
-  } catch (e) { alert('Network error'); btn.textContent='Publish Class'; btn.disabled=false; }
+    } else { alert('Error: ' + (data.message||'unknown')); btn.textContent = isEditing ? 'Update Class' : 'Publish Class'; btn.disabled=false; }
+  } catch (e) { alert('Network error'); btn.textContent = isEditing ? 'Update Class' : 'Publish Class'; btn.disabled=false; }
 }
 
 async function loadAdminCourses() {
@@ -469,6 +475,58 @@ async function loadAdminEnrollments() {
       return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2 text-xs"><span>'+esc(e.name)+' · '+esc(e.email)+' · '+esc(e.course_title)+'</span><span>'+(e.completed?'🎓 Completed':(e.quiz_total?e.quiz_score+'/'+e.quiz_total:'In progress'))+'</span></div>';
     }).join('') || '<div class="text-gray-600 text-xs">No students yet.</div>';
   } catch (e) {}
+}
+
+var cfEditingId = null;
+
+function resetCourseForm() {
+  cfEditingId = null;
+  document.getElementById('cf-title').value = '';
+  document.getElementById('cf-category').value = '';
+  document.getElementById('cf-level').value = 'Beginner';
+  document.getElementById('cf-duration').value = '';
+  document.getElementById('cf-description').value = '';
+  document.getElementById('cf-price').value = '';
+  document.getElementById('cf-is-free').checked = false;
+  cfLessons = []; cfQuizData = []; uploadedThumbUrl = '';
+  renderLessonsEditor();
+  document.getElementById('cf-quiz-editor').innerHTML = 'No quiz yet.';
+  var btn = document.getElementById('cf-save-btn');
+  btn.textContent = 'Publish Class';
+  var banner = document.getElementById('cf-editing-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function editCourse(c) {
+  cfEditingId = c.id;
+  document.getElementById('cf-title').value = c.title || '';
+  document.getElementById('cf-category').value = c.category || '';
+  document.getElementById('cf-level').value = c.level || 'Beginner';
+  document.getElementById('cf-duration').value = c.duration || '';
+  document.getElementById('cf-description').value = c.description || '';
+  document.getElementById('cf-price').value = c.price_ngn || '';
+  document.getElementById('cf-is-free').checked = !!c.is_free;
+  uploadedThumbUrl = c.thumbnail || '';
+  try { cfLessons = JSON.parse(c.lessons||'[]'); } catch(e){ cfLessons = []; }
+  try { cfQuizData = JSON.parse(c.quiz||'[]'); } catch(e){ cfQuizData = []; }
+  renderLessonsEditor();
+  if (cfQuizData.length) renderQuizEditor(); else document.getElementById('cf-quiz-editor').innerHTML = 'No quiz yet.';
+  var btn = document.getElementById('cf-save-btn');
+  btn.textContent = 'Update Class';
+  var banner = document.getElementById('cf-editing-banner');
+  if (banner) banner.classList.remove('hidden');
+  document.getElementById('cf-title').scrollIntoView({behavior:'smooth'});
+}
+
+async function togglePublish(id, currentStatus) {
+  var newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+  if (!confirm('Change status to ' + newStatus + '?')) return;
+  try {
+    await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'update_status', admin_key:ADMIN_KEY, id:id, status:newStatus })
+    });
+    loadAdminCourses();
+  } catch(e) { alert('Error updating status'); }
 }
 
 async function deleteCourse(id) {
