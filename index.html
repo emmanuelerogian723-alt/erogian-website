@@ -72,6 +72,21 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 .modal-content{background:#0a0c10;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:32px}
 .chip-active{background:linear-gradient(90deg,#8b5cf6,#3b82f6) !important;color:#fff !important;}
 .chat-link{color:#93c5fd;text-decoration:underline;}
+
+/* ===== FLIP CARDS ===== */
+.flip-container{perspective:900px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.flip-card{position:relative;width:100%;padding-top:110%;transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(.4,0,.2,1)}
+.flip-container:hover .flip-card,.flip-container.flipped .flip-card{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.flip-back{background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(59,130,246,.18));border:1px solid rgba(139,92,246,.4);transform:rotateY(180deg)}
+
+/* ===== HERO 3D scene ===== */
+.hero-grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(139,92,246,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+
+/* ===== Urgency pulse ===== */
+@keyframes urgencyPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 0 0 8px rgba(212,175,55,0)}}
+.urgency-badge{animation:urgencyPulse 2s ease infinite}
 </style>
 <script>
 (function(){try{var p=new URLSearchParams(window.location.search);fetch('https://superagent-55bc0d3a.base44.app/functions/logErogianVisit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:window.location.pathname,referrer:document.referrer||'direct',utm_source:p.get('utm_source')||'',utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',user_agent:navigator.userAgent,language:navigator.language})}).catch(function(){});}catch(e){}})();
@@ -93,17 +108,42 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10 pointer-events-none"></div>
 <div class="relative z-20 max-w-5xl mx-auto text-center" data-hero>
 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-gray-300 mb-8 opacity-0" data-hero-tag><span class="w-2 h-2 rounded-full bg-purple-400 pulse-glow"></span> AI-First Digital Studio · Nigeria &amp; Global</div>
-<h1 class="display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight opacity-0" data-hero-title>Building <span class="grad-text">Digital Legacies</span><br> Through AI, Software &amp; Creativity</h1>
-<p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto opacity-0" data-hero-sub>Helping startups, businesses and creators transform ideas into profitable digital products.</p>
+<h1 class="display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight opacity-0" data-hero-title>We Turn Your <span class="grad-text">Idea Into</span><br>A Digital Empire</h1>
+<p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto opacity-0" data-hero-sub>AI agents, websites, brands &amp; automation — built so good your competitors will wonder what happened.</p>
 <div class="mt-10 flex flex-wrap items-center justify-center gap-4 opacity-0" data-hero-cta>
-<a href="#estimator" class="px-7 py-3.5 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 transition shadow-lg shadow-purple-500/30">Estimate Your Project</a>
-<a href="#portfolio" class="px-7 py-3.5 rounded-full font-semibold glass hover:bg-white/10 transition">View Portfolio</a>
-<a href="#book" class="px-7 py-3.5 rounded-full font-semibold text-gray-300 hover:text-white transition">Book Consultation →</a>
-</div></div>
-<div class="hidden md:block absolute left-[2%] top-[30%] glass rounded-2xl p-4 w-44 card-float z-20" data-float="1"><div class="text-xs text-gray-400 mb-1">AI Agent</div><div class="text-sm font-semibold">Shazam AI Online</div><div class="mt-2 h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full w-4/5 bg-gradient-to-r from-purple-400 to-blue-400"></div></div></div>
-<div class="hidden md:block absolute right-[2%] top-[22%] glass rounded-2xl p-4 w-48 card-float z-20" data-float="2"><div class="text-xs text-gray-400 mb-1">Analytics</div><div class="text-2xl font-bold grad-text">+248%</div><div class="text-xs text-gray-500">Client conversion lift</div></div>
-<div class="hidden md:block absolute right-[4%] bottom-[18%] glass rounded-2xl p-4 w-44 card-float z-20" data-float="3"><div class="text-xs text-gray-400">Now Building</div><div class="text-sm font-semibold">WhatsApp AI Bot</div></div>
-<div class="hidden md:block absolute left-[4%] bottom-[24%] glass rounded-2xl p-4 w-40 card-float z-20" data-float="4"><div class="text-xs text-gray-400">Deploy</div><div class="text-sm font-semibold">99.9% Uptime</div></div>
+<a href="#book" class="relative px-8 py-4 rounded-full font-bold text-base overflow-hidden group" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6);box-shadow:0 0 40px rgba(139,92,246,0.5)">
+  <span class="relative z-10">🔥 Book Free Strategy Call</span>
+  <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition" style="background:linear-gradient(90deg,#7c3aed,#2563eb)"></div>
+</a>
+<a href="#portfolio" class="px-7 py-4 rounded-full font-semibold glass hover:bg-white/10 transition">See Our Work →</a>
+</div>
+<!-- Urgency Banner -->
+<div class="mt-8 opacity-0" data-hero-cta>
+  <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold" style="background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37">
+    <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse inline-block"></span>
+    🔥 LAUNCH OFFER — 3 slots left at 30% OFF this month
+  </div>
+</div>
+</div>
+
+<!-- 3D Orb scene -->
+<div class="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
+  <div id="hero-orb" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;opacity:0.18">
+    <div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:orbSpin 20s linear infinite">
+      <div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);filter:blur(60px)"></div>
+      <div style="position:absolute;inset:40px;border-radius:50%;background:conic-gradient(from 180deg,#3b82f6,#8b5cf6,#d4af37,#3b82f6);filter:blur(40px);animation:orbSpin 12s linear infinite reverse"></div>
+    </div>
+  </div>
+  <!-- Grid lines -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(139,92,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.04) 1px,transparent 1px);background-size:60px 60px"></div>
+</div>
+<style>
+@keyframes orbSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+<div class="absolute left-[2%] top-[30%] glass rounded-2xl p-3 w-36 card-float z-20 text-xs" data-float="1" style="display:block"><div class="text-xs text-gray-400 mb-1">AI Agent</div><div class="text-sm font-semibold">Shazam AI Online</div><div class="mt-2 h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full w-4/5 bg-gradient-to-r from-purple-400 to-blue-400"></div></div></div>
+<div class="absolute right-[2%] top-[22%] glass rounded-2xl p-3 w-36 card-float z-20 text-xs" data-float="2" style="display:block"><div class="text-xs text-gray-400 mb-1">Analytics</div><div class="text-2xl font-bold grad-text">+248%</div><div class="text-xs text-gray-500">Client conversion lift</div></div>
+<div class="absolute right-[1%] bottom-[14%] glass rounded-2xl p-3 w-32 card-float z-20 text-xs" data-float="3" style="display:block"><div class="text-xs text-gray-400">Now Building</div><div class="text-sm font-semibold">WhatsApp AI Bot</div></div>
+<div class="absolute left-[1%] bottom-[20%] glass rounded-2xl p-3 w-32 card-float z-20 text-xs" data-float="4" style="display:block"><div class="text-xs text-gray-400">Deploy</div><div class="text-sm font-semibold">99.9% Uptime</div></div>
 <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-gray-500 text-xs animate-bounce">scroll ↓</div>
 </section>
 
@@ -116,8 +156,8 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 </div></section>
 
 <section id="services" class="py-28 px-6"><div class="max-w-6xl mx-auto">
-<div class="text-center mb-16"><div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">What We Do</div><h2 class="display text-4xl md:text-5xl font-bold">Full-Stack Digital Solutions</h2><p class="text-gray-400 mt-4 max-w-xl mx-auto">From brand identity to AI-powered software — everything your business needs to look and perform world-class.</p></div>
-<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" id="services-grid"></div>
+<div class="text-center mb-16"><div class="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-3">What We Do</div><h2 class="display text-4xl md:text-5xl font-bold">Full-Stack Digital <span class="grad-text">Solutions</span></h2><p class="text-gray-400 mt-4 max-w-xl mx-auto">Tap any service card to see what we deliver — 20 specialties, one studio.</p></div>
+<div id="services-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
 </div></section>
 
 <section id="portfolio" class="py-28 px-6 bg-[#07080b]"><div class="max-w-6xl mx-auto">
