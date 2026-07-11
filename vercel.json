@@ -24,6 +24,12 @@
   ],
   "rewrites": [
     { "source": "/analytics", "destination": "/analytics.html" },
-    { "source": "/blog", "destination": "/blog.html" }
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/skillforge", "destination": "/skillforge.html" },
+    { "source": "/estimator", "destination": "/index.html" },
+    { "source": "/book", "destination": "/index.html" },
+    { "source": "/services", "destination": "/index.html" },
+    { "source": "/portfolio", "destination": "/index.html" },
+    { "source": "/pricing", "destination": "/index.html" }
   ]
 }
