@@ -155,10 +155,35 @@ var services = [
  ['🎓','Educational Platforms','LMS & course platforms.'],
  ['💳','Payment Integration','Paystack, Stripe & Flutterwave, done right.']
 ];
-var sgrid = document.getElementById('services-grid');
-services.forEach(function(s){
-  sgrid.innerHTML += '<div class="glass glow-border rounded-2xl p-6 card-float"><div class="text-3xl mb-4">'+s[0]+'</div><div class="font-semibold mb-2">'+s[1]+'</div><div class="text-sm text-gray-500 leading-relaxed">'+s[2]+'</div></div>';
-});
+var services = [
+ ['🌐','Website Development','Modern, blazing-fast websites that convert.','Responsive design, fast load times, SEO-ready, contact forms & WhatsApp integration. Delivered in 3–7 days.'],
+ ['📱','Mobile Apps','iOS & Android apps built for scale.','Cross-platform mobile apps using React Native. Includes auth, payments, push notifications.'],
+ ['🤖','AI Automation','Automate repetitive work with custom AI.','Custom automation workflows that save hours daily. From lead capture to customer follow-ups.'],
+ ['🧠','AI Agents','Custom AI agents for your business.','Smart AI agents that handle customer queries, bookings, or internal tasks 24/7.'],
+ ['✈️','Telegram Bots','Full-featured bots for community & commerce.','Sell, manage, engage — all inside Telegram. Paystack & subscription support included.'],
+ ['💬','WhatsApp Bots','Automated sales & support on WhatsApp.','Auto-reply bots, order flow, payment links and lead capture for your WhatsApp number.'],
+ ['🛠️','Custom Software','Bespoke systems built around your workflow.','Internal tools, dashboards, CRMs — built exactly for how your team works.'],
+ ['🎨','Brand Identity','Complete visual identity systems.','Logo, colour palette, typography, brand guide — everything for a consistent look.'],
+ ['🖋️','Logo Design','Memorable marks that scale across media.','Premium logo design with unlimited revisions. Delivered in AI, PNG, and SVG formats.'],
+ ['🎬','Video Editing','Polished edits for social & ads.','Reels, YouTube content, promos — edited professionally with captions & motion graphics.'],
+ ['✨','Motion Graphics','Animated visuals that grab attention.','Animated logos, intros, explainer videos and social content that stops the scroll.'],
+ ['🧩','UI/UX Design','Interfaces people actually enjoy using.','Figma prototypes, user flows, wireframes — designed for conversion, not just looks.'],
+ ['🏢','Business Systems','Internal tools & dashboards.','Admin panels, inventory systems, booking managers built for your exact operations.'],
+ ['☁️','Cloud Deployment','Reliable, scalable infrastructure.','Deploy on Vercel, Render, AWS or DigitalOcean. CI/CD pipelines, uptime monitoring.'],
+ ['🔌','API Development','Robust APIs connecting your stack.','RESTful APIs, webhooks, third-party integrations — built for speed and reliability.'],
+ ['🛒','E-commerce','Stores built to sell, not just look good.','Shopify, custom stores, product pages, cart, Paystack checkout — all optimised.'],
+ ['📄','Landing Pages','High-converting single pages for campaigns.','Single-page sites built to convert visitors into leads or buyers. A/B tested layouts.'],
+ ['🚀','SaaS Development','Full SaaS products, start to scale.','Full-stack SaaS: auth, billing, dashboard, user management — production ready.'],
+ ['🎓','Educational Platforms','LMS & course platforms.','Course platforms with video lessons, quizzes, certificates and student dashboards.'],
+ ['💳','Payment Integration','Paystack, Stripe & Flutterwave, done right.','Seamless payment flows for subscriptions, one-time purchases, and in-app transactions.']
+];
+
+var sgrid = document.getElementById('services-grid-flip');
+if (sgrid) {
+  services.forEach(function(s, i){
+    sgrid.innerHTML += '<div class="flip-container" onclick="this.classList.toggle('flipped')" role="button" tabindex="0" aria-label="'+s[1]+'" onkeydown="if(event.key==='Enter'||event.key===' ')this.classList.toggle('flipped')"><div class="flip-card"><div class="flip-front"><div class="text-3xl mb-3">'+s[0]+'</div><div class="font-semibold text-sm leading-snug">'+s[1]+'</div><div class="text-xs text-gray-600 mt-1">tap to learn more</div></div><div class="flip-back"><div class="text-xs text-purple-300 font-semibold mb-2 uppercase tracking-wider">'+s[1]+'</div><p class="text-xs text-gray-300 leading-relaxed">'+s[3]+'</p><a href="https://wa.me/2347045560291?text=Hi%20Erogian!%20I%20need%20'+encodeURIComponent(s[1])+'" target="_blank" class="mt-3 px-4 py-1.5 rounded-full text-xs font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)" onclick="event.stopPropagation()">Get This →</a></div></div></div>';
+  });
+}
 
 /* ===== Portfolio ===== */
 var PB = 'https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/';
