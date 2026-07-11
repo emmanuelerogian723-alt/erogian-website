@@ -6,7 +6,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillForge by EROGIAN — Learn Tech Skills That Actually Pay</title>
 <meta name="description" content="SkillForge by EROGIAN: practical, hands-on video classes in web development, AI, and automation. Some lessons are free, advanced tracks are affordable and built by working developers.">
-<link rel="canonical" href="https://erogian.vercel.app/skillforge.html">
+<meta name="keywords" content="SkillForge, learn web development Nigeria, AI courses Nigeria, automation courses, online coding classes Nigeria, EROGIAN, tech skills Nigeria, learn to code Nigeria">
+<meta name="author" content="Emmanuel Ene Rejoice">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="google-site-verification" content="DwCZtKUV6W8t6YC-G-bM1n7yqymmRHp2zUSapUN6th4">
+<link rel="canonical" href="https://erogian.vercel.app/skillforge">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SkillForge by EROGIAN — Learn Tech Skills That Actually Pay">
+<meta property="og:description" content="Hands-on video classes in web development, AI, and automation from Nigeria's AI-first digital studio.">
+<meta property="og:url" content="https://erogian.vercel.app/skillforge">
+<meta property="og:site_name" content="EROGIAN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SkillForge by EROGIAN — Learn Tech Skills That Actually Pay">
+<meta name="twitter:description" content="Hands-on video classes in web development, AI, and automation.">
+<meta name="twitter:site" content="@Voscn247">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebPage","@id":"https://erogian.vercel.app/skillforge","url":"https://erogian.vercel.app/skillforge","name":"SkillForge by EROGIAN","description":"Practical, hands-on video classes in web development, AI, and automation.","isPartOf":{"@id":"https://erogian.vercel.app/#website"}},
+{"@type":"EducationalOrganization","name":"SkillForge by EROGIAN","url":"https://erogian.vercel.app/skillforge","description":"Online tech skill training platform offering web development, AI and automation courses","provider":{"@type":"Organization","name":"EROGIAN","url":"https://erogian.vercel.app"},"availableLanguage":"English","areaServed":"Nigeria"}
+]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -131,7 +150,9 @@ input::placeholder,textarea::placeholder{color:#6b7280}
 </div>
 <div class="flex gap-3 mt-6">
 <button onclick="saveCourse()" id="cf-save-btn" class="flex-1 py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Publish Class</button>
+<button onclick="resetCourseForm()" id="cf-reset-btn" class="px-6 py-3 rounded-full font-semibold glass hover:bg-white/10 transition text-sm">Clear Form</button>
 </div>
+<div id="cf-editing-banner" class="hidden mt-3 text-xs text-yellow-400 text-center">✏️ Editing existing class — click "Update Class" to save changes</div>
 <div class="mt-8 border-t border-white/10 pt-6">
 <h4 class="font-semibold mb-3 text-sm text-gray-300">Manage Existing Classes</h4>
 <div id="admin-course-list" class="space-y-2 text-sm"></div>
