@@ -101,19 +101,51 @@ async function initiatePayment(){
     requestAnimationFrame(loop);
   }
   loop();
+
+/* ===== Hero + nav animations (bulletproof - no GSAP dependency) ===== */
+(function initHero(){
+  function revealHero(){
+    var els = document.querySelectorAll('[data-hero-tag],[data-hero-title],[data-hero-sub],[data-hero-cta]');
+    els.forEach(function(el, i){
+      setTimeout(function(){
+        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        el.style.transform = 'translateY(0)';
+        el.style.opacity = '1';
+      }, i * 200);
+    });
+  }
+  // Set initial transform
+  document.querySelectorAll('[data-hero-tag],[data-hero-title],[data-hero-sub],[data-hero-cta]').forEach(function(el){
+    el.style.transform = 'translateY(20px)';
+  });
+  if(document.readyState === 'complete' || document.readyState === 'interactive'){
+    setTimeout(revealHero, 100);
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(revealHero, 100); });
+  }
+  window.addEventListener('load', revealHero);
 })();
 
-/* ===== Hero + nav animations ===== */
-gsap.registerPlugin(ScrollTrigger);
-gsap.timeline()
-  .to('[data-hero-tag]', {opacity:1, duration:0.6})
-  .to('[data-hero-title]', {opacity:1, duration:0.8}, '-=0.3')
-  .to('[data-hero-sub]', {opacity:1, duration:0.6}, '-=0.4')
-  .to('[data-hero-cta]', {opacity:1, duration:0.5}, '-=0.3');
-gsap.utils.toArray('[data-float]').forEach(function(el, i){
-  gsap.to(el, {y:'+=12', duration:2+i, delay:i*0.2, repeat:-1, yoyo:true, ease:'sine.inOut'});
-});
+/* ===== Float animation ===== */
+(function(){
+  var floats = document.querySelectorAll('[data-float]');
+  floats.forEach(function(el, i){
+    var dir = 1;
+    var y = 0;
+    var speed = 0.03 + i * 0.01;
+    var amp = 8 + i * 2;
+    var angle = Math.random() * Math.PI * 2;
+    function animate(){
+      angle += speed;
+      y = Math.sin(angle) * amp;
+      el.style.transform = 'translateY(' + y + 'px)';
+      requestAnimationFrame(animate);
+    }
+    animate();
+  });
+})();
 
+/* ===== Nav scroll effect ===== */
 var nav = document.getElementById('mainnav');
 window.addEventListener('scroll', function(){
   if(window.scrollY > 60){
@@ -123,80 +155,89 @@ window.addEventListener('scroll', function(){
   }
 });
 
-document.querySelectorAll('.counter').forEach(function(el){
-  var target = +el.dataset.count;
-  ScrollTrigger.create({trigger:el, start:'top 90%', once:true, onEnter:function(){
-    gsap.to(el, {innerText:target, duration:2, ease:'power1.out', snap:{innerText:1}, onUpdate:function(){
-      el.innerText = Math.round(this.targets()[0].innerText) + (target===98 ? '%' : '+');
-    }});
-  }});
-});
+/* ===== Counters (pure IntersectionObserver, no GSAP) ===== */
+(function(){
+  var counters = document.querySelectorAll('.counter');
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var el = entry.target;
+        var target = parseInt(el.dataset.count, 10);
+        var suffix = target === 98 ? '%' : '+';
+        var start = 0;
+        var duration = 1800;
+        var step = Math.ceil(target / (duration / 16));
+        el.innerText = '0' + suffix;
+        var interval = setInterval(function(){
+          start += step;
+          if(start >= target){
+            start = target;
+            clearInterval(interval);
+          }
+          el.innerText = start + suffix;
+        }, 16);
+        observer.unobserve(el);
+      }
+    });
+  }, {threshold: 0.3, rootMargin: '0px 0px -50px 0px'});
+  counters.forEach(function(c){ observer.observe(c); });
+})();
 
-/* ===== Services ===== */
+/* ===== Services — FLIP CARDS ===== */
 var services = [
- ['🌐','Website Development','Modern, blazing-fast websites that convert.'],
- ['📱','Mobile Apps','iOS & Android apps built for scale.'],
- ['🤖','AI Automation','Automate repetitive work with custom AI.'],
- ['🧠','AI Agents','Custom AI agents for your business, like Shazam AI.'],
- ['✈️','Telegram Bots','Full-featured bots for community & commerce.'],
- ['💬','WhatsApp Bots','Automated sales & support on WhatsApp.'],
- ['🛠️','Custom Software','Bespoke systems built around your workflow.'],
- ['🎨','Brand Identity','Complete visual identity systems.'],
- ['🖋️','Logo Design','Memorable marks that scale across media.'],
- ['🎬','Video Editing','Polished edits for social & ads.'],
- ['✨','Motion Graphics','Animated visuals that grab attention.'],
- ['🧩','UI/UX Design','Interfaces people actually enjoy using.'],
- ['🏢','Business Systems','Internal tools & dashboards.'],
- ['☁️','Cloud Deployment','Reliable, scalable infrastructure.'],
- ['🔌','API Development','Robust APIs connecting your stack.'],
- ['🛒','E-commerce','Stores built to sell, not just look good.'],
- ['📄','Landing Pages','High-converting single pages for campaigns.'],
- ['🚀','SaaS Development','Full SaaS products, start to scale.'],
- ['🎓','Educational Platforms','LMS & course platforms.'],
- ['💳','Payment Integration','Paystack, Stripe & Flutterwave, done right.']
-];
-var services = [
- ['🌐','Website Development','Modern, blazing-fast websites that convert.','Responsive design, fast load times, SEO-ready, contact forms & WhatsApp integration. Delivered in 3–7 days.'],
- ['📱','Mobile Apps','iOS & Android apps built for scale.','Cross-platform mobile apps using React Native. Includes auth, payments, push notifications.'],
- ['🤖','AI Automation','Automate repetitive work with custom AI.','Custom automation workflows that save hours daily. From lead capture to customer follow-ups.'],
- ['🧠','AI Agents','Custom AI agents for your business.','Smart AI agents that handle customer queries, bookings, or internal tasks 24/7.'],
- ['✈️','Telegram Bots','Full-featured bots for community & commerce.','Sell, manage, engage — all inside Telegram. Paystack & subscription support included.'],
- ['💬','WhatsApp Bots','Automated sales & support on WhatsApp.','Auto-reply bots, order flow, payment links and lead capture for your WhatsApp number.'],
+ ['🌐','Website Development','Modern, blazing-fast websites that convert.','Responsive, SEO-ready, with contact forms & WhatsApp integration. Delivered in 3–7 days.'],
+ ['📱','Mobile Apps','iOS & Android apps built for scale.','Cross-platform apps using React Native. Auth, payments, push notifications included.'],
+ ['🤖','AI Automation','Automate repetitive work with custom AI.','Custom automations that save hours daily — from lead capture to customer follow-ups.'],
+ ['🧠','AI Agents','Custom AI agents for your business.','Smart agents that handle queries, bookings, or internal tasks 24/7.'],
+ ['✈️','Telegram Bots','Full-featured bots for community & commerce.','Sell, manage, engage — all inside Telegram. Paystack & subscriptions included.'],
+ ['💬','WhatsApp Bots','Automated sales & support on WhatsApp.','Auto-reply bots, order flow, payment links and lead capture for WhatsApp.'],
  ['🛠️','Custom Software','Bespoke systems built around your workflow.','Internal tools, dashboards, CRMs — built exactly for how your team works.'],
  ['🎨','Brand Identity','Complete visual identity systems.','Logo, colour palette, typography, brand guide — everything for a consistent look.'],
- ['🖋️','Logo Design','Memorable marks that scale across media.','Premium logo design with unlimited revisions. Delivered in AI, PNG, and SVG formats.'],
- ['🎬','Video Editing','Polished edits for social & ads.','Reels, YouTube content, promos — edited professionally with captions & motion graphics.'],
- ['✨','Motion Graphics','Animated visuals that grab attention.','Animated logos, intros, explainer videos and social content that stops the scroll.'],
- ['🧩','UI/UX Design','Interfaces people actually enjoy using.','Figma prototypes, user flows, wireframes — designed for conversion, not just looks.'],
- ['🏢','Business Systems','Internal tools & dashboards.','Admin panels, inventory systems, booking managers built for your exact operations.'],
- ['☁️','Cloud Deployment','Reliable, scalable infrastructure.','Deploy on Vercel, Render, AWS or DigitalOcean. CI/CD pipelines, uptime monitoring.'],
- ['🔌','API Development','Robust APIs connecting your stack.','RESTful APIs, webhooks, third-party integrations — built for speed and reliability.'],
- ['🛒','E-commerce','Stores built to sell, not just look good.','Shopify, custom stores, product pages, cart, Paystack checkout — all optimised.'],
- ['📄','Landing Pages','High-converting single pages for campaigns.','Single-page sites built to convert visitors into leads or buyers. A/B tested layouts.'],
- ['🚀','SaaS Development','Full SaaS products, start to scale.','Full-stack SaaS: auth, billing, dashboard, user management — production ready.'],
- ['🎓','Educational Platforms','LMS & course platforms.','Course platforms with video lessons, quizzes, certificates and student dashboards.'],
- ['💳','Payment Integration','Paystack, Stripe & Flutterwave, done right.','Seamless payment flows for subscriptions, one-time purchases, and in-app transactions.']
+ ['🖋️','Logo Design','Memorable marks that scale across media.','Premium logos with unlimited revisions. Delivered in AI, PNG, and SVG.'],
+ ['🎬','Video Editing','Polished edits for social & ads.','Reels, YouTube, promos — edited with captions & motion graphics.'],
+ ['✨','Motion Graphics','Animated visuals that grab attention.','Animated logos, intros, explainers and social content that stops the scroll.'],
+ ['🧩','UI/UX Design','Interfaces people actually enjoy using.','Figma prototypes, user flows, wireframes — designed for conversion.'],
+ ['🏢','Business Systems','Internal tools & dashboards.','Admin panels, inventory, booking managers for your exact operations.'],
+ ['☁️','Cloud Deployment','Reliable, scalable infrastructure.','Deploy on Vercel, Render, AWS or DigitalOcean with CI/CD pipelines.'],
+ ['🔌','API Development','Robust APIs connecting your stack.','RESTful APIs, webhooks, third-party integrations — built for speed.'],
+ ['🛒','E-commerce','Stores built to sell, not just look good.','Product pages, cart, Paystack checkout — fully optimised.'],
+ ['📄','Landing Pages','High-converting single pages for campaigns.','Single-page sites built to turn visitors into buyers.'],
+ ['🚀','SaaS Development','Full SaaS products, start to scale.','Full-stack SaaS: auth, billing, dashboard, user management.'],
+ ['🎓','Educational Platforms','LMS & course platforms.','Course platforms with video, quizzes, certificates & dashboards.'],
+ ['💳','Payment Integration','Paystack, Stripe & Flutterwave, done right.','Seamless flows for subscriptions, one-time purchases & in-app transactions.']
 ];
 
-var sgrid = document.getElementById('services-grid-flip');
-if (sgrid) {
-  services.forEach(function(s, i){
-    sgrid.innerHTML += '<div class="flip-container" onclick="this.classList.toggle('flipped')" role="button" tabindex="0" aria-label="'+s[1]+'" onkeydown="if(event.key==='Enter'||event.key===' ')this.classList.toggle('flipped')"><div class="flip-card"><div class="flip-front"><div class="text-3xl mb-3">'+s[0]+'</div><div class="font-semibold text-sm leading-snug">'+s[1]+'</div><div class="text-xs text-gray-600 mt-1">tap to learn more</div></div><div class="flip-back"><div class="text-xs text-purple-300 font-semibold mb-2 uppercase tracking-wider">'+s[1]+'</div><p class="text-xs text-gray-300 leading-relaxed">'+s[3]+'</p><a href="https://wa.me/2347045560291?text=Hi%20Erogian!%20I%20need%20'+encodeURIComponent(s[1])+'" target="_blank" class="mt-3 px-4 py-1.5 rounded-full text-xs font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)" onclick="event.stopPropagation()">Get This →</a></div></div></div>';
+(function renderServices(){
+  var sgrid = document.getElementById('services-grid');
+  if(!sgrid) return;
+  sgrid.innerHTML = '';
+  sgrid.className = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4';
+  services.forEach(function(s){
+    var waLink = 'https://wa.me/2347045560291?text=' + encodeURIComponent('Hi Erogian! I need ' + s[1]);
+    var card = document.createElement('div');
+    card.className = 'flip-container';
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    card.setAttribute('aria-label', s[1]);
+    card.innerHTML =
+      '<div class="flip-card">' +
+        '<div class="flip-front">' +
+          '<div style="font-size:2rem;margin-bottom:0.5rem">' + s[0] + '</div>' +
+          '<div style="font-weight:600;font-size:0.8rem;line-height:1.2">' + s[1] + '</div>' +
+          '<div style="font-size:0.65rem;color:#6b7280;margin-top:0.35rem">tap to see more</div>' +
+        '</div>' +
+        '<div class="flip-back">' +
+          '<div style="font-size:0.65rem;color:#a78bfa;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem">' + s[1] + '</div>' +
+          '<p style="font-size:0.7rem;color:#d1d5db;line-height:1.4;margin-bottom:0.6rem">' + s[3] + '</p>' +
+          '<a href="' + waLink + '" target="_blank" onclick="event.stopPropagation()" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:9999px;font-size:0.7rem;font-weight:600;background:linear-gradient(90deg,#8b5cf6,#3b82f6);color:#fff;text-decoration:none">Get This →</a>' +
+        '</div>' +
+      '</div>';
+    card.addEventListener('click', function(){ this.classList.toggle('flipped'); });
+    card.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); this.classList.toggle('flipped'); } });
+    sgrid.appendChild(card);
   });
-}
+})();
 
-/* ===== Portfolio ===== */
-var PB = 'https://base44.app/api/apps/6a3e59929cb482183c6b0370/files/mp/public/6a3e59929cb482183c6b0370/';
-var portfolio = [
-  [PB+'81409901a_b866a7493_whatsapp_image_989662273880892.jpg','WDS Nigeria — Youth Conference 2026','Full event branding & flyer design'],
-  [PB+'85f617b52_f534707b2_whatsapp_image_1530346825404106.jpg','Spice Kitchen Book','Complete book cover design, front & back'],
-  [PB+'d97c54327_6e42a3586_whatsapp_image_1773590597336939.jpg','Rainbow Palm Oil','Product packaging & promotional design'],
-  [PB+'404f5f9b9_3698b4fa8_whatsapp_image_1716239642906492.jpg','WDS Arts & Culture Exhibition','Exhibition promo campaign design'],
-  [PB+'566a9369d_e9085c280_whatsapp_image_1600780008312807.jpg','Velora AI Agent','Full brand & logo design for AI startup'],
-  [PB+'983f78b55_9b0b12657_whatsapp_image_1728823008155812.jpg','Arts & Culture Campaign v1','Alternate campaign concept design']
-];
-var pgrid = document.getElementById('portfolio-grid');
-portfolio.forEach(function(p){
   pgrid.innerHTML += '<div class="glass rounded-2xl overflow-hidden card-float group"><div class="aspect-[4/5] overflow-hidden"><img src="'+p[0]+'" alt="'+p[1]+'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500"></div><div class="p-4"><div class="font-semibold text-sm mb-1">'+p[1]+'</div><div class="text-xs text-gray-500">'+p[2]+'</div></div></div>';
 });
 
