@@ -17,13 +17,26 @@ var currentEnrollment = null; // {id, name, email, course}
 
 function esc(s) { return (s||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+
+
+
 function toEmbedUrl(url) {
   if (!url) return '';
-  var yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-  if (yt) return 'https://www.youtube.com/embed/' + yt[1];
+  var yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/|youtube\.com\/v\/|youtube\.com\/user\/[^/]+\/[^/]+\/|youtube\.com\/c\/[^/]+\/[^/]+\/)([\w-]+)/);
+  if (yt) return 'https://www.youtube.com/embed/' + yt[1] + '?rel=0&modestbranding=1';
   var vimeo = url.match(/vimeo\.com\/(\d+)/);
   if (vimeo) return 'https://player.vimeo.com/video/' + vimeo[1];
   return url;
+}
+function getLessonPreviewHTML(url, idx) {
+  if (!url || url.trim() === '') return '';
+  var embed = toEmbedUrl(url);
+  if (!embed || embed === url) return '<div style="padding:8px;background:rgba(255,255,255,.04);border-radius:8px;font-size:12px;color:#9ca3af;">ℹ️ Preview only available for YouTube / Vimeo links</div>';
+  return '<div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;"><iframe src="'+embed+'" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div><div style="font-size:11px;color:#34d399;padding:4px 0;">✅ Preview loaded — looks good!</div>';
+}
+function updateLessonPreview(idx, url) {
+  var el = document.getElementById('lesson-url-preview-'+idx);
+  if (el) el.innerHTML = getLessonPreviewHTML(url, idx);
 }
 
 async function loadCourses() {
@@ -307,7 +320,7 @@ document.addEventListener('change', function(e) {
     reader.onload = async function() {
       try {
         var base64 = reader.result.split(',')[1];
-        if (file.size > 800000) { preview.innerHTML += '<div class="text-red-400">Image too large (max 800KB)</div>'; return; }
+        if (file.size > 5000000) { preview.innerHTML += '<div class="text-red-400">Image too large (max 5MB)</div>'; return; }
         preview.innerHTML += '<div>Uploading...</div>';
         var res = await fetch(UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, image:base64, filename:file.name, mime:file.type }) });
         var data = await res.json();
@@ -435,6 +448,10 @@ async function saveCourse() {
     level: document.getElementById('cf-level').value,
     lessons: JSON.stringify(validLessons),
     thumbnail: uploadedThumbUrl,
+    level: (document.getElementById('cf-level')||{value:''}).value,
+    duration: (document.getElementById('cf-duration')||{value:''}).value,
+    outcomes: (document.getElementById('cf-outcomes')||{value:''}).value,
+    requirements: (document.getElementById('cf-requirements')||{value:''}).value,
     duration: document.getElementById('cf-duration').value.trim(),
     is_free: document.getElementById('cf-is-free').checked,
     price_ngn: parseInt(document.getElementById('cf-price').value) || 0,
@@ -489,6 +506,10 @@ function resetCourseForm() {
   document.getElementById('cf-price').value = '';
   document.getElementById('cf-is-free').checked = false;
   cfLessons = []; cfQuizData = []; uploadedThumbUrl = '';
+  var lvl2 = document.getElementById('cf-level'); if(lvl2) lvl2.value='';
+  var dur2 = document.getElementById('cf-duration'); if(dur2) dur2.value='';
+  var out2 = document.getElementById('cf-outcomes'); if(out2) out2.value='';
+  var req2 = document.getElementById('cf-requirements'); if(req2) req2.value='';
   renderLessonsEditor();
   document.getElementById('cf-quiz-editor').innerHTML = 'No quiz yet.';
   var btn = document.getElementById('cf-save-btn');
@@ -507,6 +528,10 @@ function editCourse(c) {
   document.getElementById('cf-price').value = c.price_ngn || '';
   document.getElementById('cf-is-free').checked = !!c.is_free;
   uploadedThumbUrl = c.thumbnail || '';
+  var lvl = document.getElementById('cf-level'); if(lvl) lvl.value = c.level||'';
+  var dur = document.getElementById('cf-duration'); if(dur) dur.value = c.duration||'';
+  var out = document.getElementById('cf-outcomes'); if(out) out.value = c.outcomes||'';
+  var req = document.getElementById('cf-requirements'); if(req) req.value = c.requirements||'';
   try { cfLessons = JSON.parse(c.lessons||'[]'); } catch(e){ cfLessons = []; }
   try { cfQuizData = JSON.parse(c.quiz||'[]'); } catch(e){ cfQuizData = []; }
   renderLessonsEditor();
