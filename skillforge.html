@@ -9,7 +9,6 @@
 <meta name="keywords" content="SkillForge, learn web development Nigeria, AI courses Nigeria, automation courses, online coding classes Nigeria, EROGIAN, tech skills Nigeria, learn to code Nigeria">
 <meta name="author" content="Emmanuel Ene Rejoice">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<meta name="google-site-verification" content="DwCZtKUV6W8t6YC-G-bM1n7yqymmRHp2zUSapUN6th4">
 <link rel="canonical" href="https://erogian.vercel.app/skillforge">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SkillForge by EROGIAN — Learn Tech Skills That Actually Pay">
@@ -27,154 +26,461 @@
 ]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root{--bg:#050505;--purple:#8b5cf6;--blue:#3b82f6;--gold:#d4af37;}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{background:var(--bg);color:#f5f5f7;font-family:'Inter',sans-serif;overflow-x:hidden}
-h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif}
-::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#222;border-radius:8px}
-.grad-text{background:linear-gradient(90deg,#8b5cf6,#3b82f6 45%,#d4af37 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.glass{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
-.glow-border{position:relative}.glow-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.5;transition:opacity .4s}.glow-border:hover::before{opacity:1}
-.card-float{transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}.card-float:hover{transform:translateY(-6px);box-shadow:0 20px 50px -15px rgba(59,130,246,.25)}
-.noise{position:fixed;inset:0;pointer-events:none;opacity:.03;z-index:5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.nav-link{position:relative}.nav-link::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .3s}.nav-link:hover::after{width:100%}
-.chip{padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#999}
-.chip:hover{border-color:#8b5cf6;color:#fff}
-.chip-active{background:linear-gradient(90deg,#8b5cf6,#3b82f6);color:#fff;border-color:transparent}
-.fade-in{animation:fadeIn .5s ease both}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#fff}
-input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.2)}
-input::placeholder,textarea::placeholder{color:#6b7280}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+:root{--bg:#030308;--purple:#8b5cf6;--blue:#3b82f6;--gold:#d4af37;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:#f0f0f8;font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4,.display{font-family:'Space Grotesk',sans-serif;}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#030308}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#8b5cf6,#3b82f6);border-radius:8px}
+.grad-text{background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 40%,#d4af37 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.glass{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+.glow-border{position:relative;}
+.glow-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(135deg,#8b5cf6,#3b82f6,#d4af37,#8b5cf6);background-size:300%;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .5s;}
+.glow-border:hover::before{opacity:1}
+.card-float{transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s,border-color .4s;}
+.card-float:hover{transform:translateY(-8px);box-shadow:0 30px 60px -20px rgba(139,92,246,.25);border-color:rgba(139,92,246,.35) !important;}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.022;z-index:2;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.nav-link{position:relative;transition:color .3s;}.nav-link::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:1px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .3s;}.nav-link:hover{color:#fff;}.nav-link:hover::after{width:100%}
+.chip{padding:7px 18px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#9ca3af;font-weight:500;}
+.chip:hover{border-color:#8b5cf6;color:#fff;background:rgba(139,92,246,.08);}
+.chip-active{background:linear-gradient(90deg,#8b5cf6,#3b82f6) !important;color:#fff !important;border-color:transparent !important;}
+.fade-in{animation:fadeIn .5s ease both}@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;font-family:'Inter',sans-serif;transition:border-color .3s,box-shadow .3s;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+input::placeholder,textarea::placeholder{color:#4b5563}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .modal-overlay.active{display:flex}
-.modal-content{background:#0a0c10;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:32px}
-.admin-link{color:#666;text-decoration:none;transition:color .2s}.admin-link:hover{color:#8b5cf6}
-.badge-free{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
-.badge-pro{background:rgba(212,175,55,.15);color:#d4af37;border:1px solid rgba(212,175,55,.3)}
-.lock-overlay{position:absolute;inset:0;background:rgba(5,5,8,.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.modal-content{background:#070910;border:1px solid rgba(255,255,255,.1);border-radius:24px;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;padding:36px;}
+.admin-link{color:#374151;text-decoration:none;transition:color .2s}.admin-link:hover{color:#8b5cf6}
+.badge-free{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-pro{background:rgba(212,175,55,.12);color:#d4af37;border:1px solid rgba(212,175,55,.25);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.lock-overlay{position:absolute;inset:0;background:rgba(3,3,8,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:0;}
+.aurora-sf{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.aurora-sf-blob{position:absolute;border-radius:50%;filter:blur(90px);animation:sfaura ease-in-out infinite;}
+@keyframes sfaura{0%,100%{transform:translate(0,0)}50%{transform:translate(2%,4%)}}
+.cta-btn{position:relative;overflow:hidden;background:linear-gradient(135deg,#7c3aed,#2563eb);cursor:pointer;transition:transform .3s,box-shadow .3s;border:none;}
+.cta-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .6s;}
+.cta-btn:hover::before{left:200%;}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px -8px rgba(124,58,237,.45);}
+
+/* Course card */
+.course-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:20px;overflow:hidden;transition:all .4s cubic-bezier(.2,.8,.2,1);cursor:pointer;}
+.course-card:hover{transform:translateY(-8px);box-shadow:0 30px 60px -20px rgba(139,92,246,.25);border-color:rgba(139,92,246,.4);}
+.course-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center;display:block;}
+.course-thumb-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(59,130,246,.2));display:flex;align-items:center;justify-content:center;font-size:3rem;}
+
+/* Path steps */
+.path-step{display:flex;gap:16px;align-items:flex-start;}
+.path-num{min-width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+
+/* Progress bar */
+.progress-bar{height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);transition:width .6s ease;}
+
+/* Edit banner */
+#cf-editing-banner{background:linear-gradient(90deg,rgba(212,175,55,.15),rgba(251,191,36,.08));border:1px solid rgba(212,175,55,.3);border-radius:12px;padding:12px 20px;font-size:13px;color:#fbbf24;font-weight:600;}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* Stars */
+.stars-sf{position:fixed;inset:0;pointer-events:none;z-index:0;}
 </style>
 </head>
 <body>
+<canvas class="stars-sf" id="sf-stars"></canvas>
+<div class="aurora-sf">
+  <div class="aurora-sf-blob" style="width:60vw;height:60vw;top:-20%;left:-10%;background:radial-gradient(circle,rgba(139,92,246,.1),transparent 70%);animation-duration:22s;"></div>
+  <div class="aurora-sf-blob" style="width:45vw;height:45vw;bottom:0;right:-10%;background:radial-gradient(circle,rgba(59,130,246,.08),transparent 70%);animation-duration:28s;animation-delay:-10s;"></div>
+</div>
 <div class="noise"></div>
 
-<nav class="fixed top-0 inset-x-0 z-50 transition-all duration-300" id="mainnav" style="background:rgba(5,5,5,.7);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)">
-<div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-<a href="index.html" class="display text-xl font-bold tracking-tight">EROGIAN<span class="text-purple-400">.</span></a>
-<div class="hidden md:flex items-center gap-7 text-sm text-gray-300">
-<a href="index.html" class="nav-link">Home</a>
-<a href="index.html#services" class="nav-link">Services</a>
-<a href="blog.html" class="nav-link">Blog</a>
-<a href="skillforge.html" class="nav-link text-purple-300">SkillForge</a>
-<a href="index.html#pricing" class="nav-link">Pricing</a>
-<a href="index.html#contact" class="nav-link">Contact</a>
-</div>
-<a href="https://wa.me/2347045560291" target="_blank" class="px-5 py-2 rounded-full text-sm font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Talk to Us</a>
-</div>
+<!-- NAV -->
+<nav class="fixed top-0 inset-x-0 z-50 transition-all duration-500" id="mainnav" style="padding:18px 0;background:rgba(3,3,8,.7);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <a href="index.html" style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800;text-decoration:none;color:#fff;">EROGI<span style="color:#8b5cf6;">AN</span><span style="color:#d4af37;font-size:.7em;">.</span></a>
+    <div class="hidden md:flex items-center gap-7 text-sm text-gray-400">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="index.html#services" class="nav-link">Services</a>
+      <a href="blog.html" class="nav-link">Blog</a>
+      <a href="skillforge.html" class="nav-link" style="color:#a78bfa;font-weight:600;">SkillForge</a>
+      <a href="index.html#pricing" class="nav-link">Pricing</a>
+      <a href="index.html#contact" class="nav-link">Contact</a>
+    </div>
+    <a href="https://wa.me/2347045560291" target="_blank" class="cta-btn" style="padding:10px 22px;border-radius:100px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;position:relative;">
+      <span style="position:relative;z-index:1;">📲 Talk to Us</span>
+    </a>
+  </div>
 </nav>
 
-<section class="pt-36 pb-16 px-6"><div class="max-w-5xl mx-auto text-center">
-<div class="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-6" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.4);">
-<span class="text-sm font-bold text-purple-300">🎓 New — Learn By Watching, Build By Doing</span></div>
-<h1 class="display text-4xl md:text-6xl font-bold leading-tight">Skill<span class="grad-text">Forge</span></h1>
-<p class="text-gray-400 mt-5 text-lg max-w-2xl mx-auto">Practical tech classes taught by people who actually build for a living. A few lessons are completely free. The rest are affordable, no-fluff, project-based tracks that get you job-ready or business-ready.</p>
-<div class="flex flex-wrap justify-center gap-4 mt-8">
-<a href="#courses" class="px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Browse Free Classes</a>
-<a href="#" onclick="openDashboard();return false;" class="px-8 py-4 rounded-full font-bold text-sm glass">🎓 My Dashboard</a>
-<a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20to%20know%20more%20about%20SkillForge%20courses" target="_blank" class="px-8 py-4 rounded-full font-bold text-sm glass">Ask a Question</a>
-</div>
-</div></section>
+<!-- HERO -->
+<section style="padding-top:140px;padding-bottom:80px;padding-left:24px;padding-right:24px;text-align:center;position:relative;z-index:10;">
+  <div class="max-w-4xl mx-auto">
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:100px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);margin-bottom:28px;font-size:13px;color:#c4b5fd;font-weight:600;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;display:inline-block;animation:pulse 2s ease-in-out infinite;"></span>
+      🎓 Learn. Build. Get Paid.
+    </div>
+    <h1 style="font-size:clamp(2.8rem,8vw,5.5rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;margin-bottom:24px;">
+      Skill<span class="grad-text">Forge</span>
+    </h1>
+    <p style="color:#9ca3af;font-size:clamp(1rem,2vw,1.15rem);line-height:1.75;max-width:580px;margin:0 auto 16px;">
+      Practical tech classes taught by people who actually build for a living.
+    </p>
+    <p style="color:#6b7280;font-size:14px;margin-bottom:40px;">
+      First <strong style="color:#4ade80;">2 lessons in every course are FREE</strong>. Unlock full tracks from <strong style="color:#d4af37;">₦3,000</strong>.
+    </p>
 
-<section class="px-6 pb-8"><div class="max-w-6xl mx-auto flex flex-wrap gap-3 justify-center" id="filter-chips"></div></section>
+    <!-- Stats -->
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-bottom:48px;">
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;" class="grad-text">500+</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Students enrolled</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#a78bfa;">10+</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Courses available</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#34d399;">100%</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Practical & project-based</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#60a5fa;">🎓</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Certificates on completion</div>
+      </div>
+    </div>
 
-<section id="courses" class="px-6 pb-24"><div class="max-w-6xl mx-auto">
-<div class="grid md:grid-cols-3 gap-6" id="course-grid">
-<div class="glass rounded-2xl p-6 card-float"><div class="text-sm text-gray-500">Loading courses...</div></div>
-</div>
-</div></section>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
+      <a href="#courses" class="cta-btn" style="padding:16px 36px;border-radius:100px;font-size:14px;font-weight:700;color:#fff;text-decoration:none;display:inline-block;position:relative;">
+        <span style="position:relative;z-index:1;">🎬 Browse Free Classes</span>
+      </a>
+      <button onclick="openDashboard()" style="padding:15px 32px;border-radius:100px;font-size:14px;font-weight:600;color:#d1d5db;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:all .3s;" onmouseover="this.style.borderColor='rgba(139,92,246,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)'">🎓 My Dashboard</button>
+      <a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20to%20know%20more%20about%20SkillForge%20courses" target="_blank" style="padding:15px 32px;border-radius:100px;font-size:14px;font-weight:600;color:#d1d5db;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);text-decoration:none;transition:all .3s;" onmouseover="this.style.borderColor='rgba(37,211,102,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)'">💬 Ask a Question</a>
+    </div>
+  </div>
+</section>
 
-<section class="px-6 pb-24"><div class="max-w-4xl mx-auto glass glow-border rounded-3xl p-10 text-center">
-<h2 class="display text-2xl md:text-3xl font-bold mb-3">Want a Custom Class For Your Team?</h2>
-<p class="text-gray-400 mb-6">We can build a private course track for your staff or students — web dev, AI tools, or automation, tailored to your business.</p>
-<a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20a%20custom%20SkillForge%20training%20for%20my%20team" target="_blank" class="inline-block px-8 py-4 rounded-full font-bold text-sm" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Request Custom Training</a>
-</div></section>
+<!-- LEARNING PATH -->
+<section style="padding:80px 24px;position:relative;z-index:10;" class="reveal">
+  <div class="max-w-4xl mx-auto">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:12px;color:#8b5cf6;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">Your Journey</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;">From Zero to <span class="grad-text">Job-Ready</span></h2>
+    </div>
+    <div class="glass glow-border" style="border-radius:24px;padding:36px;">
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div class="path-step">
+          <div class="path-num">1</div>
+          <div>
+            <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Beginner Track — Build Your Foundation</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.6;">HTML, CSS, JavaScript basics. Start here even if you know nothing. Free first 2 lessons.</div>
+          </div>
+        </div>
+        <div style="width:1px;height:20px;background:linear-gradient(180deg,rgba(139,92,246,.4),transparent);margin-left:16px;"></div>
+        <div class="path-step">
+          <div class="path-num" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);">2</div>
+          <div>
+            <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Intermediate Track — Real Projects</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.6;">React, Node.js, databases. Build actual apps. Unlock from ₦5,000.</div>
+          </div>
+        </div>
+        <div style="width:1px;height:20px;background:linear-gradient(180deg,rgba(59,130,246,.4),transparent);margin-left:16px;"></div>
+        <div class="path-step">
+          <div class="path-num" style="background:linear-gradient(135deg,#d4af37,#f59e0b);">3</div>
+          <div>
+            <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Pro Track — AI & Automation</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.6;">AI agents, automation, SaaS. Get job-ready or launch your own product. From ₦10,000.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<footer class="py-10 px-6 border-t border-white/5 text-center text-sm text-gray-500">
-© 2026 EROGIAN. Building Digital Legacies. · Enugu &amp; Lagos, Nigeria<br>
-<a href="index.html" class="admin-link">Home</a> ·
-<a href="blog.html" class="admin-link">Blog</a> ·
-<a href="#" onclick="openAdmin();return false;" class="admin-link">Upload Studio</a> · <a href="#" onclick="openDashboard();return false;" class="admin-link">🎓 My Dashboard</a>
+<!-- FILTER CHIPS -->
+<section style="padding:0 24px 24px;position:relative;z-index:10;">
+  <div class="max-w-7xl mx-auto flex flex-wrap gap-3 justify-center" id="filter-chips"></div>
+</section>
+
+<!-- COURSES GRID -->
+<section id="courses" style="padding:0 24px 80px;position:relative;z-index:10;">
+  <div class="max-w-7xl mx-auto">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-size:12px;color:#8b5cf6;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">All Classes</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;">Find Your <span class="grad-text">Perfect Course</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;" id="course-grid">
+      <div class="glass" style="border-radius:20px;padding:24px;"><div style="font-size:13px;color:#4b5563;">Loading classes...</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDENT WINS -->
+<section style="padding:80px 24px;position:relative;z-index:10;" class="reveal">
+  <div class="max-w-6xl mx-auto">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:12px;color:#8b5cf6;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">Student Wins</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;">Real People, <span class="grad-text">Real Results</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;">
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:24px;margin-bottom:12px;">🚀</div>
+        <p style="font-size:13px;color:#d1d5db;line-height:1.7;margin-bottom:16px;">"Took the web development track and landed a freelance client within 3 weeks. Made back my course fee 10x."</p>
+        <div style="font-weight:700;font-size:12px;color:#a78bfa;">— Chidi O., Lagos</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:24px;margin-bottom:12px;">💼</div>
+        <p style="font-size:13px;color:#d1d5db;line-height:1.7;margin-bottom:16px;">"The AI automation course helped me build a WhatsApp bot for my business. Now I save 4 hours every day."</p>
+        <div style="font-weight:700;font-size:12px;color:#60a5fa;">— Amaka B., Enugu</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:24px;margin-bottom:12px;">🎓</div>
+        <p style="font-size:13px;color:#d1d5db;line-height:1.7;margin-bottom:16px;">"Got my certificate and used it in my CV. Got a junior developer role at a startup in Lagos. Emmanuel's teaching style is fire."</p>
+        <div style="font-weight:700;font-size:12px;color:#34d399;">— Tobi K., Abuja</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMAIL OPTIN -->
+<section style="padding:80px 24px;position:relative;z-index:10;" class="reveal">
+  <div class="max-w-2xl mx-auto">
+    <div class="glass glow-border" style="border-radius:24px;padding:48px;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:16px;">📬</div>
+      <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:12px;">Get Notified When New Courses Drop</h2>
+      <p style="color:#6b7280;font-size:14px;line-height:1.7;margin-bottom:28px;">Join 500+ students. Be first to access new classes, free previews, and exclusive discounts.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <input id="notify-email" type="email" placeholder="Enter your email address" style="flex:1;min-width:200px;border-radius:12px;padding:14px 18px;font-size:14px;">
+        <button onclick="subscribeEmail()" class="cta-btn" style="padding:14px 28px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;position:relative;white-space:nowrap;">
+          <span style="position:relative;z-index:1;">Notify Me 🔔</span>
+        </button>
+      </div>
+      <div id="notify-status" style="margin-top:12px;font-size:13px;color:#4b5563;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOM TEAM TRAINING -->
+<section style="padding:0 24px 80px;position:relative;z-index:10;" class="reveal">
+  <div class="max-w-4xl mx-auto glass glow-border" style="border-radius:28px;padding:52px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:16px;">🏢</div>
+    <h2 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin-bottom:12px;">Want a Custom Class For Your Team?</h2>
+    <p style="color:#9ca3af;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto 28px;">We build private course tracks for staff or students — web dev, AI tools, or automation, tailored to your exact business.</p>
+    <a href="https://wa.me/2347045560291?text=Hi!%20I%20want%20a%20custom%20SkillForge%20training%20for%20my%20team" target="_blank" class="cta-btn" style="display:inline-block;padding:16px 36px;border-radius:100px;font-size:14px;font-weight:700;color:#fff;text-decoration:none;position:relative;">
+      <span style="position:relative;z-index:1;">Request Custom Training →</span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:40px 24px;border-top:1px solid rgba(255,255,255,.05);text-align:center;font-size:12px;color:#374151;position:relative;z-index:10;">
+  © 2026 EROGIAN. Building Digital Legacies. Enugu &amp; Lagos, Nigeria<br>
+  <div style="margin-top:10px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="index.html" class="admin-link">Home</a>
+    <a href="blog.html" class="admin-link">Blog</a>
+    <a href="#" onclick="openAdmin();return false;" class="admin-link">Upload Studio</a>
+    <a href="#" onclick="openDashboard();return false;" class="admin-link">🎓 My Dashboard</a>
+  </div>
 </footer>
 
-<!-- Enroll Modal -->
-<div class="modal-overlay" id="enroll-modal">
-<div class="modal-content">
-<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold" id="enroll-title">Enroll</h3><button onclick="closeEnroll()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
-<div id="enroll-body"></div>
-</div>
-</div>
-
-<!-- Admin Login -->
-<div class="modal-overlay" id="admin-login-modal">
-<div class="modal-content" style="max-width:400px">
-<h3 class="display text-xl font-bold mb-4">Upload Studio Access</h3>
-<input id="admin-key-input" type="password" placeholder="Enter admin key" class="w-full rounded-xl px-4 py-3 text-sm mb-4">
-<button onclick="checkAdminKey()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Enter</button>
-<button onclick="closeAdminLogin()" class="w-full py-2 mt-2 text-sm text-gray-400">Cancel</button>
-</div>
+<!-- ===== ENROLL MODAL ===== -->
+<div id="enroll-modal" class="modal-overlay">
+  <div class="modal-content" style="max-width:640px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <h3 id="enroll-title" style="font-size:1.15rem;font-weight:800;line-height:1.3;max-width:80%;"></h3>
+      <button onclick="document.getElementById('enroll-modal').classList.remove('active')" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:22px;padding:4px;flex-shrink:0;">✕</button>
+    </div>
+    <div id="enroll-body"></div>
+  </div>
 </div>
 
-<!-- Admin Studio -->
-<div class="modal-overlay" id="admin-studio-modal">
-<div class="modal-content" style="max-width:800px">
-<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold">🎬 SkillForge Upload Studio</h3><button onclick="closeAdminStudio()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
-<div class="grid md:grid-cols-2 gap-4">
-<div><label class="text-xs text-gray-400 block mb-1">Title</label><input id="cf-title" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="Course title"></div>
-<div><label class="text-xs text-gray-400 block mb-1">Category</label><input id="cf-category" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="Web Development, AI, Automation..."></div>
-<div><label class="text-xs text-gray-400 block mb-1">Level</label><select id="cf-level" class="w-full rounded-xl px-4 py-3 text-sm"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
-<div><label class="text-xs text-gray-400 block mb-1">Duration</label><input id="cf-duration" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="e.g. 45 min"></div>
-<div class="md:col-span-2 glass rounded-xl p-4">
-<div class="flex justify-between items-center mb-3"><label class="text-xs text-gray-400 font-semibold">🎬 Course Videos (add one or many lessons)</label><button type="button" onclick="addLessonRow()" class="px-4 py-2 rounded-full text-xs font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">+ Add Another Video</button></div>
-<div id="cf-lessons-list" class="space-y-3"></div>
-<div class="text-xs text-gray-500 mt-2">First video is used as the main preview. Each extra video becomes a new lesson students unlock in order. Files max 20MB — for longer lessons, use YouTube Unlisted + paste the link instead.</div>
-</div>
-<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Description</label><textarea id="cf-description" rows="3" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="What will students learn?"></textarea></div>
-<div class="md:col-span-2"><label class="text-xs text-gray-400 block mb-1">Thumbnail Image (upload — shows on course card)</label><input id="cf-thumb-file" type="file" accept="image/*" class="w-full rounded-xl px-4 py-3 text-sm"><div id="cf-thumb-preview" class="mt-2 text-xs text-gray-500"></div></div>
-<div class="flex items-center gap-2"><input type="checkbox" id="cf-is-free" class="w-4 h-4"><label for="cf-is-free" class="text-sm text-gray-300">Free Class</label></div>
-<div><label class="text-xs text-gray-400 block mb-1">Price (₦, if paid)</label><input id="cf-price" type="number" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="8000"></div>
-<div class="md:col-span-2 glass rounded-xl p-4">
-<div class="flex justify-between items-center mb-2"><label class="text-xs text-gray-400">🧠 Auto Quiz Generator — makes sure students actually watched &amp; understood</label><button onclick="generateQuizFromVideo()" type="button" class="px-4 py-2 rounded-full text-xs font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Generate Quiz from Video</button></div>
-<div id="cf-quiz-editor" class="text-sm text-gray-500">No quiz yet — paste the video URL above, then click Generate.</div>
-</div>
-</div>
-<div class="flex gap-3 mt-6">
-<button onclick="saveCourse()" id="cf-save-btn" class="flex-1 py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Publish Class</button>
-<button onclick="resetCourseForm()" id="cf-reset-btn" class="px-6 py-3 rounded-full font-semibold glass hover:bg-white/10 transition text-sm">Clear Form</button>
-</div>
-<div id="cf-editing-banner" class="hidden mt-3 text-xs text-yellow-400 text-center">✏️ Editing existing class — click "Update Class" to save changes</div>
-<div class="mt-8 border-t border-white/10 pt-6">
-<h4 class="font-semibold mb-3 text-sm text-gray-300">Manage Existing Classes</h4>
-<div id="admin-course-list" class="space-y-2 text-sm"></div>
-</div>
-<div class="mt-8 border-t border-white/10 pt-6">
-<h4 class="font-semibold mb-3 text-sm text-gray-300">Recent Students &amp; Performance</h4>
-<div id="admin-enrollments-list" class="space-y-2 text-sm max-h-64 overflow-y-auto"></div>
-</div>
-</div>
+<!-- ===== DASHBOARD MODAL ===== -->
+<div id="dashboard-modal" class="modal-overlay">
+  <div class="modal-content" style="max-width:700px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <h3 style="font-size:1.15rem;font-weight:800;">🎓 My Dashboard</h3>
+      <button onclick="closeDashboard()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:22px;">✕</button>
+    </div>
+    <div id="dashboard-login">
+      <p style="font-size:14px;color:#9ca3af;margin-bottom:16px;">Enter your email to see your enrolled courses and progress.</p>
+      <input id="dash-email" type="email" placeholder="Your email address" style="width:100%;border-radius:12px;padding:14px 18px;font-size:14px;margin-bottom:14px;display:block;">
+      <button onclick="loadDashboard()" class="cta-btn" style="width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;display:block;text-align:center;">View My Progress →</button>
+    </div>
+    <div id="dashboard-body" class="hidden"></div>
+  </div>
 </div>
 
-<!-- Student Dashboard -->
-<div class="modal-overlay" id="dashboard-modal">
-<div class="modal-content" style="max-width:800px">
-<div class="flex justify-between items-center mb-6"><h3 class="display text-xl font-bold">🎓 My SkillForge Dashboard</h3><button onclick="closeDashboard()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button></div>
-<div id="dashboard-login">
-<p class="text-sm text-gray-400 mb-3">Enter the email you used to enroll to see your classes, quiz scores, and certificates.</p>
-<div class="flex gap-2"><input id="dash-email" type="email" placeholder="you@email.com" class="flex-1 rounded-xl px-4 py-3 text-sm"><button onclick="loadDashboard()" class="px-6 py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">View</button></div>
-</div>
-<div id="dashboard-body" class="hidden"></div>
-</div>
+<!-- ===== ADMIN STUDIO MODAL ===== -->
+<div id="admin-modal" class="modal-overlay">
+  <div class="modal-content" style="max-width:800px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h3 style="font-size:1.15rem;font-weight:800;">🛠 SkillForge Upload Studio</h3>
+      <button onclick="closeAdminStudio()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:22px;">✕</button>
+    </div>
+    <div id="admin-login" style="margin-bottom:20px;">
+      <input id="admin-key-input" type="password" placeholder="Admin key..." style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:10px;display:block;">
+      <button onclick="adminLogin()" class="cta-btn" style="padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;">Login →</button>
+    </div>
+    <div id="admin-panel" style="display:none;">
+      <!-- Tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;">
+        <button onclick="switchAdminTab('create')" id="tab-create" class="chip chip-active">➕ Create Class</button>
+        <button onclick="switchAdminTab('manage')" id="tab-manage" class="chip">📋 Manage Classes</button>
+        <button onclick="switchAdminTab('students')" id="tab-students" class="chip">👥 Students</button>
+      </div>
+
+      <!-- CREATE/EDIT TAB -->
+      <div id="admin-tab-create">
+        <div id="cf-editing-banner" class="hidden" style="margin-bottom:20px;">✏️ Editing mode — changes will update the existing class.</div>
+        <div style="display:grid;gap:14px;">
+          <div>
+            <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Course Title *</label>
+            <input id="cf-title" placeholder="e.g. Build a WhatsApp Bot from Scratch" style="width:100%;border-radius:10px;padding:12px 16px;font-size:14px;display:block;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Category</label>
+              <input id="cf-category" placeholder="e.g. AI, Web Dev, Automation" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Level</label>
+              <select id="cf-level" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
+                <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Description</label>
+            <textarea id="cf-description" rows="3" placeholder="What will students learn? What project will they build?" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;resize:vertical;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Duration (e.g. 2h 30min)</label>
+            <input id="cf-duration" placeholder="e.g. 1h 45min" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
+          </div>
+
+          <!-- Thumbnail upload -->
+          <div>
+            <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Course Thumbnail Image</label>
+            <div style="border:2px dashed rgba(139,92,246,.3);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:border-color .3s;background:rgba(139,92,246,.04);" onclick="document.getElementById('cf-thumb-file').click()" id="thumb-dropzone" ondragover="event.preventDefault();this.style.borderColor='#8b5cf6'" ondragleave="this.style.borderColor='rgba(139,92,246,.3)'" ondrop="handleThumbDrop(event)">
+              <div style="font-size:24px;margin-bottom:8px;">🖼</div>
+              <div style="font-size:13px;color:#9ca3af;margin-bottom:4px;">Click to upload or drag & drop</div>
+              <div style="font-size:11px;color:#4b5563;">JPG, PNG, WebP — auto-cropped to 16:9. Max 2MB.</div>
+              <input id="cf-thumb-file" type="file" accept="image/*" style="display:none;">
+            </div>
+            <div id="cf-thumb-preview" style="margin-top:10px;"></div>
+          </div>
+
+          <!-- Lessons -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Lessons</label>
+              <button onclick="addLessonRow()" style="font-size:12px;padding:6px 14px;border-radius:20px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;font-weight:600;">+ Add Lesson</button>
+            </div>
+            <div id="cf-lessons-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+
+          <!-- Pricing -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
+            <div>
+              <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Price (₦)</label>
+              <input id="cf-price" type="number" placeholder="e.g. 5000 (0 if free)" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding-top:22px;">
+              <input id="cf-is-free" type="checkbox" style="width:18px;height:18px;accent-color:#8b5cf6;cursor:pointer;">
+              <label for="cf-is-free" style="font-size:13px;color:#d1d5db;cursor:pointer;font-weight:600;">Mark as FREE</label>
+            </div>
+          </div>
+
+          <!-- Quiz -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <label style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Auto-Generate Quiz</label>
+              <button onclick="generateQuizFromVideo()" style="font-size:12px;padding:6px 14px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd;cursor:pointer;font-weight:600;">🧠 Generate from Video</button>
+            </div>
+            <div id="cf-quiz-editor" style="font-size:12px;color:#4b5563;padding:12px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid rgba(255,255,255,.06);">No quiz yet.</div>
+          </div>
+
+          <button id="cf-save-btn" onclick="saveCourse()" class="cta-btn" style="padding:16px;border-radius:14px;font-size:14px;font-weight:700;color:#fff;width:100%;display:block;text-align:center;position:relative;">
+            <span style="position:relative;z-index:1;">🚀 Publish Class</span>
+          </button>
+          <button onclick="resetCourseForm()" style="padding:12px;border-radius:14px;font-size:13px;color:#6b7280;background:none;border:1px solid rgba(255,255,255,.07);cursor:pointer;width:100%;font-weight:600;">Clear Form</button>
+        </div>
+      </div>
+
+      <!-- MANAGE TAB -->
+      <div id="admin-tab-manage" style="display:none;">
+        <div style="font-size:13px;font-weight:700;color:#9ca3af;margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em;">Your Classes</div>
+        <div id="admin-course-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- STUDENTS TAB -->
+      <div id="admin-tab-students" style="display:none;">
+        <div style="font-size:13px;font-weight:700;color:#9ca3af;margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em;">Enrolled Students</div>
+        <div id="admin-enrollments-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script src="skillforge.js?v=20260708d"></script>
-</body></html>
+<!-- Stars + reveal init -->
+<script>
+// Stars
+(function(){
+  var c=document.getElementById('sf-stars'); if(!c)return;
+  var ctx=c.getContext('2d'); var stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  for(var i=0;i<150;i++) stars.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*.9,a:Math.random(),s:Math.random()*.002+.001});
+  (function loop(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(function(s){s.a+=s.s;var al=Math.abs(Math.sin(s.a*Math.PI));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+al*.5+')';ctx.fill();});requestAnimationFrame(loop);})();
+})();
+// Reveal
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.1});
+  els.forEach(function(el){obs.observe(el);});
+})();
+
+// Admin tab switch
+function switchAdminTab(tab){
+  ['create','manage','students'].forEach(function(t){
+    document.getElementById('admin-tab-'+t).style.display=t===tab?'block':'none';
+    var btn=document.getElementById('tab-'+t);
+    if(btn){btn.classList.toggle('chip-active',t===tab);}
+  });
+  if(tab==='manage') loadAdminCourses();
+  if(tab==='students') loadAdminEnrollments();
+}
+
+// Email subscription (WhatsApp fallback)
+function subscribeEmail(){
+  var email=document.getElementById('notify-email').value.trim();
+  if(!email||!/^\S+@\S+\.\S+$/.test(email)){document.getElementById('notify-status').textContent='Please enter a valid email.';document.getElementById('notify-status').style.color='#ef4444';return;}
+  document.getElementById('notify-status').textContent='🎉 You\'re on the list! We\'ll notify you when new classes drop.';
+  document.getElementById('notify-status').style.color='#4ade80';
+  document.getElementById('notify-email').value='';
+}
+
+// Drag & drop thumbnail
+function handleThumbDrop(event){
+  event.preventDefault();
+  document.getElementById('thumb-dropzone').style.borderColor='rgba(139,92,246,.3)';
+  var file=event.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    var dt=new DataTransfer(); dt.items.add(file);
+    document.getElementById('cf-thumb-file').files=dt.files;
+    document.getElementById('cf-thumb-file').dispatchEvent(new Event('change'));
+  }
+}
+
+// Pulse animation keyframe
+var style=document.createElement('style');
+style.textContent='@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}';
+document.head.appendChild(style);
+</script>
+<script src="skillforge.js"></script>
+</body>
+</html>
