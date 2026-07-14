@@ -460,6 +460,8 @@ function handleSend(){
     }
   } else { sendToAI(v); }
 }
+// Alias for inline onclick in index.html
+function sendChat(){ handleSend(); }
 var chatSend = document.getElementById('chat-send');
 if(chatSend) chatSend.addEventListener('click', handleSend);
 if(chatInput) chatInput.addEventListener('keydown', function(e){ if(e.key==='Enter') handleSend(); });
@@ -498,4 +500,11 @@ if(apptForm) apptForm.addEventListener('submit', async function(e){
     alert('Connection error. WhatsApp: wa.me/2347045560291');
     btn.textContent = 'Book My Appointment'; btn.disabled = false;
   }
+});
+
+// Auto-start inline chat if chat-body exists and no launcher
+document.addEventListener('DOMContentLoaded', function(){
+  var body = document.getElementById('chat-body');
+  var launcher = document.getElementById('chat-launcher');
+  if(body && !launcher){ startChat(); }
 });
