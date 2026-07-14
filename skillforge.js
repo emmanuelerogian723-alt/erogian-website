@@ -54,7 +54,7 @@ function renderGrid() {
   var list = currentFilter === 'all' ? allCourses : allCourses.filter(function(c){ return c.category === currentFilter; });
   if (!list.length) { grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float col-span-3"><div class="text-sm text-gray-500">New classes coming soon.</div></div>'; return; }
   grid.innerHTML = list.map(function(c) {
-    var thumb = c.thumbnail ? '<img src="'+esc(c.thumbnail)+'" class="w-full h-40 object-cover" loading="lazy">' : '<div class="w-full h-40 bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center text-4xl">🎬</div>';
+    var thumb = c.thumbnail ? '<img src="'+esc(c.thumbnail)+'" class="course-thumb" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center;display:block;">' : '<div class="course-thumb-placeholder" style="width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(59,130,246,.2));display:flex;align-items:center;justify-content:center;font-size:3rem;">🎬</div>';
     var badge = c.is_free ? '<span class="badge-free text-xs px-3 py-1 rounded-full font-semibold">FREE</span>' : '<span class="badge-pro text-xs px-3 py-1 rounded-full font-semibold">₦'+Number(c.price_ngn||0).toLocaleString()+'</span>';
     var lock = c.is_free ? '' : '<div class="lock-overlay"><div class="text-3xl">🔒</div><div class="text-xs text-gray-300">Premium Class</div></div>';
     var hasQuiz = (function(){ try { return JSON.parse(c.quiz||'[]').length > 0; } catch(e){ return false; } })();
@@ -518,6 +518,19 @@ function editCourse(c) {
   document.getElementById('cf-title').scrollIntoView({behavior:'smooth'});
 }
 
+
+async function editCourseFromAdmin(id) {
+  // Load full course data by id, then switch to create tab and populate form
+  try {
+    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_list', admin_key:ADMIN_KEY }) });
+    var data = await res.json();
+    var c = (data.courses||[]).find(function(x){ return x.id === id; });
+    if (!c) { alert('Course not found.'); return; }
+    editCourse(c);
+    switchAdminTab('create');
+  } catch(e) { alert('Could not load course data.'); }
+}
+
 async function togglePublish(id, currentStatus) {
   var newStatus = currentStatus === 'draft' ? 'published' : 'draft';
   if (!confirm('Change status to ' + newStatus + '?')) return;
@@ -616,3 +629,4 @@ function redownloadCertificate(name, courseTitle) {
 }
 
 loadCourses();
+
