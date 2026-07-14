@@ -53,6 +53,10 @@ canvas{max-height:220px}
 <script>
 const FN_URL='https://superagent-55bc0d3a.base44.app/functions/getErogianAnalytics';
 function unlock(){const key=document.getElementById('keyInput').value.trim();if(!key)return;localStorage.setItem('erogian_dash_key',key);load(key)}
+window.addEventListener('DOMContentLoaded',function(){
+  var saved=localStorage.getItem('erogian_dash_key');
+  if(saved){load(saved);}
+});
 async function load(key){
 const app=document.getElementById('app');
 app.innerHTML='<div class="err">Loading...</div>';
