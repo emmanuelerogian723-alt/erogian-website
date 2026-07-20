@@ -1,5 +1,7 @@
 /* ===== Config ===== */
 var SKILLFORGE_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianSkillForge';
+var ERGIO_ENGINES_URL = 'https://ergio-engines.onrender.com';
+var _uploadedFiles = []; // track uploaded files
 var UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianUpload';
 var VIDEO_UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianVideoUpload';
 var ADMIN_KEY = 'erogian_skillforge_admin_2026';
@@ -654,4 +656,292 @@ function redownloadCertificate(name, courseTitle) {
 }
 
 loadCourses();
+
+// ═══════════════════════════════════════════════════════════
+// CONDUCTOR LIVE TAB
+// ═══════════════════════════════════════════════════════════
+var _conductorES = null;
+var _conductorEventCount = 0;
+
+function connectConductorStream() {
+  if (_conductorES) { _conductorES.close(); _conductorES = null; }
+  var log = document.getElementById('conductor-activity-log');
+  var dot = document.getElementById('conductor-status-dot');
+  var statusText = document.getElementById('conductor-status-text');
+
+  // Show connecting state
+  dot.style.background = '#f59e0b';
+  statusText.textContent = 'Connecting...';
+  log.innerHTML = '<div style="color:#f59e0b;font-style:italic;">[' + _ts() + '] Connecting to ERGIO Engines...</div>';
+
+  try {
+    _conductorES = new EventSource(ERGIO_ENGINES_URL + '/activity/stream');
+
+    _conductorES.onopen = function() {
+      dot.style.background = '#10b981';
+      statusText.textContent = 'Live';
+      _appendLog({type:'system', message:'Connected to ERGIO Engines live feed', level:'success'});
+    };
+
+    _conductorES.onmessage = function(e) {
+      try {
+        var data = JSON.parse(e.data);
+        if (data.type === 'heartbeat') return;
+        _conductorEventCount++;
+        document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
+        _appendLog(data);
+      } catch(err) {}
+    };
+
+    _conductorES.onerror = function() {
+      dot.style.background = '#ef4444';
+      statusText.textContent = 'Disconnected';
+      _appendLog({type:'system', message:'Connection lost. Click Connect to retry.', level:'error'});
+    };
+  } catch(e) {
+    dot.style.background = '#ef4444';
+    statusText.textContent = 'Failed';
+    _appendLog({type:'system', message:'EventSource not supported. Using polling.', level:'warn'});
+    // Fallback: poll every 3s
+    _pollActivityFallback();
+  }
+}
+
+function _pollActivityFallback() {
+  setInterval(async function() {
+    try {
+      var r = await fetch(ERGIO_ENGINES_URL + '/activity/history');
+      var d = await r.json();
+      if (d.events && d.events.length > _conductorEventCount) {
+        var newEvents = d.events.slice(_conductorEventCount);
+        newEvents.forEach(function(ev) { _appendLog(ev); });
+        _conductorEventCount = d.events.length;
+        document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
+      }
+    } catch(e) {}
+  }, 3000);
+}
+
+function _ts() {
+  return new Date().toTimeString().slice(0,8);
+}
+
+function _appendLog(ev) {
+  var log = document.getElementById('conductor-activity-log');
+  if (!log) return;
+
+  var colorMap = {
+    success: '#10b981', error: '#ef4444', warn: '#f59e0b',
+    info: '#60a5fa', system: '#8b5cf6', conductor: '#34d399',
+    engine: '#f472b6', upload: '#a78bfa'
+  };
+  var iconMap = {
+    success: '✅', error: '❌', warn: '⚠️', info: 'ℹ️',
+    system: '🔧', conductor: '⚡', engine: '🔄', upload: '📤'
+  };
+  var level = ev.level || ev.type || 'info';
+  var color = colorMap[level] || colorMap[ev.type] || '#9ca3af';
+  var icon = iconMap[level] || iconMap[ev.type] || '▸';
+  var ts = ev.ts || _ts();
+
+  var line = document.createElement('div');
+  line.style.cssText = 'border-left:2px solid ' + color + ';padding-left:10px;margin-bottom:4px;animation:fadeInLine .2s ease;';
+  line.innerHTML = '<span style="color:#4b5563;">[' + ts + ']</span> ' +
+    icon + ' <span style="color:' + color + ';font-weight:600;">[' + (ev.type||level).toUpperCase() + ']</span> ' +
+    '<span style="color:#d1d5db;">' + esc(ev.message || '') + '</span>';
+
+  // Remove placeholder if present
+  var placeholder = log.querySelector('[style*="italic"]');
+  if (placeholder) placeholder.remove();
+
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+
+  // Keep max 300 lines
+  while (log.children.length > 300) log.removeChild(log.firstChild);
+}
+
+function clearActivityLog() {
+  var log = document.getElementById('conductor-activity-log');
+  if (log) { log.innerHTML = '<div style="color:#4b5563;font-style:italic;">[' + _ts() + '] Log cleared.</div>'; }
+  _conductorEventCount = 0;
+  document.getElementById('conductor-event-count').textContent = '0 events';
+}
+
+function conductorTask(task) {
+  var input = document.getElementById('conductor-task-input');
+  if (input) { input.value = task; }
+  runConductorTask();
+}
+
+async function runConductorTask() {
+  var task = (document.getElementById('conductor-task-input').value || '').trim();
+  if (!task) { alert('Enter a task first.'); return; }
+
+  var btn = document.getElementById('conductor-run-btn');
+  btn.textContent = '⏳ Running...';
+  btn.disabled = true;
+
+  _appendLog({type:'conductor', message:'Task started: ' + task.slice(0,80), level:'conductor'});
+
+  try {
+    var res = await fetch(ERGIO_ENGINES_URL + '/conductor/run', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({request: task, business_id: 'ergio', user_id: 'admin'})
+    });
+    var data = await res.json();
+    _appendLog({type:'conductor', message:'Task completed!', level:'success'});
+
+    // Show result
+    var resultDiv = document.getElementById('conductor-result');
+    var resultBody = document.getElementById('conductor-result-body');
+    if (resultDiv && resultBody) {
+      resultDiv.style.display = 'block';
+      var txt = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      resultBody.innerHTML = '<pre style="white-space:pre-wrap;font-size:12px;color:#d1d5db;margin:0;">' + esc(txt.slice(0, 2000)) + (txt.length > 2000 ? '\n... (truncated)' : '') + '</pre>';
+    }
+  } catch(e) {
+    _appendLog({type:'conductor', message:'Error: ' + e.message, level:'error'});
+  }
+
+  btn.textContent = '▶ Run Task';
+  btn.disabled = false;
+}
+
+// Auto-connect when Conductor tab is opened
+var _origSwitchAdminTab = switchAdminTab;
+switchAdminTab = function(tab) {
+  _origSwitchAdminTab(tab);
+  if (tab === 'conductor' && !_conductorES) {
+    setTimeout(connectConductorStream, 300);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// GENERAL FILE UPLOAD TAB
+// ═══════════════════════════════════════════════════════════
+function handleGenFileDrop(e) {
+  e.preventDefault();
+  var zone = document.getElementById('gen-upload-zone');
+  zone.style.borderColor = 'rgba(16,185,129,.3)';
+  zone.style.background = 'rgba(16,185,129,.03)';
+  var files = Array.from(e.dataTransfer.files);
+  files.forEach(function(f) { uploadGenFile(f); });
+}
+
+function handleGenFileSelect(e) {
+  var files = Array.from(e.target.files);
+  files.forEach(function(f) { uploadGenFile(f); });
+  e.target.value = '';
+}
+
+async function uploadGenFile(file) {
+  var queueEl = document.getElementById('gen-upload-queue');
+  var itemId = 'uq_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+  // Add progress item to queue
+  var item = document.createElement('div');
+  item.id = itemId;
+  item.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;';
+  item.innerHTML = _fileIcon(file.type) + ' ' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(file.name) + '</div>' +
+      '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (file.size/1024/1024).toFixed(2) + ' MB</div>' +
+      '<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:8px;overflow:hidden;">' +
+        '<div id="' + itemId + '_bar" style="height:100%;width:0%;background:linear-gradient(90deg,#10b981,#059669);transition:width .3s;border-radius:2px;"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="' + itemId + '_status" style="font-size:12px;color:#6b7280;flex-shrink:0;">Uploading...</div>';
+  queueEl.appendChild(item);
+
+  // Simulate progress
+  var bar = document.getElementById(itemId + '_bar');
+  var prog = 0;
+  var progT = setInterval(function() {
+    prog = Math.min(prog + Math.random()*15, 85);
+    if (bar) bar.style.width = prog + '%';
+  }, 200);
+
+  try {
+    // Read as base64
+    var b64 = await _fileToBase64(file);
+    var purpose = file.type.startsWith('image/') ? 'thumbnail' : 
+                  file.type.startsWith('video/') ? 'video' : 'document';
+
+    var res = await fetch(ERGIO_ENGINES_URL + '/upload', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file: b64, filename: file.name, mime: file.type, purpose: purpose})
+    });
+    var data = await res.json();
+    clearInterval(progT);
+
+    if (data.status === 'ok' && data.url) {
+      if (bar) bar.style.width = '100%';
+      document.getElementById(itemId + '_status').innerHTML = '<span style="color:#10b981;font-weight:700;">✓ Done</span>';
+      // Move to history
+      setTimeout(function() { item.remove(); }, 1500);
+      _addToUploadHistory(file.name, data.url, file.type, data.size_mb);
+      _uploadedFiles.push({name: file.name, url: data.url, type: file.type});
+    } else {
+      clearInterval(progT);
+      if (bar) bar.style.background = '#ef4444';
+      document.getElementById(itemId + '_status').innerHTML = '<span style="color:#ef4444;">✗ Failed</span>';
+      item.title = data.message || 'Upload failed';
+    }
+  } catch(e) {
+    clearInterval(progT);
+    if (bar) bar.style.background = '#ef4444';
+    var st = document.getElementById(itemId + '_status');
+    if (st) st.innerHTML = '<span style="color:#ef4444;">✗ Error</span>';
+  }
+}
+
+function _fileIcon(mime) {
+  if (!mime) return '📄';
+  if (mime.startsWith('image/')) return '<span style="font-size:24px;">🖼</span>';
+  if (mime.startsWith('video/')) return '<span style="font-size:24px;">🎬</span>';
+  if (mime.startsWith('audio/')) return '<span style="font-size:24px;">🎵</span>';
+  if (mime.includes('pdf')) return '<span style="font-size:24px;">📕</span>';
+  if (mime.includes('zip') || mime.includes('rar')) return '<span style="font-size:24px;">🗜</span>';
+  if (mime.includes('word') || mime.includes('doc')) return '<span style="font-size:24px;">📝</span>';
+  return '<span style="font-size:24px;">📄</span>';
+}
+
+function _addToUploadHistory(name, url, type, sizeMb) {
+  var list = document.getElementById('gen-uploaded-list');
+  if (!list) return;
+  var item = document.createElement('div');
+  item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(16,185,129,.15);border-radius:10px;';
+  var isImg = type && type.startsWith('image/');
+  var preview = isImg ? '<img src="' + url + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;">' : _fileIcon(type);
+  item.innerHTML = preview +
+    '<div style="flex:1;min-width:0;">' +
+      '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(name) + '</div>' +
+      '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (sizeMb ? sizeMb.toFixed(2) + ' MB · ' : '') + '<a href="' + url + '" target="_blank" style="color:#34d399;text-decoration:none;">Open ↗</a></div>' +
+    '</div>' +
+    '<button onclick="navigator.clipboard.writeText('' + url + '');this.textContent='✓';" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
+  list.insertBefore(item, list.firstChild);
+}
+
+function _fileToBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var result = e.target.result;
+      var b64 = result.includes(',') ? result.split(',')[1] : result;
+      resolve(b64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Add CSS animation for log lines
+(function() {
+  var style = document.createElement('style');
+  style.textContent = '@keyframes fadeInLine { from { opacity:0; transform:translateX(-4px); } to { opacity:1; transform:translateX(0); } }';
+  document.head.appendChild(style);
+})();
 
