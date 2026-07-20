@@ -52,12 +52,22 @@ canvas{max-height:220px}
 </div>
 <script>
 const FN_URL='https://superagent-55bc0d3a.base44.app/functions/getErogianAnalytics';
-function unlock(){const key=document.getElementById('keyInput').value.trim();if(!key)return;localStorage.setItem('erogian_dash_key',key);load(key)}
+function unlock(){const key=document.getElementById('keyInput').value.trim();if(!key)return;localStorage.setItem('erogian_dash_key',key);load(key);startAutoRefresh(key);}
 window.addEventListener('DOMContentLoaded',function(){
   var saved=localStorage.getItem('erogian_dash_key');
+  if(saved){startAutoRefresh(saved);}
   if(saved){load(saved);}
 });
+var _analyticsKey = null;
+var _analyticsRefreshTimer = null;
+
+function startAutoRefresh(key) {
+  if (_analyticsRefreshTimer) clearInterval(_analyticsRefreshTimer);
+  _analyticsRefreshTimer = setInterval(function() { if (_analyticsKey) load(_analyticsKey); }, 60000);
+}
+
 async function load(key){
+  _analyticsKey = key;
 const app=document.getElementById('app');
 app.innerHTML='<div class="err">Loading...</div>';
 try{
