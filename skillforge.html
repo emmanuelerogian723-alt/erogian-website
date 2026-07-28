@@ -89,6 +89,19 @@ input::placeholder,textarea::placeholder{color:#4b5563}
 
 /* Stars */
 .stars-sf{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* ===== RESPONSIVE + ACCESSIBILITY ENHANCEMENTS ===== */
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+button,a[role="button"]{min-height:44px;min-width:44px}
+img,video,canvas{max-width:100%;height:auto}
+*,*::before,*::after{max-width:100%}
+@media(max-width:480px){html{font-size:14px}input,textarea,select{font-size:16px!important}}
+@media(max-width:768px){.container,.wrapper,.main{max-width:100%;padding:0 1rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+a.skip-link{position:absolute;top:-100px;left:0;background:#8b5cf6;color:#fff;padding:.5rem 1rem;z-index:9999;border-radius:0 0 8px 0}
+a.skip-link:focus{top:0}
+@media print{nav,.hero{display:none}body{background:#fff;color:#000}}
 </style>
 </head>
 <body>
