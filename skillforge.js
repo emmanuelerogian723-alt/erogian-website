@@ -295,13 +295,13 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
 function closeEnroll() { document.getElementById('enroll-modal').classList.remove('active'); }
 
 /* ===== Admin ===== */
-function openAdmin() { document.getElementById('admin-login-modal').classList.add('active'); }
-function closeAdminLogin() { document.getElementById('admin-login-modal').classList.remove('active'); }
+function openAdmin() { document.getElementById('admin-modal').classList.add('active'); }
+function closeAdminLogin() { document.getElementById('admin-modal').classList.remove('active'); }
 function checkAdminKey() {
   var key = document.getElementById('admin-key-input').value;
   if (key === ADMIN_KEY) {
-    closeAdminLogin();
-    document.getElementById('admin-studio-modal').classList.add('active');
+
+    document.getElementById('admin-login').style.display='none'; document.getElementById('admin-panel').style.display='block';
     cfLessons = [];
     renderLessonsEditor();
     loadAdminCourses();
@@ -310,7 +310,8 @@ function checkAdminKey() {
     alert('Incorrect key.');
   }
 }
-function closeAdminStudio() { document.getElementById('admin-studio-modal').classList.remove('active'); }
+function closeAdminStudio() { document.getElementById('admin-modal').classList.remove('active'); }
+function adminLogin() { checkAdminKey(); }
 
 document.addEventListener('change', function(e) {
   if (e.target && e.target.id === 'cf-thumb-file') {
@@ -921,7 +922,7 @@ function _addToUploadHistory(name, url, type, sizeMb) {
       '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(name) + '</div>' +
       '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (sizeMb ? sizeMb.toFixed(2) + ' MB · ' : '') + '<a href="' + url + '" target="_blank" style="color:#34d399;text-decoration:none;">Open ↗</a></div>' +
     '</div>' +
-    '<button onclick="navigator.clipboard.writeText('' + url + '');this.textContent='✓';" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
+    '<button data-url="' + url + '" class="copy-url-btn" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
   list.insertBefore(item, list.firstChild);
 }
 
@@ -945,3 +946,12 @@ function _fileToBase64(file) {
   document.head.appendChild(style);
 })();
 
+
+
+// Copy URL button handler
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList && e.target.classList.contains('copy-url-btn')) {
+    var url = e.target.getAttribute('data-url');
+    if (url) { navigator.clipboard.writeText(url); e.target.textContent = '\u2713'; }
+  }
+});
