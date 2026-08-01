@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VETRON — Autonomous AI Software Engineer</title>
+<meta name="description" content="Vetron is the living engineering intelligence inside ERGIO. Think. Reason. Build. Verify. Improve. Repeat.">
+<style>
+:root {
+  --bg: #06070b;
+  --bg2: #0a0c14;
+  --surface: rgba(255,255,255,.03);
+  --border: rgba(255,255,255,.08);
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --primary: #8b5cf6;
+  --primary-glow: rgba(139,92,246,.3);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,.3);
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --font: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ===== BREATHING ATLAS CANVAS ===== */
+#atlas-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header {
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(6,7,11,.7);
+  backdrop-filter: blur(20px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-core {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: .6; box-shadow: 0 0 20px var(--primary-glow); }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 40px var(--primary-glow); }
+}
+
+.logo-text {
+  font-family: var(--font);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.logo-text span { color: var(--primary); }
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background .3s;
+}
+
+.status-dot.idle { background: var(--muted); }
+.status-dot.listening { background: var(--blue); animation: pulse-dot 1s infinite; }
+.status-dot.thinking { background: var(--primary); animation: pulse-dot .8s infinite; }
+.status-dot.coding { background: var(--green); animation: pulse-dot .6s infinite; }
+.status-dot.debugging { background: var(--red); animation: pulse-dot .5s infinite; }
+.status-dot.deploying { background: var(--amber); animation: pulse-dot .7s infinite; }
+.status-dot.success { background: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+
+/* Main content area */
+.main-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Left panel: Agents */
+.agents-panel {
+  width: 260px;
+  border-right: 1px solid var(--border);
+  background: rgba(6,7,11,.5);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 12px;
+  font-family: var(--font);
+}
+
+.agent-card {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid transparent;
+  transition: all .3s;
+  cursor: pointer;
+}
+
+.agent-card:hover {
+  border-color: var(--border);
+  background: rgba(255,255,255,.05);
+}
+
+.agent-card.active {
+  border-color: var(--primary);
+  background: rgba(139,92,246,.08);
+  box-shadow: 0 0 12px rgba(139,92,246,.15);
+}
+
+.agent-icon {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.agent-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.agent-role {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Center: Chat + Atlas */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Atlas visualization */
+.atlas-visual {
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.atlas-core {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 80%);
+  animation: breathe 4s ease-in-out infinite;
+  position: relative;
+}
+
+.atlas-core.thinking {
+  animation: think-pulse 1.5s ease-in-out infinite;
+}
+
+.atlas-core.coding {
+  animation: code-pulse 1s ease-in-out infinite;
+  background: radial-gradient(circle, var(--green) 0%, transparent 80%);
+}
+
+.atlas-core.success {
+  animation: success-pulse 2s ease-out;
+  background: radial-gradient(circle, var(--green) 0%, transparent 80%);
+}
+
+@keyframes think-pulse {
+  0%, 100% { transform: scale(1); opacity: .7; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes code-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Sound waves */
+.atlas-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wave {
+  position: absolute;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.wave.active {
+  animation: wave-expand 2s ease-out infinite;
+}
+
+@keyframes wave-expand {
+  0% { width: 80px; height: 80px; opacity: .5; }
+  100% { width: 300px; height: 300px; opacity: 0; }
+}
+
+/* Chat area */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.chat-msg {
+  margin-bottom: 16px;
+  max-width: 80%;
+}
+
+.chat-msg.user {
+  margin-left: auto;
+}
+
+.chat-msg .bubble {
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chat-msg.user .bubble {
+  background: rgba(139,92,246,.15);
+  border: 1px solid rgba(139,92,246,.2);
+  border-bottom-right-radius: 4px;
+}
+
+.chat-msg.vetron .bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-msg.vetron .label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+  font-family: var(--font);
+}
+
+/* Phases display */
+.phase-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.phase-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-family: var(--font);
+}
+
+.phase-item.active {
+  border-color: var(--primary);
+  background: rgba(139,92,246,.08);
+}
+
+.phase-item.complete {
+  border-color: var(--green);
+  opacity: .7;
+}
+
+.phase-icon {
+  font-size: 14px;
+}
+
+.phase-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.phase-msg {
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* Input area */
+.input-area {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  background: rgba(6,7,11,.7);
+  backdrop-filter: blur(20px);
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.input-row textarea {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--sans);
+  resize: none;
+  outline: none;
+  transition: border-color .3s;
+  max-height: 120px;
+}
+
+.input-row textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(139,92,246,.15);
+}
+
+.send-btn {
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s;
+  white-space: nowrap;
+}
+
+.send-btn:hover {
+  box-shadow: 0 0 20px var(--primary-glow);
+  transform: translateY(-1px);
+}
+
+.send-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Right panel: Activity + Tools */
+.right-panel {
+  width: 340px;
+  border-left: 1px solid var(--border);
+  background: rgba(6,7,11,.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.right-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.right-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .3s;
+}
+
+.right-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.right-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* Activity log */
+.activity-log {
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+.activity-entry {
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.02);
+  border-left: 2px solid var(--border);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.activity-entry.info { border-left-color: var(--blue); }
+.activity-entry.success { border-left-color: var(--green); }
+.activity-entry.error { border-left-color: var(--red); }
+.activity-entry.warn { border-left-color: var(--amber); }
+.activity-entry.conductor { border-left-color: var(--primary); }
+
+.activity-ts {
+  color: var(--muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.activity-msg {
+  color: var(--text);
+  flex: 1;
+  word-break: break-word;
+}
+
+/* Tools panel */
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tool-card {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.tool-card:hover {
+  border-color: var(--primary);
+  background: rgba(139,92,246,.08);
+}
+
+.tool-icon { font-size: 20px; margin-bottom: 4px; }
+.tool-name { font-size: 11px; font-weight: 600; }
+.tool-status { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+/* Memory panel */
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.memory-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.memory-key {
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font);
+}
+
+.memory-value {
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.memory-cat {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Quick actions */
+.quick-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.quick-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .3s;
+  font-family: var(--font);
+}
+
+.quick-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .agents-panel { display: none; }
+  .right-panel { width: 100%; display: none; }
+  .right-panel.active { display: flex; position: fixed; inset: 0; z-index: 20; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+
+<canvas id="atlas-canvas"></canvas>
+
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-core" id="logo-core"></div>
+      <div class="logo-text">VETRON<span>.</span></div>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot idle" id="status-dot"></div>
+      <span id="status-text">Idle</span>
+      <span style="opacity:.3;">|</span>
+      <span id="agent-count">22 Agents</span>
+      <span style="opacity:.3;">|</span>
+      <span id="task-count">0 tasks</span>
+    </div>
+  </header>
+
+  <div class="main-area">
+    <!-- Left: Agents -->
+    <div class="agents-panel">
+      <div class="panel-title">Engineering Team</div>
+      <div id="agents-list"></div>
+    </div>
+
+    <!-- Center: Atlas + Chat -->
+    <div class="center-panel">
+      <!-- Breathing Atlas -->
+      <div class="atlas-visual">
+        <div class="atlas-waves" id="atlas-waves">
+          <div class="wave" id="wave1"></div>
+          <div class="wave" id="wave2"></div>
+          <div class="wave" id="wave3"></div>
+        </div>
+        <div class="atlas-core" id="atlas-core"></div>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-area" id="chat-area">
+        <div class="chat-msg vetron">
+          <div class="label">VETRON</div>
+          <div class="bubble">
+            I'm Vetron — your autonomous AI software engineer. I can build apps, fix bugs, deploy infrastructure, review code, and much more. What are we building today?
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-area">
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="quickTask('Build a landing page for a SaaS product')">Build a landing page</button>
+          <button class="quick-btn" onclick="quickTask('Review my code for security vulnerabilities')">Security audit</button>
+          <button class="quick-btn" onclick="quickTask('Deploy a FastAPI app to Render')">Deploy app</button>
+          <button class="quick-btn" onclick="quickTask('Create a database schema for an e-commerce platform')">Design database</button>
+        </div>
+        <div class="input-row">
+          <textarea id="input" rows="1" placeholder="Ask Vetron to build, fix, deploy, or analyze anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Activity/Tools/Memory -->
+    <div class="right-panel">
+      <div class="right-tabs">
+        <div class="right-tab active" onclick="switchRightTab('activity')">Activity</div>
+        <div class="right-tab" onclick="switchRightTab('tools')">Tools</div>
+        <div class="right-tab" onclick="switchRightTab('memory')">Memory</div>
+      </div>
+      <div class="right-content" id="right-content">
+        <div id="tab-activity" class="activity-log">
+          <div class="activity-entry info">
+            <span class="activity-ts">--:--:--</span>
+            <span class="activity-msg">Vetron initialized. 22 agents ready.</span>
+          </div>
+        </div>
+        <div id="tab-tools" style="display:none;">
+          <div class="tool-grid" id="tool-grid"></div>
+        </div>
+        <div id="tab-memory" style="display:none;">
+          <div class="memory-list" id="memory-list">
+            <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No memories yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// VETRON INTERFACE — Breathing Atlas
+// ═══════════════════════════════════════════════════════════
+
+const ENGINES_URL = 'https://ergio-engines.onrender.com';
+let _atlasES = null;
+let _taskCount = 0;
+let _agents = [];
+
+// ── Agents ─────────────────────────────────────────────
+const AGENTS = [
+  {key:'chief_engineer', name:'Chief Engineer', icon:'🎖', role:'Strategic oversight'},
+  {key:'architect', name:'Architect', icon:'🏗', role:'System design'},
+  {key:'frontend', name:'Frontend Engineer', icon:'🎨', role:'UI implementation'},
+  {key:'backend', name:'Backend Engineer', icon:'⚙', role:'Server logic'},
+  {key:'fullstack', name:'Full-Stack Engineer', icon:'🔧', role:'End-to-end features'},
+  {key:'mobile', name:'Mobile Engineer', icon:'📱', role:'iOS, Android'},
+  {key:'devops', name:'DevOps Engineer', icon:'🚀', role:'CI/CD, infrastructure'},
+  {key:'cloud', name:'Cloud Engineer', icon:'☁', role:'Cloud architecture'},
+  {key:'database', name:'Database Engineer', icon:'🗄', role:'Schema, queries'},
+  {key:'security', name:'Security Engineer', icon:'🔒', role:'Vulnerabilities'},
+  {key:'qa', name:'QA Engineer', icon:'✅', role:'Testing, validation'},
+  {key:'performance', name:'Performance Engineer', icon:'⚡', role:'Optimization'},
+  {key:'ai_engineer', name:'AI Engineer', icon:'🧠', role:'ML, prompting'},
+  {key:'researcher', name:'Research Engineer', icon:'🔬', role:'New tech evaluation'},
+  {key:'docs_writer', name:'Documentation', icon:'📝', role:'README, API docs'},
+  {key:'automation', name:'Automation', icon:'🤖', role:'Workflow automation'},
+  {key:'product_designer', name:'Product Designer', icon:'📐', role:'User flows'},
+  {key:'ux_designer', name:'UX Designer', icon:'✨', role:'Interaction design'},
+  {key:'code_reviewer', name:'Code Reviewer', icon:'👁', role:'Quality, practices'},
+  {key:'release_manager', name:'Release Manager', icon:'📦', role:'Deployments'},
+  {key:'data_engineer', name:'Data Engineer', icon:'📊', role:'Pipelines, ETL'},
+  {key:'predictive', name:'Predictive', icon:'🔮', role:'Future bug detection'},
+];
+
+function renderAgents() {
+  const list = document.getElementById('agents-list');
+  list.innerHTML = AGENTS.map(a => `
+    <div class="agent-card" id="agent-${a.key}" onclick="selectAgent('${a.key}')">
+      <div class="agent-icon">${a.icon}</div>
+      <div class="agent-name">${a.name}</div>
+      <div class="agent-role">${a.role}</div>
+    </div>
+  `).join('');
+}
+
+function selectAgent(key) {
+  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('agent-' + key).classList.add('active');
+}
+
+function activateAgents(keys) {
+  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+  keys.forEach(k => {
+    const el = document.getElementById('agent-' + k);
+    if (el) el.classList.add('active');
+  });
+}
+
+// ── Tools ──────────────────────────────────────────────
+const TOOLS = [
+  {name:'GitHub', icon:'🐙', status:'Connected'},
+  {name:'Render', icon:'🟣', status:'Connected'},
+  {name:'Vercel', icon:'▲', status:'Connected'},
+  {name:'Supabase', icon:'🟢', status:'Connected'},
+  {name:'Terminal', icon:'💻', status:'Ready'},
+  {name:'Browser', icon:'🌐', status:'Ready'},
+  {name:'File System', icon:'📁', status:'Ready'},
+  {name:'MCP Servers', icon:'🔌', status:'Ready'},
+];
+
+function renderTools() {
+  const grid = document.getElementById('tool-grid');
+  grid.innerHTML = TOOLS.map(t => `
+    <div class="tool-card">
+      <div class="tool-icon">${t.icon}</div>
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-status">${t.status}</div>
+    </div>
+  `).join('');
+}
+
+// ── Atlas Canvas (Particles) ────────────────────────────
+const canvas = document.getElementById('atlas-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let _atlasState = 'idle';
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Create particles
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 1.5 + 0.5,
+    a: Math.random() * 0.5 + 0.1,
+    connections: [],
+  });
+}
+
+function animateCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  const speedMul = _atlasState === 'thinking' ? 3 : _atlasState === 'coding' ? 2 : 1;
+  const color = _atlasState === 'coding' || _atlasState === 'success' ? '16,185,129' :
+                _atlasState === 'debugging' ? '239,68,68' :
+                _atlasState === 'deploying' ? '245,158,11' :
+                '139,92,246';
+
+  particles.forEach((p, i) => {
+    p.x += p.vx * speedMul;
+    p.y += p.vy * speedMul;
+    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+    // Draw particle
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${color},${p.a})`;
+    ctx.fill();
+
+    // Draw connections (thinking state)
+    if (_atlasState === 'thinking' || _atlasState === 'coding') {
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(${color},${0.15 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  });
+
+  requestAnimationFrame(animateCanvas);
+}
+animateCanvas();
+
+// ── Atlas State Management ──────────────────────────────
+function setAtlasState(state, data = {}) {
+  _atlasState = state;
+  const core = document.getElementById('atlas-core');
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  
+  core.className = 'atlas-core ' + state;
+  dot.className = 'status-dot ' + state;
+  
+  const stateLabels = {
+    idle: 'Idle',
+    listening: 'Listening...',
+    thinking: 'Thinking...',
+    coding: 'Building...',
+    debugging: 'Debugging...',
+    deploying: 'Deploying...',
+    success: 'Complete',
+  };
+  text.textContent = stateLabels[state] || state;
+
+  // Waves for listening
+  document.querySelectorAll('.wave').forEach((w, i) => {
+    w.classList.toggle('active', state === 'listening');
+    if (state === 'listening') {
+      w.style.animationDelay = (i * 0.5) + 's';
+    }
+  });
+}
+
+// ── Chat ────────────────────────────────────────────────
+function addMessage(text, sender = 'vetron', extra = '') {
+  const area = document.getElementById('chat-area');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ' + sender;
+  
+  if (sender === 'vetron') {
+    msg.innerHTML = `<div class="label">VETRON</div><div class="bubble">${text}${extra}</div>`;
+  } else {
+    msg.innerHTML = `<div class="bubble">${text}</div>`;
+  }
+  
+  area.appendChild(msg);
+  area.scrollTop = area.scrollHeight;
+}
+
+function addPhases(phases) {
+  const area = document.getElementById('chat-area');
+  const lastMsg = area.lastElementChild;
+  if (!lastMsg) return;
+  
+  const phaseList = document.createElement('div');
+  phaseList.className = 'phase-list';
+  phaseList.id = 'phase-list';
+  
+  phases.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'phase-item';
+    item.id = 'phase-' + p.phase;
+    item.innerHTML = `
+      <span class="phase-icon">⏳</span>
+      <span class="phase-name">${p.phase}</span>
+      <span class="phase-msg">${p.message || ''}</span>
+    `;
+    phaseList.appendChild(item);
+  });
+  
+  lastMsg.querySelector('.bubble').appendChild(phaseList);
+  area.scrollTop = area.scrollHeight;
+}
+
+function updatePhase(phase, status, result) {
+  const el = document.getElementById('phase-' + phase);
+  if (!el) return;
+  el.className = 'phase-item ' + status;
+  const icon = el.querySelector('.phase-icon');
+  icon.textContent = status === 'complete' ? '✅' : '🔄';
+}
+
+// ── Activity Log ────────────────────────────────────────
+function addActivity(type, message, level = 'info') {
+  const log = document.getElementById('tab-activity');
+  const ts = new Date().toTimeString().slice(0, 8);
+  
+  const entry = document.createElement('div');
+  entry.className = 'activity-entry ' + level;
+  entry.innerHTML = `
+    <span class="activity-ts">${ts}</span>
+    <span class="activity-msg">${message}</span>
+  `;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  
+  // Keep max 100 entries
+  while (log.children.length > 100) log.removeChild(log.firstChild);
+}
+
+// ── Send Message ────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = '';
+  addMessage(text, 'user');
+  
+  await runVetronTask(text);
+}
+
+function quickTask(task) {
+  document.getElementById('input').value = task;
+  sendMessage();
+}
+
+async function runVetronTask(task) {
+  setAtlasState('listening', {task});
+  addActivity('task', `Task received: ${task.slice(0, 80)}`, 'info');
+  
+  const sendBtn = document.getElementById('send-btn');
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Working...';
+  
+  try {
+    // Use streaming endpoint
+    const resp = await fetch(ENGINES_URL + '/vetron/think', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({request: task, stream: true}),
+    });
+    
+    if (!resp.ok) {
+      // Fallback to non-streaming
+      const resp2 = await fetch(ENGINES_URL + '/vetron/think', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({request: task}),
+      });
+      const data = await resp2.json();
+      addMessage(formatResult(data), 'vetron');
+      setAtlasState('success');
+      return;
+    }
+    
+    // Read SSE stream
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let phasesAdded = false;
+    
+    addMessage('Processing your request...', 'vetron');
+    
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event = JSON.parse(line.slice(6));
+          
+          if (event.type === 'state') {
+            setAtlasState(event.state);
+            addActivity('state', `State: ${event.state} — ${event.message || ''}`, 'info');
+          } else if (event.type === 'phase') {
+            if (!phasesAdded) {
+              addPhases([{phase: event.phase.phase, message: event.phase.message}]);
+              phasesAdded = true;
+            } else {
+              // Add new phase
+              const list = document.getElementById('phase-list');
+              if (list && !document.getElementById('phase-' + event.phase.phase)) {
+                const item = document.createElement('div');
+                item.className = 'phase-item ' + event.phase.status;
+                item.id = 'phase-' + event.phase.phase;
+                item.innerHTML = `
+                  <span class="phase-icon">${event.phase.status === 'complete' ? '✅' : '🔄'}</span>
+                  <span class="phase-name">${event.phase.phase}</span>
+                  <span class="phase-msg">${event.phase.message || ''}</span>
+                `;
+                list.appendChild(item);
+              }
+            }
+            updatePhase(event.phase.phase, event.phase.status);
+            
+            if (event.phase.status === 'active') {
+              setAtlasState(event.phase.phase === 'execute' ? 'coding' : 'thinking');
+            }
+          } else if (event.type === 'complete') {
+            const result = event.result;
+            addActivity('task', 'Task completed successfully!', 'success');
+            
+            // Activate used agents
+            if (result.agents_used) {
+              activateAgents(result.agents_used);
+            }
+            
+            // Update last message with summary
+            const area = document.getElementById('chat-area');
+            const lastMsg = area.lastElementChild;
+            if (lastMsg) {
+              const bubble = lastMsg.querySelector('.bubble');
+              if (bubble) {
+                bubble.innerHTML = formatResult(result) + bubble.innerHTML.replace('Processing your request...', '');
+              }
+            }
+            
+            setAtlasState('success');
+          } else if (event.type === 'error') {
+            addActivity('error', event.message, 'error');
+            setAtlasState('idle');
+          }
+        } catch (e) {}
+      }
+    }
+  } catch (e) {
+    addActivity('error', 'Connection error: ' + e.message, 'error');
+    addMessage('I encountered a connection issue. The ERGIO Engines service may be waking up — try again in a few seconds.', 'vetron');
+    setAtlasState('idle');
+  }
+  
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'Send';
+  _taskCount++;
+  document.getElementById('task-count').textContent = _taskCount + ' task' + (_taskCount > 1 ? 's' : '');
+  
+  setTimeout(() => setAtlasState('idle'), 3000);
+}
+
+function formatResult(result) {
+  if (!result) return 'Done.';
+  
+  let html = '';
+  
+  if (result.summary) {
+    html += '<div style="margin-bottom:12px;">' + result.summary.replace(/\n/g, '<br>') + '</div>';
+  }
+  
+  if (result.agents_used && result.agents_used.length > 0) {
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:8px;">Agents used: ' + result.agents_used.join(', ') + '</div>';
+  }
+  
+  return html || 'Task completed.';
+}
+
+// ── Atlas SSE Stream ────────────────────────────────────
+function connectAtlas() {
+  try {
+    _atlasES = new EventSource(ENGINES_URL + '/vetron/atlas/stream');
+    
+    _atlasES.onmessage = function(e) {
+      try {
+        const event = JSON.parse(e.data);
+        if (event.type === 'state_change') {
+          setAtlasState(event.state);
+        } else if (event.type === 'activity' || event.message) {
+          addActivity(event.type, event.message, event.level || 'info');
+        }
+      } catch (err) {}
+    };
+    
+    _atlasES.onerror = function() {
+      addActivity('system', 'Atlas stream disconnected. Reconnecting...', 'warn');
+      setTimeout(connectAtlas, 5000);
+    };
+  } catch (e) {
+    console.log('SSE not supported, using polling');
+  }
+}
+
+// ── Right Panel Tabs ────────────────────────────────────
+function switchRightTab(tab) {
+  document.querySelectorAll('.right-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-activity').style.display = tab === 'activity' ? 'block' : 'none';
+  document.getElementById('tab-tools').style.display = tab === 'tools' ? 'block' : 'none';
+  document.getElementById('tab-memory').style.display = tab === 'memory' ? 'block' : 'none';
+}
+
+// ── Init ────────────────────────────────────────────────
+renderAgents();
+renderTools();
+connectAtlas();
+setAtlasState('idle');
+
+// Auto-resize textarea
+const input = document.getElementById('input');
+input.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+</body>
+</html>
