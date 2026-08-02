@@ -1,6 +1,7 @@
 /* ===== Config ===== */
 var SKILLFORGE_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianSkillForge';
 var ERGIO_ENGINES_URL = 'https://ergio-engines.onrender.com';
+var ENGINES_PROXY = '/api/engines-proxy';
 var _uploadedFiles = []; // track uploaded files
 var UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianUpload';
 var VIDEO_UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianVideoUpload';
@@ -699,7 +700,7 @@ function connectConductorStream() {
   // Poll /status endpoint every 4 seconds (server doesn't support SSE)
   _conductorES = setInterval(async function() {
     try {
-      var res = await fetch(ERGIO_ENGINES_URL + '/status');
+      var res = await fetch(ENGINES_PROXY + '/status');
       var data = await res.json();
       if (data.status === 'healthy' || data.status === 'running') {
         dot.style.background = '#10b981';
@@ -763,7 +764,7 @@ function connectConductorStream() {
   _appendLog({type:'system', message:'Connected to ERGIO Engines (polling mode)', level:'success'});
 
   // Do an immediate status fetch
-  fetch(ERGIO_ENGINES_URL + '/status')
+  fetch(ENGINES_PROXY + '/status')
     .then(r => r.json())
     .then(data => {
       _conductorEventCount++;
@@ -844,7 +845,7 @@ async function runConductorTask() {
   _appendLog({type:'conductor', message:'Task started: ' + task.slice(0,80), level:'conductor'});
 
   try {
-    var res = await fetch(ERGIO_ENGINES_URL + '/conductor', {
+    var res = await fetch(ENGINES_PROXY + '/conductor', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({request: task, business_id: 'ergio', user_id: 'admin'})
