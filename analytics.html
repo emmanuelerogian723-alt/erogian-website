@@ -47,6 +47,24 @@ button,a[role="button"]{min-height:44px;min-width:44px}
 img,video,canvas{max-width:100%;height:auto}
 *,*::before,*::after{max-width:100%}
 @media(max-width:480px){html{font-size:14px}input,textarea,select{font-size:16px!important}}
+
+.expense-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:20px}
+.expense-form input,.expense-form select{background:#111;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px}
+.expense-form button{background:#3b82f6;color:#fff;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:600}
+.expense-form button:hover{background:#2563eb}
+.expense-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.expense-row:hover{background:rgba(255,255,255,.03)}
+.expense-cat{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.expense-cat-marketing{background:rgba(59,130,246,.15);color:#93c5fd}
+.expense-cat-tools{background:rgba(139,92,246,.15);color:#c4b5fd}
+.expense-cat-ads{background:rgba(245,158,11,.15);color:#facc15}
+.expense-cat-salary{background:rgba(239,68,68,.15);color:#f87171}
+.expense-cat-hosting{background:rgba(16,185,129,.15);color:#6ee7a0}
+.expense-cat-other{background:rgba(156,163,175,.15);color:#d1d5db}
+.del-btn{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+.del-btn:hover{background:rgba(239,68,68,.25)}
+@media(max-width:600px){.expense-form{grid-template-columns:1fr 1fr;gap:8px}}
+
 @media(max-width:768px){.container,.wrapper,.main{max-width:100%;padding:0 1rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
@@ -97,6 +115,7 @@ function esc(s){return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function switchTab(name){
 document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
 document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+name));
+if(name==='expenses')renderExpenses();
 }
 function render(d){
 const app=document.getElementById('app');
@@ -153,13 +172,126 @@ const skillForgeSection=
 (d.recentEnrollments||[]).map(e=>'<tr><td>'+esc(e.name)+'</td><td>'+esc(e.email)+'</td><td>'+esc(e.course_title)+'</td><td>'+payBadge(e.payment_status)+'</td><td>'+(e.quiz_total?e.quiz_score+'/'+e.quiz_total:'—')+'</td><td>'+(e.completed?'<span class="status-badge pill-green">Yes</span>':'<span class="status-badge pill-yellow">No</span>')+'</td><td>'+(e.certificate_issued?'<span class="status-badge pill-green">Issued</span>':'—')+'</td><td>'+new Date(e.date).toLocaleDateString()+'</td></tr>').join('')+
 '</table></div>';
 
+
+// ===== EXPENSE TRACKER =====
+var expenses = JSON.parse(localStorage.getItem('erogian_expenses') || '[]');
+var expenseChart = null;
+
+function renderExpenses(){
+  var list = document.getElementById('expense-list');
+  if(!list) return;
+  if(expenses.length === 0){
+    list.innerHTML = '<div style="text-align:center;color:#666;padding:30px;">No expenses logged yet. Add your first expense above.</div>';
+  } else {
+    list.innerHTML = expenses.map(function(e,i){
+      var catClass = 'expense-cat-' + (e.category || 'other');
+      return '<div class="expense-row"><div><span style="font-weight:600;color:#fff">' + esc(e.title) + '</span> <span style="font-size:11px;color:#666">' + new Date(e.date).toLocaleDateString() + '</span></div><div style="display:flex;align-items:center;gap:12px;"><span class="expense-cat ' + catClass + '">' + (e.category||'other') + '</span><span style="font-weight:700;color:#f87171;">₦' + Number(e.amount).toLocaleString() + '</span><button class="del-btn" onclick="deleteExpense(' + i + ')">Delete</button></div></div>';
+    }).join('');
+  }
+  updateExpenseStats();
+  renderExpenseChart();
+}
+
+function addExpense(){
+  var title = document.getElementById('exp-title').value.trim();
+  var amount = document.getElementById('exp-amount').value;
+  var category = document.getElementById('exp-category').value;
+  var date = document.getElementById('exp-date').value;
+  if(!title || !amount) { alert('Enter title and amount'); return; }
+  expenses.push({ title:title, amount:Number(amount), category:category, date:date || new Date().toISOString().slice(0,10) });
+  localStorage.setItem('erogian_expenses', JSON.stringify(expenses));
+  document.getElementById('exp-title').value = '';
+  document.getElementById('exp-amount').value = '';
+  renderExpenses();
+}
+
+function deleteExpense(i){
+  expenses.splice(i,1);
+  localStorage.setItem('erogian_expenses', JSON.stringify(expenses));
+  renderExpenses();
+}
+
+function updateExpenseStats(){
+  var total = expenses.reduce(function(s,e){ return s + Number(e.amount); }, 0);
+  var byCat = {};
+  expenses.forEach(function(e){ byCat[e.category||'other'] = (byCat[e.category||'other']||0) + Number(e.amount); });
+  var monthTotal = expenses.filter(function(e){
+    var d = new Date(e.date); var now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).reduce(function(s,e){ return s + Number(e.amount); }, 0);
+
+  var stats = document.getElementById('expense-stats');
+  if(!stats) return;
+  stats.innerHTML =
+    '<div class="card"><div class="num">₦' + total.toLocaleString() + '</div><div class="label">Total Expenses</div></div>' +
+    '<div class="card"><div class="num">₦' + monthTotal.toLocaleString() + '</div><div class="label">This Month</div></div>' +
+    '<div class="card"><div class="num">' + expenses.length + '</div><div class="label">Entries</div></div>' +
+    '<div class="card"><div class="num">' + Object.keys(byCat).length + '</div><div class="label">Categories</div></div>';
+
+  // Category breakdown panel
+  var breakdown = document.getElementById('expense-breakdown');
+  if(breakdown){
+    var rows = Object.entries(byCat).sort(function(a,b){ return b[1]-a[1]; }).map(function(c){
+      return '<tr><td><span class="expense-cat expense-cat-' + c[0] + '">' + c[0] + '</span></td><td style="text-align:right;font-weight:700;">₦' + Number(c[1]).toLocaleString() + '</td><td style="text-align:right;color:#666;">' + Math.round(c[1]/total*100) + '%</td></tr>';
+    }).join('');
+    breakdown.innerHTML = '<table><tr><th>Category</th><th style="text-align:right">Amount</th><th style="text-align:right">% of Total</th></tr>' + rows + '</table>';
+  }
+}
+
+function renderExpenseChart(){
+  var canvas = document.getElementById('expenseChart');
+  if(!canvas) return;
+  var byCat = {};
+  expenses.forEach(function(e){ byCat[e.category||'other'] = (byCat[e.category||'other']||0) + Number(e.amount); });
+  var labels = Object.keys(byCat);
+  var data = labels.map(function(k){ return byCat[k]; });
+  var colors = labels.map(function(k){
+    var map = { marketing:'#3b82f6', tools:'#8b5cf6', ads:'#f59e0b', salary:'#ef4444', hosting:'#10b981', other:'#9ca3af' };
+    return map[k] || '#9ca3af';
+  });
+  if(expenseChart) expenseChart.destroy();
+  expenseChart = new Chart(canvas, { type:'doughnut', data:{ labels:labels, datasets:[{ data:data, backgroundColor:colors, borderWidth:0 }] }, options:{ plugins:{ legend:{ position:'bottom', labels:{ color:'#aaa', font:{ size:11 } } } } } });
+}
+
+var expenseSection =
+  '<div class="grid" id="expense-stats">' +
+    '<div class="card"><div class="num">₦0</div><div class="label">Total Expenses</div></div>' +
+    '<div class="card"><div class="num">₦0</div><div class="label">This Month</div></div>' +
+    '<div class="card"><div class="num">0</div><div class="label">Entries</div></div>' +
+    '<div class="card"><div class="num">0</div><div class="label">Categories</div></div>' +
+  '</div>' +
+  '<div class="panel"><h2>Add Expense</h2>' +
+    '<div class="expense-form">' +
+      '<input id="exp-title" type="text" placeholder="Expense title" />' +
+      '<input id="exp-amount" type="number" placeholder="Amount (₦)" />' +
+      '<select id="exp-category">' +
+        '<option value="marketing">Marketing</option>' +
+        '<option value="tools">Tools & Software</option>' +
+        '<option value="ads">Ads</option>' +
+        '<option value="salary">Salary</option>' +
+        '<option value="hosting">Hosting</option>' +
+        '<option value="other">Other</option>' +
+      '</select>' +
+      '<input id="exp-date" type="date" />' +
+      '<button onclick="addExpense()">Add</button>' +
+    '</div>' +
+  '</div>' +
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">' +
+    '<div class="panel"><h2>Category Breakdown</h2><div id="expense-breakdown"><table><tr><td style="color:#666;text-align:center;padding:20px;">Add expenses to see breakdown</td></tr></table></div></div>' +
+    '<div class="panel"><h2>Spending Distribution</h2><canvas id="expenseChart"></canvas></div>' +
+  '</div>' +
+  '<div class="panel"><h2>Expense History</h2><div id="expense-list"></div></div>';
+
+
 app.innerHTML='<h1>Erogian Analytics</h1><div class="sub">Live data for erogian website</div>'+
 '<div class="tabs">'+
 '<div class="tab active" data-tab="site" onclick="switchTab(\'site\')">🌐 Website</div>'+
 '<div class="tab" data-tab="skillforge" onclick="switchTab(\'skillforge\')">🎓 SkillForge Students</div>'+
+'<div class="tab" data-tab="expenses" onclick="switchTab(\'expenses\')">💰 Expenses</div>'+
 '</div>'+
 '<div class="section active" id="sec-site">'+siteSection+'</div>'+
-'<div class="section" id="sec-skillforge">'+skillForgeSection+'</div>';
+'<div class="section" id="sec-skillforge">'+skillForgeSection+'</div>'+
+'<div class="section" id="sec-expenses">'+expenseSection+'</div>';
 
 const ctx=document.getElementById('dayChart');
 new Chart(ctx,{type:'line',data:{labels:d.byDay.map(x=>x.name),datasets:[{label:'Visits',data:d.byDay.map(x=>x.count),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.15)',tension:0.3,fill:true}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}});

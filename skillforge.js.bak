@@ -295,13 +295,13 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
 function closeEnroll() { document.getElementById('enroll-modal').classList.remove('active'); }
 
 /* ===== Admin ===== */
-function openAdmin() { document.getElementById('admin-modal').classList.add('active'); }
-function closeAdminLogin() { document.getElementById('admin-modal').classList.remove('active'); }
+function openAdmin() { document.getElementById('admin-login-modal').classList.add('active'); }
+function closeAdminLogin() { document.getElementById('admin-login-modal').classList.remove('active'); }
 function checkAdminKey() {
   var key = document.getElementById('admin-key-input').value;
   if (key === ADMIN_KEY) {
-
-    document.getElementById('admin-login').style.display='none'; document.getElementById('admin-panel').style.display='block';
+    closeAdminLogin();
+    document.getElementById('admin-studio-modal').classList.add('active');
     cfLessons = [];
     renderLessonsEditor();
     loadAdminCourses();
@@ -310,8 +310,7 @@ function checkAdminKey() {
     alert('Incorrect key.');
   }
 }
-function closeAdminStudio() { document.getElementById('admin-modal').classList.remove('active'); }
-function adminLogin() { checkAdminKey(); }
+function closeAdminStudio() { document.getElementById('admin-studio-modal').classList.remove('active'); }
 
 document.addEventListener('change', function(e) {
   if (e.target && e.target.id === 'cf-thumb-file') {
@@ -479,27 +478,10 @@ async function loadAdminCourses() {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_list', admin_key:ADMIN_KEY }) });
     var data = await res.json();
     var list = document.getElementById('admin-course-list');
-    if (!list) return;
     list.innerHTML = (data.courses||[]).map(function(c) {
-      var status = c.status || 'published';
-      var statusBadge = status === 'published'
-        ? '<span style="color:#10b981;font-size:10px;background:rgba(16,185,129,.15);padding:2px 8px;border-radius:10px;">Published</span>'
-        : '<span style="color:#f59e0b;font-size:10px;background:rgba(245,158,11,.15);padding:2px 8px;border-radius:10px;">Draft</span>';
-      var priceLabel = c.is_free ? 'Free' : '₦' + (c.price_ngn || 0);
-      return '<div class="glass rounded-lg px-3 py-2 mb-2" style="border:1px solid rgba(255,255,255,.06);">'
-        + '<div class="flex justify-between items-center">'
-        + '<span style="font-size:13px;font-weight:600;">' + esc(c.title) + '</span>'
-        + statusBadge
-        + '</div>'
-        + '<div style="font-size:11px;color:#6b7280;margin-top:4px;">' + esc(c.category||'') + ' · ' + priceLabel + ' · ' + (c.enrolled_count||0) + ' students</div>'
-        + '<div style="display:flex;gap:6px;margin-top:8px;">'
-        + '<button onclick="editCourseFromAdmin(\''+c.id+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);cursor:pointer;">✏️ Edit</button>'
-        + '<button onclick="togglePublish(\''+c.id+'\',\''+status+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);cursor:pointer;">🔄 Toggle</button>'
-        + '<button onclick="deleteCourse(\''+c.id+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);cursor:pointer;">🗑️ Delete</button>'
-        + '</div>'
-        + '</div>';
+      return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2"><span>'+esc(c.title)+' <span class="text-gray-600">('+(c.is_free?'Free':'₦'+c.price_ngn)+' · '+(c.enrolled_count||0)+' students)</span></span><button onclick="deleteCourse(\''+c.id+'\')" class="text-red-400 text-xs">Delete</button></div>';
     }).join('') || '<div class="text-gray-600 text-xs">No classes yet.</div>';
-  } catch (e) { console.error('loadAdminCourses error:', e); }
+  } catch (e) {}
 }
 
 async function loadAdminEnrollments() {
@@ -680,11 +662,9 @@ loadCourses();
 // ═══════════════════════════════════════════════════════════
 var _conductorES = null;
 var _conductorEventCount = 0;
-var _conductorLoggedEngines = {};
-var _conductorLastBizCount = -1;
 
 function connectConductorStream() {
-  if (_conductorES) { clearInterval(_conductorES); _conductorES = null; }
+  if (_conductorES) { _conductorES.close(); _conductorES = null; }
   var log = document.getElementById('conductor-activity-log');
   var dot = document.getElementById('conductor-status-dot');
   var statusText = document.getElementById('conductor-status-text');
@@ -694,91 +674,52 @@ function connectConductorStream() {
   statusText.textContent = 'Connecting...';
   log.innerHTML = '<div style="color:#f59e0b;font-style:italic;">[' + _ts() + '] Connecting to ERGIO Engines...</div>';
 
-  _appendLog({type:'system', message:'Connecting to ERGIO Engines at ' + ERGIO_ENGINES_URL, level:'info'});
+  try {
+    _conductorES = new EventSource(ERGIO_ENGINES_URL + '/activity/stream');
 
-  // Poll /status endpoint every 4 seconds (server doesn't support SSE)
-  _conductorES = setInterval(async function() {
-    try {
-      var res = await fetch(ERGIO_ENGINES_URL + '/status');
-      var data = await res.json();
-      if (data.status === 'healthy' || data.status === 'running') {
-        dot.style.background = '#10b981';
-        statusText.textContent = 'Live';
-      } else {
-        dot.style.background = '#f59e0b';
-        statusText.textContent = data.status || 'Unknown';
-      }
+    _conductorES.onopen = function() {
+      dot.style.background = '#10b981';
+      statusText.textContent = 'Live';
+      _appendLog({type:'system', message:'Connected to ERGIO Engines live feed', level:'success'});
+    };
 
-      // Log engine status changes
-      if (data.engines) {
-        for (var i = 0; i < data.engines.length; i++) {
-          var eng = data.engines[i];
-          if (eng.name && !_conductorLoggedEngines[eng.name]) {
-            _conductorLoggedEngines[eng.name] = true;
-            _conductorEventCount++;
-            _appendLog({type:'engine', message: eng.name + ': ' + (eng.status || 'ready'), level:'info'});
-          }
-        }
-      }
+    _conductorES.onmessage = function(e) {
+      try {
+        var data = JSON.parse(e.data);
+        if (data.type === 'heartbeat') return;
+        _conductorEventCount++;
+        document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
+        _appendLog(data);
+      } catch(err) {}
+    };
 
-      // Log groq/search/supabase status
-      if (data.groq !== undefined && !_conductorLoggedEngines['groq']) {
-        _conductorLoggedEngines['groq'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Groq AI: ' + (data.groq ? 'connected' : 'offline'), level: data.groq ? 'success' : 'warn'});
-      }
-      if (data.supabase !== undefined && !_conductorLoggedEngines['supabase']) {
-        _conductorLoggedEngines['supabase'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Supabase: ' + (data.supabase ? 'connected' : 'offline'), level: data.supabase ? 'success' : 'warn'});
-      }
-      if (data.searxng !== undefined && !_conductorLoggedEngines['searxng']) {
-        _conductorLoggedEngines['searxng'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'SearXNG Search: ' + (data.searxng ? 'connected' : 'offline'), level: data.searxng ? 'success' : 'warn'});
-      }
-      if (data.playwright !== undefined && !_conductorLoggedEngines['playwright']) {
-        _conductorLoggedEngines['playwright'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Playwright: ' + (data.playwright ? 'connected' : 'offline'), level: data.playwright ? 'success' : 'warn'});
-      }
-
-      // Log businesses count
-      if (data.businesses_count !== undefined && data.businesses_count !== _conductorLastBizCount) {
-        _conductorLastBizCount = data.businesses_count;
-        _conductorEventCount++;
-        _appendLog({type:'info', message: data.businesses_count + ' businesses tracked', level:'info'});
-      }
-
-      document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
-    } catch(e) {
+    _conductorES.onerror = function() {
       dot.style.background = '#ef4444';
       statusText.textContent = 'Disconnected';
-    }
-  }, 4000);
-
-  // Mark connected immediately
-  dot.style.background = '#10b981';
-  statusText.textContent = 'Live';
-  _appendLog({type:'system', message:'Connected to ERGIO Engines (polling mode)', level:'success'});
-
-  // Do an immediate status fetch
-  fetch(ERGIO_ENGINES_URL + '/status')
-    .then(r => r.json())
-    .then(data => {
-      _conductorEventCount++;
-      _appendLog({type:'system', message:'Server: ' + (data.name || 'ERGIO Engines') + ' v' + (data.version || '5.0.0'), level:'success'});
-      _appendLog({type:'system', message:'Status: ' + (data.status || 'running'), level:'success'});
-      document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
-    })
-    .catch(e => {
-      _appendLog({type:'system', message:'Connection error: ' + e.message, level:'error'});
-    });
+      _appendLog({type:'system', message:'Connection lost. Click Connect to retry.', level:'error'});
+    };
+  } catch(e) {
+    dot.style.background = '#ef4444';
+    statusText.textContent = 'Failed';
+    _appendLog({type:'system', message:'EventSource not supported. Using polling.', level:'warn'});
+    // Fallback: poll every 3s
+    _pollActivityFallback();
+  }
 }
 
 function _pollActivityFallback() {
-  // Legacy fallback — now handled by connectConductorStream polling
-  connectConductorStream();
+  setInterval(async function() {
+    try {
+      var r = await fetch(ERGIO_ENGINES_URL + '/activity/history');
+      var d = await r.json();
+      if (d.events && d.events.length > _conductorEventCount) {
+        var newEvents = d.events.slice(_conductorEventCount);
+        newEvents.forEach(function(ev) { _appendLog(ev); });
+        _conductorEventCount = d.events.length;
+        document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
+      }
+    } catch(e) {}
+  }, 3000);
 }
 
 function _ts() {
@@ -844,14 +785,12 @@ async function runConductorTask() {
   _appendLog({type:'conductor', message:'Task started: ' + task.slice(0,80), level:'conductor'});
 
   try {
-    var res = await fetch(ERGIO_ENGINES_URL + '/conductor', {
+    var res = await fetch(ERGIO_ENGINES_URL + '/conductor/run', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({request: task, business_id: 'ergio', user_id: 'admin'})
     });
-    if (!res.ok) throw new Error('Conductor API returned ' + res.status);
     var data = await res.json();
-    _conductorEventCount++;
     _appendLog({type:'conductor', message:'Task completed!', level:'success'});
 
     // Show result
@@ -982,7 +921,7 @@ function _addToUploadHistory(name, url, type, sizeMb) {
       '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(name) + '</div>' +
       '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (sizeMb ? sizeMb.toFixed(2) + ' MB · ' : '') + '<a href="' + url + '" target="_blank" style="color:#34d399;text-decoration:none;">Open ↗</a></div>' +
     '</div>' +
-    '<button data-url="' + url + '" class="copy-url-btn" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
+    '<button onclick="navigator.clipboard.writeText('' + url + '');this.textContent='✓';" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
   list.insertBefore(item, list.firstChild);
 }
 
@@ -1006,12 +945,3 @@ function _fileToBase64(file) {
   document.head.appendChild(style);
 })();
 
-
-
-// Copy URL button handler
-document.addEventListener('click', function(e) {
-  if (e.target && e.target.classList && e.target.classList.contains('copy-url-btn')) {
-    var url = e.target.getAttribute('data-url');
-    if (url) { navigator.clipboard.writeText(url); e.target.textContent = '\u2713'; }
-  }
-});
