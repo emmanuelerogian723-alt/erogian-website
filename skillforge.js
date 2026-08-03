@@ -700,7 +700,7 @@ function connectConductorStream() {
   // Poll /status endpoint every 4 seconds (server doesn't support SSE)
   _conductorES = setInterval(async function() {
     try {
-      var res = await fetch(ENGINES_PROXY + '/status');
+      var res = await fetch(ENGINES_PROXY + '?path=/status');
       var data = await res.json();
       if (data.status === 'healthy' || data.status === 'running') {
         dot.style.background = '#10b981';
@@ -764,7 +764,7 @@ function connectConductorStream() {
   _appendLog({type:'system', message:'Connected to ERGIO Engines (polling mode)', level:'success'});
 
   // Do an immediate status fetch
-  fetch(ENGINES_PROXY + '/status')
+  fetch(ENGINES_PROXY + '?path=/status')
     .then(r => r.json())
     .then(data => {
       _conductorEventCount++;
@@ -845,7 +845,7 @@ async function runConductorTask() {
   _appendLog({type:'conductor', message:'Task started: ' + task.slice(0,80), level:'conductor'});
 
   try {
-    var res = await fetch(ENGINES_PROXY + '/conductor', {
+    var res = await fetch(ENGINES_PROXY + '?path=/conductor', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({request: task, business_id: 'ergio', user_id: 'admin'})
