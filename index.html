@@ -175,7 +175,10 @@ input::placeholder,textarea::placeholder{color:#4b5563}
 .testimonial-card:hover{background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.3);transform:translateY(-4px);}
 
 /* AI hologram assistant */
-#ai-assistant{position:fixed;bottom:90px;right:20px;z-index:150;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(59,130,246,.8),rgba(139,92,246,.6));box-shadow:0 0 30px rgba(59,130,246,.5);animation:assistBreath 4s ease-in-out infinite;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(59,130,246,.5);}
+#ai-assistant{position:fixed;bottom:24px;right:20px;z-index:150;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(59,130,246,.9),rgba(139,92,246,.75));box-shadow:0 0 30px rgba(139,92,246,.5);animation:assistBreath 4s ease-in-out infinite;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(139,92,246,.5);}
+#ai-assistant .online-dot{position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#34d399;border:2px solid #0a0a0f;}
+.rail-icon{position:fixed;right:24px;z-index:150;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;transition:all .25s;backdrop-filter:blur(8px);}
+.rail-icon:hover{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.12);transform:translateY(-2px);}
 @keyframes assistBreath{0%,100%{box-shadow:0 0 30px rgba(59,130,246,.5),0 0 60px rgba(139,92,246,.2);}50%{box-shadow:0 0 50px rgba(59,130,246,.8),0 0 90px rgba(139,92,246,.4);}}
 
 /* Globe */
@@ -265,7 +268,7 @@ a.skip-link:focus{top:0}
   <a href="index.html">Home</a>
   <a href="#services">Services</a>
   <a href="#services">Services</a>
-  <a href="#portfolio">Portfolio</a>
+  <a href="#portfolio">Work</a>
   <a href="#platforms">Studio</a>
   <a href="#about">About Us</a>
   <a href="blog.html">Blog</a>
@@ -281,7 +284,7 @@ a.skip-link:focus{top:0}
         <span style="position:absolute;left:50%;top:26px;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#a78bfa;"></span>
       </a>
       <a href="#services" class="nav-link">Services</a>
-      <a href="#portfolio" class="nav-link">Portfolio</a>
+      <a href="#portfolio" class="nav-link">Work</a>
       <a href="#platforms" class="nav-link">Studio</a>
       <a href="#about" class="nav-link">About Us</a>
       <a href="blog.html" class="nav-link">Blog</a>
@@ -291,7 +294,7 @@ a.skip-link:focus{top:0}
         <div class="wave-glow"></div>
         <span style="position:relative;z-index:1;">Book a Call 📞</span>
       </a>
-      <button onclick="toggleMobileMenu()" class="md:hidden" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px;">☰</button>
+      <button onclick="toggleMobileMenu()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(139,92,246,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.14)'">☰</button>
     </div>
   </div>
 </nav>
@@ -759,10 +762,11 @@ a.skip-link:focus{top:0}
 </section>
 
 
-<!-- ===== FLOATING CHATBOT WIDGET ===== -->
-<div id="chat-launcher" style="position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;box-shadow:0 4px 20px rgba(139,92,246,.4);transition:transform .2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-  <span style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:#34d399;border:2px solid #0a0a0f;"></span>
+<!-- ===== FLOATING ACTION RAIL (theme toggle · WhatsApp · AI assistant) ===== -->
+<div id="theme-toggle" class="rail-icon" style="bottom:152px;" title="Toggle theme" onclick="toggleTheme()">🌙</div>
+<a href="https://wa.me/2347045560291" target="_blank" class="rail-icon" style="bottom:96px;color:#34d399;" title="Chat on WhatsApp">💬</a>
+<div id="chat-launcher" style="position:fixed;bottom:24px;right:24px;width:0;height:0;pointer-events:none;">
+  <!-- kept for chat-window JS wiring; click handled by #ai-assistant below -->
 </div>
 
 <div id="chat-window" class="hidden flex" style="position:fixed;bottom:90px;right:24px;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 120px);background:#12121a;border:1px solid rgba(255,255,255,.1);border-radius:20px;flex-direction:column;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;">
@@ -847,12 +851,25 @@ a.skip-link:focus{top:0}
 </div>
 
 <!-- AI Holographic Assistant -->
-<div id="ai-assistant" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})" title="Chat with us">🤖</div>
-
-<!-- Floating WhatsApp -->
-<a href="https://wa.me/2347045560291" target="_blank" style="position:fixed;bottom:24px;right:20px;z-index:200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:26px;text-decoration:none;box-shadow:0 4px 20px rgba(37,211,102,.4);animation:assistBreath 3s ease-in-out infinite;">💬</a>
+<div id="ai-assistant" onclick="document.getElementById('chat-launcher').click ? document.getElementById('chat-launcher').click() : window.toggleChat && window.toggleChat()" title="Chat with our AI">
+  🤖
+  <span class="online-dot"></span>
+</div>
 
 <script src="app.js"></script>
+<script>
+// Simple day/night visual toggle — subtle brightness shift, keeps the signature dark-luxury look
+function toggleTheme(){
+  var html = document.documentElement;
+  var btn = document.getElementById('theme-toggle');
+  var isLight = html.classList.toggle('light-preview');
+  btn.textContent = isLight ? '☀️' : '🌙';
+}
+</script>
+<style>
+html.light-preview body{filter:brightness(1.12) saturate(.92) contrast(.97);transition:filter .4s ease;}
+body{transition:filter .4s ease;}
+</style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 // Stars
