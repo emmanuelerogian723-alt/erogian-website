@@ -348,12 +348,12 @@ function linkify(text){
 }
 function addBot(msg){
   if(!chatBody) return;
-  chatBody.innerHTML += '<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">'+linkify(msg).replace(/\n/g,'<br>')+'</div>';
+  chatBody.innerHTML += '<div class="chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-3 max-w-[88%]" style="font-size:14px;line-height:1.55;color:#e5e7eb;">'+linkify(msg).replace(/\n/g,'<br>')+'</div>';
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 function addUser(msg){
   if(!chatBody) return;
-  chatBody.innerHTML += '<div class="chat-bubble-enter bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] ml-auto text-right">'+msg+'</div>';
+  chatBody.innerHTML += '<div class="chat-bubble-enter bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[88%] ml-auto text-right" style="font-size:14px;line-height:1.55;color:#fff;">'+msg+'</div>';
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 function addQuickActions(actions){
@@ -390,7 +390,7 @@ function addStandardQR(){
   if(!chatBody) return;
   var qr = document.createElement('div');
   qr.className = 'chat-bubble-enter flex flex-wrap gap-2';
-  qr.innerHTML = '<button type="button" class="qr-pricing text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition">💰 Pricing</button><button type="button" class="qr-payment text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition">💳 Pay Now</button><button type="button" class="qr-whatsapp text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition">💬 WhatsApp</button><button type="button" class="qr-services text-xs px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition">🛠️ Services</button>';
+  qr.innerHTML = '<button type="button" class="qr-pricing text-sm px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">💰 Pricing</button><button type="button" class="qr-payment text-sm px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">💳 Pay Now</button><button type="button" class="qr-whatsapp text-sm px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">💬 WhatsApp</button><button type="button" class="qr-services text-sm px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">🛠️ Services</button>';
   chatBody.appendChild(qr); chatBody.scrollTop = chatBody.scrollHeight;
   qr.querySelector('.qr-pricing').addEventListener('click', function(){ addUser('How much do your services cost?'); sendToAI('How much do your services cost?'); });
   qr.querySelector('.qr-payment').addEventListener('click', function(){ addUser('I want to pay now'); sendToAI('I want to pay now'); });
@@ -400,7 +400,7 @@ function addStandardQR(){
 function addQuoteButton(){
   if(!chatBody) return;
   var wrap = document.createElement('div'); wrap.className = 'chat-bubble-enter';
-  wrap.innerHTML = '<button type="button" id="quote-btn" class="text-xs px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 font-semibold">📋 Get a Project Quote</button>';
+  wrap.innerHTML = '<button type="button" id="quote-btn" class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 font-semibold">📋 Get a Project Quote</button>';
   chatBody.appendChild(wrap); chatBody.scrollTop = chatBody.scrollHeight;
   document.getElementById('quote-btn').addEventListener('click', function(){ mode='lead'; step=0; lead={}; addBot(flow[0].q); });
 }
@@ -414,7 +414,7 @@ async function sendToAI(msg){
   if(!chatBody) return;
   var tid = 't' + Date.now();
   var typingDiv = document.createElement('div');
-  typingDiv.className = 'chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%] text-gray-400';
+  typingDiv.className = 'chat-bubble-enter glass rounded-2xl rounded-tl-sm px-4 py-3 max-w-[88%] text-gray-400'; typingDiv.style.fontSize='14px';
   typingDiv.id = tid; typingDiv.textContent = 'typing…';
   chatBody.appendChild(typingDiv); chatBody.scrollTop = chatBody.scrollHeight;
   try{
