@@ -195,7 +195,36 @@ input::placeholder,textarea::placeholder{color:#4b5563}
 .path-step:last-child::after{display:none;}
 
 /* Floating stats cards */
-.stat-card{position:absolute;background:rgba(8,10,18,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px;backdrop-filter:blur(20px);min-width:150px;}
+.stat-card{position:absolute;background:rgba(8,10,18,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px;backdrop-filter:blur(20px);min-width:150px;box-shadow:0 12px 30px rgba(0,0,0,.4);}
+
+/* Hero visual — image that comes to life */
+.hero-visual{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:1/1.05;box-shadow:0 40px 100px -20px rgba(139,92,246,.35),0 0 0 1px rgba(255,255,255,.06);}
+.hero-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,3,10,0) 40%,rgba(3,3,10,.75) 100%),linear-gradient(90deg,rgba(3,3,10,.35),transparent 30%);pointer-events:none;z-index:2;}
+.hero-visual img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06);animation:kenBurns 16s ease-in-out infinite alternate;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+@keyframes kenBurns{0%{transform:scale(1.06) translate(0,0);}100%{transform:scale(1.14) translate(-1.5%,-1.5%);}}
+.hero-visual-wrap{position:relative;}
+.hero-visual-wrap .stat-card{position:absolute;z-index:3;}
+.hero-screen-overlay{position:absolute;left:14%;top:34%;width:46%;max-width:220px;background:rgba(10,8,20,.72);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:12px 14px;backdrop-filter:blur(10px);z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.5);animation:floatCard 6s ease-in-out infinite;}
+@media(max-width:1024px){
+  .hero-visual{aspect-ratio:1/1;}
+}
+@media(max-width:768px){
+  .hero-visual{aspect-ratio:4/3;border-radius:20px;}
+  .hero-visual-wrap .stat-card{min-width:110px;padding:8px 10px;}
+  .hero-visual-wrap .stat-card[style*="left:-8%"]{left:0 !important;}
+  .hero-visual-wrap .stat-card[style*="right:-10%"]{right:0 !important;}
+  .hero-visual-wrap .stat-card[style*="left:-10%"]{left:0 !important;}
+  .hero-visual-wrap .stat-card[style*="right:-8%"]{right:0 !important;}
+  .hero-screen-overlay{display:none;}
+}
+
+/* Trusted-by logo strip */
+.trusted-strip{border-top:1px solid rgba(255,255,255,.06);padding:24px 24px;position:relative;z-index:10;}
+.trusted-strip .trusted-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:28px;justify-content:space-between;}
+.trusted-label{font-size:11px;color:#4b5563;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.5;white-space:nowrap;}
+.trusted-logos{display:flex;flex-wrap:wrap;gap:32px;align-items:center;}
+.trusted-logo{display:flex;align-items:center;gap:8px;color:#6b7280;font-size:14px;font-weight:600;opacity:.6;transition:opacity .3s,color .3s;filter:grayscale(1);}
+.trusted-logo:hover{opacity:1;color:#d1d5db;filter:grayscale(0);}
 
 /* Mobile menu */
 #mobile-menu{display:none;position:fixed;inset:0;background:rgba(3,3,8,.97);z-index:500;padding:80px 32px 32px;flex-direction:column;gap:24px;}
@@ -205,7 +234,6 @@ input::placeholder,textarea::placeholder{color:#4b5563}
 
 @media(max-width:768px){
   #ai-orb{width:280px;height:280px;}
-  .stat-card{display:none;}
   #globe-canvas{width:280px;height:280px;}
 }
 
@@ -269,7 +297,7 @@ a.skip-link:focus{top:0}
 </nav>
 
 <!-- ===== HERO ===== -->
-<section style="position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:0 24px;">
+<section style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:120px 24px 0;">
   <canvas id="neural-canvas"></canvas>
   <canvas id="globe-canvas"></canvas>
 
@@ -281,76 +309,136 @@ a.skip-link:focus{top:0}
     <div class="orb-ring orb-ring-3"></div>
   </div>
 
-  <!-- Floating stat cards -->
-  <div class="stat-card float-card" style="top:22%;left:5%;animation-duration:5s;">
-    <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">🚀 Projects Delivered</div>
-    <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;" class="grad-text counter" data-count="87">0+</div>
-  </div>
-  <div class="stat-card float-card-2" style="top:18%;right:5%;animation-duration:6.5s;">
-    <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">⚡ Avg Delivery</div>
-    <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#a78bfa;">5 Days</div>
-  </div>
-  <div class="stat-card float-card" style="bottom:28%;left:4%;animation-duration:7s;animation-delay:-2s;">
-    <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">🌍 Countries Served</div>
-    <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#60a5fa;">12+</div>
-  </div>
-  <div class="stat-card float-card-2" style="bottom:22%;right:4%;animation-duration:5.5s;animation-delay:-3s;">
-    <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">😍 Client Satisfaction</div>
-    <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#34d399;"><span class="counter" data-count="98">0</span>%</div>
-  </div>
+  <div class="max-w-7xl mx-auto" style="position:relative;z-index:10;width:100%;display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;" id="hero-grid">
+    <!-- LEFT — Hero content -->
+    <div>
+      <div data-hero-tag style="display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:100px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);margin-bottom:28px;font-size:13px;color:#c4b5fd;font-weight:600;letter-spacing:.02em;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;display:inline-block;animation:orbBreath 2s ease-in-out infinite;"></span>
+        Nigeria's Premier AI-First Digital Studio
+      </div>
 
-  <!-- Hero content -->
-  <div class="max-w-4xl mx-auto text-center" style="position:relative;z-index:10;">
-    <div data-hero-tag style="display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:100px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);margin-bottom:28px;font-size:13px;color:#c4b5fd;font-weight:600;letter-spacing:.02em;">
-      <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;display:inline-block;animation:orbBreath 2s ease-in-out infinite;"></span>
-      Nigeria's Premier AI-First Digital Studio
-    </div>
+      <h1 data-hero-title style="font-size:clamp(2.3rem,5.2vw,4.2rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;margin-bottom:24px;">
+        We Build Digital<br><span class="grad-text">Legacies That</span><br>Print Money
+      </h1>
 
-    <h1 data-hero-title style="font-size:clamp(2.4rem,7vw,5rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:24px;">
-      We Build Digital<br><span class="grad-text">Legacies That</span><br>Print Money
-    </h1>
+      <p data-hero-sub style="font-size:clamp(1rem,1.6vw,1.15rem);color:#9ca3af;line-height:1.7;max-width:520px;margin-bottom:40px;">
+        From stunning websites to autonomous AI agents — we turn your vision into a profitable digital asset. Startups, businesses &amp; creators across Africa and beyond.
+      </p>
 
-    <p data-hero-sub style="font-size:clamp(1rem,2vw,1.2rem);color:#9ca3af;line-height:1.7;max-width:600px;margin:0 auto 40px;">
-      From stunning websites to autonomous AI agents — we turn your vision into a profitable digital asset. Startups, businesses &amp; creators across Africa and beyond.
-    </p>
+      <div data-hero-cta style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
+        <a href="https://wa.me/2347045560291?text=Hi%20Erogian!%20I%20want%20to%20book%20a%20free%20strategy%20call." target="_blank" class="cta-btn" style="position:relative;padding:16px 36px;border-radius:100px;font-size:15px;font-weight:700;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+          <div class="wave-glow" style="border-radius:100px;"></div>
+          <span style="position:relative;z-index:1;">📞 Book Free Strategy Call</span>
+        </a>
+        <a href="#services" style="padding:15px 32px;border-radius:100px;font-size:14px;font-weight:600;color:#d1d5db;text-decoration:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);transition:all .3s;display:inline-flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor='rgba(139,92,246,.5)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#d1d5db'">
+          See Our Work ↓
+        </a>
+      </div>
 
-    <div data-hero-cta style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;">
-      <a href="https://wa.me/2347045560291?text=Hi%20Erogian!%20I%20want%20to%20book%20a%20free%20strategy%20call." target="_blank" class="cta-btn" style="position:relative;padding:16px 36px;border-radius:100px;font-size:15px;font-weight:700;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
-        <div class="wave-glow" style="border-radius:100px;"></div>
-        <span style="position:relative;z-index:1;">📞 Book Free Strategy Call</span>
-      </a>
-      <a href="#services" style="padding:15px 32px;border-radius:100px;font-size:14px;font-weight:600;color:#d1d5db;text-decoration:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);transition:all .3s;display:inline-flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor='rgba(139,92,246,.5)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#d1d5db'">
-        See Our Work ↓
-      </a>
-    </div>
-
-    <!-- Social proof strip -->
-    <div data-hero-cta style="margin-top:52px;display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:center;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="display:flex;">
-          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border:2px solid #030308;margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
-          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);border:2px solid #030308;margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
-          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f59e0b);border:2px solid #030308;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
+      <!-- Social proof strip -->
+      <div data-hero-cta style="margin-top:48px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border:2px solid #030308;margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);border:2px solid #030308;margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f59e0b);border:2px solid #030308;display:flex;align-items:center;justify-content:center;font-size:10px;">👤</div>
+          </div>
+          <span style="font-size:13px;color:#9ca3af;"><span style="color:#fff;font-weight:600;">87+ clients</span> already building</span>
         </div>
-        <span style="font-size:13px;color:#9ca3af;"><span style="color:#fff;font-weight:600;">87+ clients</span> already building</span>
+        <div style="display:flex;gap:2px;">
+          <span style="color:#f59e0b;font-size:14px;">★★★★★</span>
+          <span style="font-size:13px;color:#9ca3af;margin-left:6px;">5.0 avg rating</span>
+        </div>
+        <div style="font-size:13px;color:#9ca3af;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;margin-right:6px;animation:orbBreath 2s ease-in-out infinite;"></span>
+          Available for new projects
+        </div>
       </div>
-      <div style="display:flex;gap:2px;">
-        <span style="color:#f59e0b;font-size:14px;">★★★★★</span>
-        <span style="font-size:13px;color:#9ca3af;margin-left:6px;">5.0 avg rating</span>
+    </div>
+
+    <!-- RIGHT — Living hero visual -->
+    <div class="hero-visual-wrap" id="hero-visual-wrap">
+      <div class="hero-visual" id="hero-visual">
+        <img src="https://media.base44.com/images/public/6a3e3c3c76ad435fb80d320b/d94582d86_generated_image.png" alt="Erogian founder building digital products with AI" loading="eager">
+        <div class="hero-screen-overlay">
+          <div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Live Dashboard</div>
+          <div style="font-size:13px;color:#e5e7eb;font-weight:600;line-height:1.4;">Elevating Brands Through Digital <span style="color:#a78bfa;">Innovation</span></div>
+        </div>
       </div>
-      <div style="font-size:13px;color:#9ca3af;">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;margin-right:6px;animation:orbBreath 2s ease-in-out infinite;"></span>
-        Available for new projects
+
+      <!-- Floating stat cards over image -->
+      <div class="stat-card float-card" style="top:6%;left:-8%;animation-duration:5s;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">🚀 Projects Delivered</div>
+        <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;" class="grad-text counter" data-count="87">0+</div>
+      </div>
+      <div class="stat-card float-card-2" style="top:2%;right:-10%;animation-duration:6.5s;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">⚡ Avg Delivery</div>
+        <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#a78bfa;">5 Days</div>
+      </div>
+      <div class="stat-card float-card" style="bottom:16%;left:-10%;animation-duration:7s;animation-delay:-2s;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">🌍 Countries Served</div>
+        <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#60a5fa;">12+</div>
+      </div>
+      <div class="stat-card float-card-2" style="bottom:6%;right:-8%;animation-duration:5.5s;animation-delay:-3s;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">😍 Client Satisfaction</div>
+        <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#34d399;"><span class="counter" data-count="98">0</span>%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trusted-by strip -->
+  <div class="trusted-strip">
+    <div class="trusted-inner">
+      <div class="trusted-label">Trusted by<br>Innovative Brands<br>&amp; Founders</div>
+      <div class="trusted-logos">
+        <div class="trusted-logo">💳 Paystack</div>
+        <div class="trusted-logo">▲ Vercel</div>
+        <div class="trusted-logo">⚡ Supabase</div>
+        <div class="trusted-logo">🤖 OpenAI</div>
+        <div class="trusted-logo">◆ Render</div>
+        <div class="trusted-logo">🍃 MongoDB</div>
       </div>
     </div>
   </div>
 
   <!-- Scroll indicator -->
-  <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:floatCard 2.5s ease-in-out infinite;">
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;animation:floatCard 2.5s ease-in-out infinite;z-index:5;">
     <span style="font-size:11px;color:#4b5563;letter-spacing:.1em;text-transform:uppercase;">scroll</span>
-    <div style="width:1px;height:40px;background:linear-gradient(180deg,rgba(139,92,246,.6),transparent);"></div>
   </div>
 </section>
+
+<style>
+@media(max-width:900px){
+  #hero-grid{grid-template-columns:1fr !important;text-align:center;}
+  #hero-grid > div:first-child{order:1;}
+  #hero-visual-wrap{order:0;max-width:420px;margin:0 auto 32px;}
+  #hero-grid [data-hero-cta]{justify-content:center;}
+}
+</style>
+
+<script>
+// Mouse parallax on hero visual — brings the image to life
+(function(){
+  var wrap = document.getElementById('hero-visual-wrap');
+  var img = document.querySelector('#hero-visual img');
+  if(!wrap || !img || window.matchMedia('(pointer:coarse)').matches) return;
+  var raf = null;
+  document.addEventListener('mousemove', function(e){
+    if(raf) return;
+    raf = requestAnimationFrame(function(){
+      var w = window.innerWidth, h = window.innerHeight;
+      var x = (e.clientX / w - 0.5) * 2;
+      var y = (e.clientY / h - 0.5) * 2;
+      wrap.style.transform = 'rotateY(' + (x * 4) + 'deg) rotateX(' + (-y * 4) + 'deg) translateZ(0)';
+      img.style.transform = 'scale(1.1) translate(' + (-x * 10) + 'px,' + (-y * 10) + 'px)';
+      raf = null;
+    });
+  });
+  wrap.style.transformStyle = 'preserve-3d';
+  wrap.style.transition = 'transform .3s ease-out';
+  wrap.style.perspective = '1000px';
+})();
+</script>
 
 <!-- ===== SOCIAL PROOF — MARQUEE ===== -->
 <section style="padding:40px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);overflow:hidden;position:relative;z-index:10;">
