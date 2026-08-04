@@ -20,8 +20,10 @@ function getSessionId(){
   ];
   var i = 0;
   function show(){
+    if(document.body.classList.contains('chat-open')){ i++; setTimeout(show, 18000); return; }
     var b = document.createElement('div');
-    b.style.cssText = 'position:fixed;bottom:90px;left:16px;z-index:9999;background:rgba(10,12,16,.95);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:12px;color:#d1d5db;max-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.5)';
+    b.className = 'booking-toast';
+    b.style.cssText = 'position:fixed;bottom:90px;left:16px;z-index:400;background:rgba(10,12,16,.95);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:12px;color:#d1d5db;max-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.5)';
     b.innerHTML = '🔔 ' + msgs[i % msgs.length];
     document.body.appendChild(b);
     setTimeout(function(){ b.style.transition='opacity .5s'; b.style.opacity='0'; setTimeout(function(){ b.remove(); }, 600); }, 5000);
@@ -438,10 +440,13 @@ if(chatLauncher) chatLauncher.addEventListener('click', function(){
   if(!win) return;
   var hidden = win.classList.contains('hidden');
   win.classList.toggle('hidden'); win.classList.toggle('flex');
-  if(hidden) startChat();
+  document.body.classList.toggle('chat-open', hidden);
+  if(hidden){ startChat(); document.body.style.overflow = window.innerWidth <= 640 ? 'hidden' : ''; }
 });
 var chatClose = document.getElementById('chat-close');
 if(chatClose) chatClose.addEventListener('click', function(){
+  document.body.classList.remove('chat-open');
+  document.body.style.overflow = '';
   var win = document.getElementById('chat-window');
   if(win){ win.classList.add('hidden'); win.classList.remove('flex'); }
 });
