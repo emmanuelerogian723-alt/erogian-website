@@ -1027,9 +1027,108 @@ function toggleForge() {
   }
 }
 
+
+/* ===== Skill of the Day ===== */
+var incomeEstimates = {
+  "Catering & Baking": "₦50K-₦200K/month",
+  "Beauty & Fashion": "₦40K-₦150K/month",
+  "Home & Craft Skills": "₦30K-₦100K/month",
+  "Writing & Freelancing": "₦100K-₦500K/month",
+  "Creative Skills": "₦50K-₦200K/month",
+  "Business & Finance": "₦100K-₦1M/month",
+  "Web Development": "₦200K-₦1M/month",
+  "AI & Machine Learning": "₦300K-₦2M/month",
+  "Digital Marketing": "₦100K-₦500K/month",
+  "Content Creation": "₦50K-₦300K/month",
+  "Cybersecurity": "₦200K-₦1M/month",
+  "Personal Development": "Priceless life skill"
+};
+
+function initSkillOfTheDay() {
+  if (!allCourses || allCourses.length === 0) return;
+  
+  // Use the day of the year to pick a consistent course per day
+  var now = new Date();
+  var start = new Date(now.getFullYear(), 0, 0);
+  var diff = (now - start) / (1000 * 60 * 60 * 24);
+  var dayOfYear = Math.floor(diff);
+  
+  // Filter to free courses with good content
+  var candidates = allCourses.filter(function(c) { return c.is_free; });
+  if (candidates.length === 0) candidates = allCourses;
+  
+  // Pick the course for today
+  var course = candidates[dayOfYear % candidates.length];
+  
+  var sotd = document.getElementById('skill-of-day');
+  if (!sotd) return;
+  
+  sotd.classList.add('active');
+  
+  // Set date
+  var dateEl = document.getElementById('sotd-date');
+  if (dateEl) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    dateEl.textContent = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  }
+  
+  // Set thumbnail
+  var thumb = document.getElementById('sotd-thumb');
+  if (thumb) {
+    if (course.thumbnail) {
+      thumb.style.backgroundImage = 'url(' + course.thumbnail + ')';
+    } else {
+      // Fallback gradient
+      thumb.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(59,130,246,0.2))';
+      thumb.style.display = 'flex';
+      thumb.style.alignItems = 'center';
+      thumb.style.justifyContent = 'center';
+      thumb.style.fontSize = '48px';
+      thumb.textContent = '🎓';
+    }
+  }
+  
+  // Set title
+  document.getElementById('sotd-title').textContent = course.title;
+  
+  // Set description (truncated)
+  var desc = course.description || '';
+  if (desc.length > 120) desc = desc.substring(0, 120) + '...';
+  document.getElementById('sotd-desc').textContent = desc;
+  
+  // Set meta
+  var metaEl = document.getElementById('sotd-meta');
+  if (metaEl) {
+    var metaHtml = '<span>' + esc(course.category) + '</span>';
+    metaHtml += '<span>' + esc(course.level || 'Beginner') + '</span>';
+    metaHtml += '<span>' + esc(course.duration || 'Self-paced') + '</span>';
+    if (course.is_free) {
+      metaHtml += '<span class="free">FREE</span>';
+    } else {
+      metaHtml += '<span class="free">₦' + Number(course.price_ngn||0).toLocaleString() + '</span>';
+    }
+    metaEl.innerHTML = metaHtml;
+  }
+  
+  // Set income estimate
+  var incomeEl = document.getElementById('sotd-income');
+  if (incomeEl) {
+    var income = incomeEstimates[course.category] || '';
+    if (income) {
+      incomeEl.textContent = '💰 Potential income: ' + income;
+    }
+  }
+  
+  // Set CTA
+  var cta = document.getElementById('sotd-cta');
+  if (cta) {
+    cta.onclick = function() { openCourse(course.slug); };
+  }
+}
+
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', function() {
-  loadCourses().then(handlePaymentSuccess).then(initForgeAvatar);
+  loadCourses().then(handlePaymentSuccess).then(initForgeAvatar).then(initSkillOfTheDay);
 
   updateStreak();
   
