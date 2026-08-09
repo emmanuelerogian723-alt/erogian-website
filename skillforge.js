@@ -924,9 +924,112 @@ function startClassAfterPayment(slug) {
   renderVideoStep(course);
 }
 
+
+/* ===== FORGE AI Mentor Avatar ===== */
+var forgeGreetings = [
+  "🔥 Ready to learn a skill that pays? I've got you.",
+  "💡 Did you know? Baking skills can earn ₦50K+ per week in Nigeria.",
+  "🎯 New courses just dropped! Catering, ghostwriting, soap making & more.",
+  "💪 Your daily streak is growing. Keep it up!",
+  "🎨 Creative skills like photography & makeup are in high demand this season.",
+  "💰 Freelance ghostwriters charge ₦200K+ per month. Want in?",
+  "🍰 Cake making is one of the most profitable home businesses in Nigeria.",
+  "🧹 Soap making costs ₦2K to start but can earn ₦100K+ monthly."
+];
+var forgeBubbleShown = false;
+
+function showForgeBubble(msg) {
+  var bubble = document.getElementById('forge-bubble');
+  if (!bubble) return;
+  bubble.textContent = msg;
+  bubble.classList.add('show');
+  setTimeout(function() { bubble.classList.remove('show'); }, 8000);
+}
+
+function initForgeAvatar() {
+  // Show first bubble after 3 seconds
+  setTimeout(function() {
+    if (!forgeBubbleShown) {
+      showForgeBubble(forgeGreetings[Math.floor(Math.random() * forgeGreetings.length)]);
+      forgeBubbleShown = true;
+    }
+  }, 3000);
+  
+  // Rotate bubbles every 20 seconds
+  setInterval(function() {
+    var panel = document.getElementById('forge-panel');
+    if (!panel || !panel.classList.contains('active')) {
+      showForgeBubble(forgeGreetings[Math.floor(Math.random() * forgeGreetings.length)]);
+    }
+  }, 20000);
+  
+  // Build recommendations
+  buildForgeRecommendations();
+}
+
+function buildForgeRecommendations() {
+  var recs = document.getElementById('forge-recommendations');
+  if (!recs || !allCourses || allCourses.length === 0) return;
+  
+  // Pick trending/recommended courses
+  var lifestyleCats = ['Catering & Baking', 'Beauty & Fashion', 'Home & Craft Skills', 'Writing & Freelancing'];
+  var recommended = allCourses.filter(function(c) {
+    return lifestyleCats.indexOf(c.category) !== -1;
+  });
+  
+  // If not enough, fill with any free courses
+  if (recommended.length < 4) {
+    var others = allCourses.filter(function(c) { return recommended.indexOf(c) === -1 && c.is_free; });
+    recommended = recommended.concat(others.slice(0, 6 - recommended.length));
+  }
+  
+  recommended = recommended.slice(0, 5);
+  
+  var skillEmojis = {
+    'Catering & Baking': '🍰',
+    'Beauty & Fashion': '💄',
+    'Home & Craft Skills': '🧼',
+    'Writing & Freelancing': '✍️',
+    'Creative Skills': '📸',
+    'Business & Finance': '💰',
+    'Web Development': '💻',
+    'AI & Machine Learning': '🤖',
+    'Cybersecurity': '🔒',
+    'Content Creation': '🎥',
+    'Digital Marketing': '📱'
+  };
+  
+  recs.innerHTML = recommended.map(function(c) {
+    var emoji = skillEmojis[c.category] || '📚';
+    return '<div class="forge-skill-card" onclick="openCourse(\''+esc(c.slug)+'\')">' +
+      '<div class="skill-emoji">'+emoji+'</div>' +
+      '<div class="skill-info"><h4>'+esc(c.title.substring(0, 50))+'</h4><p>'+esc(c.category)+' · '+esc(c.duration || 'Self-paced')+'</p></div>' +
+      '<div class="skill-badge">'+(c.is_free ? 'FREE' : '₦'+Number(c.price_ngn||0).toLocaleString())+'</div>' +
+    '</div>';
+  }).join('');
+  
+  // Update streak text
+  var streak = localStorage.getItem('erogian_streak');
+  var streakText = document.getElementById('forge-streak-text');
+  if (streak && streakText) {
+    streakText.textContent = '🔥 ' + streak + ' day streak! Keep learning to grow it.';
+  }
+}
+
+function toggleForge() {
+  var panel = document.getElementById('forge-panel');
+  if (!panel) return;
+  panel.classList.toggle('active');
+  var bubble = document.getElementById('forge-bubble');
+  if (bubble) bubble.classList.remove('show');
+  if (panel.classList.contains('active')) {
+    buildForgeRecommendations();
+  }
+}
+
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', function() {
-  loadCourses().then(handlePaymentSuccess);
+  loadCourses().then(handlePaymentSuccess).then(initForgeAvatar);
 
   updateStreak();
   
