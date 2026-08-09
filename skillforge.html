@@ -109,6 +109,194 @@ img,video,canvas{max-width:100%;height:auto}
 a.skip-link{position:absolute;top:-100px;left:0;background:#8b5cf6;color:#fff;padding:.5rem 1rem;z-index:9999;border-radius:0 0 8px 0}
 a.skip-link:focus{top:0}
 @media print{nav,.hero{display:none}body{background:#fff;color:#000}}
+
+/* ===== FORGE Avatar ===== */
+#forge-avatar {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#forge-avatar .forge-orb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3);
+  animation: forgePulse 3s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+#forge-avatar .forge-orb::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  animation: forgeShine 4s linear infinite;
+}
+@keyframes forgePulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.7), 0 0 80px rgba(59, 130, 246, 0.5); }
+}
+@keyframes forgeShine {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
+}
+#forge-avatar .forge-bubble {
+  background: rgba(15, 15, 20, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 20px 20px 20px 4px;
+  padding: 12px 18px;
+  max-width: 260px;
+  font-size: 13px;
+  color: #e5e7eb;
+  line-height: 1.5;
+  display: none;
+  animation: forgeBubbleIn 0.4s ease;
+}
+#forge-avatar .forge-bubble.show { display: block; }
+@keyframes forgeBubbleIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+#forge-avatar:hover .forge-orb {
+  transform: scale(1.1);
+}
+#forge-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 380px;
+  max-height: 600px;
+  background: rgba(10, 10, 15, 0.98);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 24px;
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(139, 92, 246, 0.15);
+  animation: forgePanelIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#forge-panel.active { display: flex; }
+@keyframes forgePanelIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.forge-header {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.1));
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+.forge-header .forge-avatar-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
+.forge-header h3 { font-size: 16px; font-weight: 700; margin: 0; color: #fff; }
+.forge-header p { font-size: 11px; color: #a78bfa; margin: 2px 0 0; }
+.forge-body { padding: 20px; overflow-y: auto; flex: 1; }
+.forge-body .forge-message {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+.forge-body .forge-message strong { color: #a78bfa; }
+.forge-body .forge-skill-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.forge-body .forge-skill-card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.08);
+  transform: translateX(4px);
+}
+.forge-body .forge-skill-card .skill-emoji { font-size: 28px; }
+.forge-body .forge-skill-card .skill-info { flex: 1; }
+.forge-body .forge-skill-card .skill-info h4 { font-size: 13px; font-weight: 600; margin: 0 0 2px; color: #fff; }
+.forge-body .forge-skill-card .skill-info p { font-size: 11px; color: #9ca3af; margin: 0; }
+.forge-body .forge-skill-card .skill-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: rgba(34, 197, 94, 0.15); color: #4ade80; font-weight: 600; }
+.forge-streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #fbbf24;
+}
+.forge-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.forge-close:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+.forge-cta {
+  margin: 16px 20px 20px;
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.forge-cta:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4); }
+
 </style>
 </head>
 <body>
@@ -600,5 +788,36 @@ style.textContent='@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}';
 document.head.appendChild(style);
 </script>
 <script src="skillforge.js"></script>
+
+<!-- ===== FORGE AI Mentor Avatar ===== -->
+<div id="forge-avatar" onclick="toggleForge()">
+  <div class="forge-bubble" id="forge-bubble"></div>
+  <div class="forge-orb">🤖</div>
+</div>
+
+<div id="forge-panel">
+  <div class="forge-header">
+    <div class="forge-avatar-img">🤖</div>
+    <div>
+      <h3>FORGE</h3>
+      <p>Your AI Skill Mentor · Online</p>
+    </div>
+    <button class="forge-close" onclick="toggleForge()">✕</button>
+  </div>
+  <div class="forge-body" id="forge-body">
+    <div class="forge-streak">🔥 <span id="forge-streak-text">Welcome! You're on day 1 of your learning journey</span></div>
+    <div class="forge-message">
+      <strong>Hey! 👋 I'm FORGE</strong>, your AI mentor on SkillForge. I help you find the perfect skill to learn and guide you to earning with it.
+    </div>
+    <div class="forge-message">
+      Based on what's trending, here are <strong>skills that can earn you money this week:</strong>
+    </div>
+    <div id="forge-recommendations"></div>
+  </div>
+  <div class="forge-cta" onclick="document.getElementById('forge-panel').classList.remove('active'); document.getElementById('courses-section').scrollIntoView({behavior:'smooth'});">
+    🚀 Browse All 48+ Courses
+  </div>
+</div>
+
 </body>
 </html>
