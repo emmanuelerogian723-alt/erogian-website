@@ -249,22 +249,58 @@ async function startPaidClass(slug) {
   var info = validateEnrollForm();
   if (!info) return;
   var course = allCourses.find(function(c){ return c.slug === slug; });
+  
+  // Show payment loading
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div class="text-center py-8"><div style="font-size:3rem;margin-bottom:12px;">💳</div><div style="font-size:14px;color:#9ca3af;">Initializing secure payment...</div></div>';
+  
   try {
+    // Enroll the student first
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:false, amount_ngn: course.price_ngn }) });
     var data = await res.json();
     currentEnrollment = { id: data.enrollment ? data.enrollment.id : null, name: info.name, email: info.email, course: course };
   } catch(e) {}
-  var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge. My name: '+info.name+', email: '+info.email);
-  var body = document.getElementById('enroll-body');
-  body.innerHTML =
-    '<div class="text-center py-6">' +
-    '<div style="font-size:3rem;margin-bottom:12px;">💰</div>' +
-    '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Complete Your Payment</h3>' +
-    '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate</div></div>' +
-    '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="w-full py-3 rounded-full font-semibold inline-block text-center" style="background:#25D366;color:#fff;text-decoration:none;margin-bottom:8px;">💬 Pay via WhatsApp →</a>' +
-    '<div style="font-size:11px;color:#6b7280;">Send the WhatsApp message and we\'ll confirm your payment and unlock the class immediately.</div>' +
-    '<button onclick="startFreeClass(\''+esc(slug)+'\')" style="width:100%;padding:10px;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#9ca3af;font-size:12px;cursor:pointer;">Preview first lesson free →</button>' +
-    '</div>';
+  
+  // Initialize Paystack payment
+  try {
+    var payRes = await fetch('https://superagent-55bc0d3a.base44.app/functions/initPaystackPayment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: info.email,
+        amount: course.price_ngn,
+        course_slug: slug,
+        course_title: course.title,
+        student_name: info.name
+      })
+    });
+    var payData = await payRes.json();
+    
+    if (payData.status === 'ok' && payData.authorization_url) {
+      // Redirect to Paystack payment page
+      body.innerHTML = '<div class="text-center py-6">' +
+        '<div style="font-size:3rem;margin-bottom:12px;">🔒</div>' +
+        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Secure Checkout</h3>' +
+        '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">'+esc(course.title)+'</div></div>' +
+        '<div style="font-size:11px;color:#9ca3af;margin-bottom:16px;">You\'ll be redirected to Paystack to complete your payment securely. Card, bank transfer, USSD & more supported.</div>' +
+        '<a href="'+payData.authorization_url+'" target="_blank" class="w-full py-3 rounded-full font-semibold inline-block text-center" style="background:linear-gradient(90deg,#00C896,#00A378);color:#fff;text-decoration:none;margin-bottom:8px;">💳 Pay with Paystack →</a>' +
+        '<button onclick="startFreeClass(\''+esc(slug)+'\')" style="width:100%;padding:10px;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#9ca3af;font-size:12px;cursor:pointer;">Preview first lesson free →</button>' +
+        '</div>';
+    } else {
+      throw new Error(payData.message || 'Payment failed');
+    }
+  } catch(e) {
+    // Fallback to WhatsApp payment
+    var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge. My name: '+info.name+', email: '+info.email);
+    body.innerHTML = '<div class="text-center py-6">' +
+      '<div style="font-size:3rem;margin-bottom:12px;">💰</div>' +
+      '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Complete Your Payment</h3>' +
+      '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate</div></div>' +
+      '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="w-full py-3 rounded-full font-semibold inline-block text-center" style="background:#25D366;color:#fff;text-decoration:none;margin-bottom:8px;">💬 Pay via WhatsApp →</a>' +
+      '<div style="font-size:11px;color:#6b7280;">Send the WhatsApp message and we\'ll confirm your payment and unlock the class immediately.</div>' +
+      '<button onclick="startFreeClass(\''+esc(slug)+'\')" style="width:100%;padding:10px;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#9ca3af;font-size:12px;cursor:pointer;">Preview first lesson free →</button>' +
+      '</div>';
+  }
 }
 
 function startFreeClass(slug) {
@@ -856,9 +892,42 @@ function loadEnrollments() {
     .catch(function(){ document.getElementById('admin-enrollments-list').innerHTML = '<div style="font-size:12px;color:#ef4444;">Failed to load.</div>'; });
 }
 
+
+/* ===== Paystack Payment Success Handler ===== */
+function handlePaymentSuccess() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    var courseSlug = params.get('course');
+    if (courseSlug) {
+      var course = allCourses.find(function(c) { return c.slug === courseSlug; });
+      if (course) {
+        var body = document.getElementById('enroll-body');
+        document.getElementById('enroll-title').textContent = '✅ Payment Successful!';
+        body.innerHTML = '<div class="text-center py-8">' +
+          '<div style="font-size:3rem;margin-bottom:12px;">🎉</div>' +
+          '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Payment Confirmed!</h3>' +
+          '<div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">You now have full access to <strong style="color:#a78bfa;">'+esc(course.title)+'</strong></div>' +
+          '<button onclick="document.getElementById(\'enroll-modal\').classList.remove(\'active\'); startClassAfterPayment(\''+esc(courseSlug)+'\')" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🚀 Start Learning Now →</button>' +
+          '</div>';
+        document.getElementById('enroll-modal').classList.add('active');
+      }
+    }
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+function startClassAfterPayment(slug) {
+  var course = allCourses.find(function(c) { return c.slug === slug; });
+  if (!course) return;
+  currentEnrollment = { id: 'paid', name: 'Student', email: '', course: course };
+  renderVideoStep(course);
+}
+
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', function() {
-  loadCourses();
+  loadCourses().then(handlePaymentSuccess);
+
   updateStreak();
   
   // Reveal animations
