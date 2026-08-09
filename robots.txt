@@ -4,11 +4,13 @@ Allow: /blog
 Allow: /skillforge
 Allow: /analytics
 Disallow: /analytics.html
+Disallow: /api/
+Disallow: /*.bak
 
-# Priority pages for crawlers
+# Sitemap
 Sitemap: https://erogian.vercel.app/sitemap.xml
 
-# Google-specific
+# Google
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
@@ -17,3 +19,18 @@ Crawl-delay: 1
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 2
+
+# Yandex
+User-agent: Yandex
+Allow: /
+Crawl-delay: 3
+
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
