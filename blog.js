@@ -102,7 +102,7 @@ function renderFeatured() {
     '<div class="flex items-center gap-3 mb-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300">Featured</span><span class="text-xs text-gray-500">' + esc(featured.category) + '</span></div>' +
     '<h2 class="display text-2xl md:text-3xl font-bold mb-4 group-hover:grad-text transition"><a href="/blog/' + escAttr(featured.slug) + '" onclick="event.preventDefault();openPost(\'' + featured.slug + '\')" style="color:inherit;text-decoration:none">' + esc(featured.title) + '</a></h2>' +
     '<p class="text-gray-400 text-sm leading-relaxed mb-6">' + esc(featured.excerpt) + '</p>' +
-    '<div class="flex items-center gap-4 text-xs text-gray-500"><span>By ' + esc(featured.author) + '</span><span>·</span><span>' + d + '</span><span>·</span><span>' + esc(featured.read_time) + '</span></div>' +
+    '<div class="flex items-center gap-4 text-xs text-gray-500"><span>By <a href="/about-emmanuel" style="color:#8b5cf6;text-decoration:none">' + esc(featured.author) + '</a></span><span>·</span><span>' + d + '</span><span>·</span><span>' + esc(featured.read_time) + '</span></div>' +
     '<div class="mt-6 text-sm font-semibold text-purple-400">Read article →</div></div></div></div>';
 }
 
