@@ -1,13 +1,38 @@
 User-agent: *
 Allow: /
 Allow: /blog
-Allow: /blog/
 Allow: /skillforge
 Allow: /analytics
 Disallow: /analytics.html
+Disallow: /api/
+Disallow: /*.bak
 
-# AI crawlers - explicitly allowed so ChatGPT, Perplexity, Gemini, Claude, and Kimi can read and cite EROGIAN content
+# Sitemap
+Sitemap: https://erogian.vercel.app/sitemap.xml
+
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Yandex
+User-agent: Yandex
+Allow: /
+Crawl-delay: 3
+
+# AI Crawlers
 User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
 Allow: /
 
 User-agent: ChatGPT-User
@@ -16,16 +41,10 @@ Allow: /
 User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: ClaudeBot
-Allow: /
-
 User-agent: Claude-Web
 Allow: /
 
 User-agent: anthropic-ai
-Allow: /
-
-User-agent: PerplexityBot
 Allow: /
 
 User-agent: Perplexity-User
@@ -45,16 +64,3 @@ Allow: /
 
 User-agent: Bytespider
 Allow: /
-
-# Priority pages for crawlers
-Sitemap: https://erogian.vercel.app/sitemap.xml
-
-# Google-specific
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 1
-
-# Bing
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 2

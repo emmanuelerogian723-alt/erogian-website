@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillForge by EROGIAN — Learn Tech Skills That Actually Pay</title>
 <meta name="description" content="SkillForge by EROGIAN: practical, hands-on video classes in web development, AI, and automation. Some lessons are free, advanced tracks are affordable and built by working developers.">
-<meta name="keywords" content="SkillForge, learn web development Nigeria, AI courses Nigeria, automation courses, online coding classes Nigeria, EROGIAN, tech skills Nigeria, learn to code Nigeria">
+<meta name="keywords" content="SkillForge, learn web development Nigeria, AI courses Nigeria, automation courses, online coding classes Nigeria, EROGIAN, tech skills Nigeria, learn to code Nigeria, Python course Nigeria, JavaScript course, React course, HTML CSS course, cybersecurity training Nigeria, AWS cloud computing, digital marketing Nigeria, prompt engineering, AI agents course, data analytics Nigeria, free coding courses Africa, tech certification Nigeria, online learning Nigeria, programming courses Nigeria, tech skills for students, daily income skills Nigeria, no code development, Bubble.io, Flutter development, TypeScript course">
 <meta name="author" content="Emmanuel Ene Rejoice">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://erogian.vercel.app/skillforge">
@@ -21,8 +21,15 @@
 <meta name="twitter:site" content="@Voscn247">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
-{"@type":"WebPage","@id":"https://erogian.vercel.app/skillforge","url":"https://erogian.vercel.app/skillforge","name":"SkillForge by EROGIAN","description":"Practical, hands-on video classes in web development, AI, and automation.","isPartOf":{"@id":"https://erogian.vercel.app/#website"}},
-{"@type":"EducationalOrganization","name":"SkillForge by EROGIAN","url":"https://erogian.vercel.app/skillforge","description":"Online tech skill training platform offering web development, AI and automation courses","provider":{"@type":"Organization","name":"EROGIAN","url":"https://erogian.vercel.app"},"availableLanguage":"English","areaServed":"Nigeria"}
+  {"@type":"EducationalOrganization","@id":"https://erogian.vercel.app/skillforge/#org","name":"SkillForge by EROGIAN","url":"https://erogian.vercel.app/skillforge","description":"Practical tech courses in web development, AI, automation, cybersecurity, cloud computing, and digital marketing.","parentOrganization":{"@id":"https://erogian.vercel.app/#organization"}},
+  {"@type":"ItemList","@id":"https://erogian.vercel.app/skillforge/#courses","name":"SkillForge Courses","description":"Tech courses available on SkillForge including web development, AI, cybersecurity, cloud computing, digital marketing, and more."},
+  {"@type":"FAQPage","@id":"https://erogian.vercel.app/skillforge/#faq","mainEntity":[
+    {"@type":"Question","name":"Are SkillForge courses free?","acceptedAnswer":{"@type":"Answer","text":"Yes! SkillForge offers 27 free courses covering web development, AI, programming, design, and more. Premium tracks start from ₦10,000 with lifetime access and certificates."}},
+    {"@type":"Question","name":"Do SkillForge courses offer certificates?","acceptedAnswer":{"@type":"Answer","text":"Yes, every SkillForge course includes a certificate of completion. Pass the final quiz with 70%+ to unlock and download your certificate."}},
+    {"@type":"Question","name":"How do I pay for premium SkillForge courses?","acceptedAnswer":{"@type":"Answer","text":"Premium courses can be paid for securely via Paystack using card, bank transfer, or USSD. Free courses require no payment."}},
+    {"@type":"Question","name":"What courses are available on SkillForge?","acceptedAnswer":{"@type":"Answer","text":"SkillForge offers 36 courses across categories including web development, AI & machine learning, cybersecurity, cloud computing, digital marketing, mobile development, programming, design, content creation, and more."}},
+    {"@type":"Question","name":"Can I learn AI and build AI agents on SkillForge?","acceptedAnswer":{"@type":"Answer","text":"Yes! SkillForge offers courses in ChatGPT, generative AI, prompt engineering, AI agents, and AI agency building — all taught by working developers."}}
+  ]}
 ]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,6 +109,290 @@ img,video,canvas{max-width:100%;height:auto}
 a.skip-link{position:absolute;top:-100px;left:0;background:#8b5cf6;color:#fff;padding:.5rem 1rem;z-index:9999;border-radius:0 0 8px 0}
 a.skip-link:focus{top:0}
 @media print{nav,.hero{display:none}body{background:#fff;color:#000}}
+
+/* ===== FORGE Avatar ===== */
+#forge-avatar {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#forge-avatar .forge-orb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3);
+  animation: forgePulse 3s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+#forge-avatar .forge-orb::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  animation: forgeShine 4s linear infinite;
+}
+@keyframes forgePulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.7), 0 0 80px rgba(59, 130, 246, 0.5); }
+}
+@keyframes forgeShine {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
+}
+#forge-avatar .forge-bubble {
+  background: rgba(15, 15, 20, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 20px 20px 20px 4px;
+  padding: 12px 18px;
+  max-width: 260px;
+  font-size: 13px;
+  color: #e5e7eb;
+  line-height: 1.5;
+  display: none;
+  animation: forgeBubbleIn 0.4s ease;
+}
+#forge-avatar .forge-bubble.show { display: block; }
+@keyframes forgeBubbleIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+#forge-avatar:hover .forge-orb {
+  transform: scale(1.1);
+}
+#forge-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 380px;
+  max-height: 600px;
+  background: rgba(10, 10, 15, 0.98);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 24px;
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(139, 92, 246, 0.15);
+  animation: forgePanelIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#forge-panel.active { display: flex; }
+@keyframes forgePanelIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.forge-header {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.1));
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+.forge-header .forge-avatar-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
+.forge-header h3 { font-size: 16px; font-weight: 700; margin: 0; color: #fff; }
+.forge-header p { font-size: 11px; color: #a78bfa; margin: 2px 0 0; }
+.forge-body { padding: 20px; overflow-y: auto; flex: 1; }
+.forge-body .forge-message {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+.forge-body .forge-message strong { color: #a78bfa; }
+.forge-body .forge-skill-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.forge-body .forge-skill-card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.08);
+  transform: translateX(4px);
+}
+.forge-body .forge-skill-card .skill-emoji { font-size: 28px; }
+.forge-body .forge-skill-card .skill-info { flex: 1; }
+.forge-body .forge-skill-card .skill-info h4 { font-size: 13px; font-weight: 600; margin: 0 0 2px; color: #fff; }
+.forge-body .forge-skill-card .skill-info p { font-size: 11px; color: #9ca3af; margin: 0; }
+.forge-body .forge-skill-card .skill-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: rgba(34, 197, 94, 0.15); color: #4ade80; font-weight: 600; }
+.forge-streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #fbbf24;
+}
+.forge-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.forge-close:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+.forge-cta {
+  margin: 16px 20px 20px;
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.forge-cta:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4); }
+
+
+/* ===== Skill of the Day ===== */
+#skill-of-day {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08));
+  border: 1px solid rgba(139,92,246,0.25);
+  margin: 40px 0;
+  display: none;
+}
+#skill-of-day.active { display: block; }
+#skill-of-day .sotd-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+  padding: 6px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#skill-of-day .sotd-content {
+  display: flex;
+  gap: 0;
+  margin-top: 32px;
+}
+#skill-of-day .sotd-thumb {
+  width: 200px;
+  min-width: 200px;
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  margin: 0 20px 20px;
+}
+#skill-of-day .sotd-info {
+  padding: 0 20px 20px 0;
+  flex: 1;
+}
+#skill-of-day .sotd-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #fff;
+}
+#skill-of-day .sotd-info p {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+#skill-of-day .sotd-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+#skill-of-day .sotd-meta span {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #d1d5db;
+}
+#skill-of-day .sotd-meta span.free { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+#skill-of-day .sotd-cta {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+#skill-of-day .sotd-cta:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(139,92,246,0.4); }
+#skill-of-day .sotd-income {
+  font-size: 12px;
+  color: #fbbf24;
+  margin-top: 8px;
+}
+@media (max-width: 600px) {
+  #skill-of-day .sotd-content { flex-direction: column; }
+  #skill-of-day .sotd-thumb { width: calc(100% - 40px); height: 180px; }
+}
+
 </style>
 </head>
 <body>
@@ -148,24 +439,8 @@ a.skip-link:focus{top:0}
     </p>
 
     <!-- Stats -->
-    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-bottom:48px;">
-      <div style="text-align:center;">
-        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;" class="grad-text">500+</div>
-        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Students enrolled</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#a78bfa;">10+</div>
-        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Courses available</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#34d399;">100%</div>
-        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Practical & project-based</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:1.8rem;font-weight:800;font-family:'Space Grotesk',sans-serif;color:#60a5fa;">🎓</div>
-        <div style="font-size:12px;color:#6b7280;margin-top:4px;">Certificates on completion</div>
-      </div>
-    </div>
+    <div id="sf-stats" style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-bottom:24px;"></div>
+    <div id="sf-streak-display" style="margin-bottom:32px;"></div>
 
     <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
       <a href="#courses" class="cta-btn" style="padding:16px 36px;border-radius:100px;font-size:14px;font-weight:700;color:#fff;text-decoration:none;display:inline-block;position:relative;">
@@ -205,8 +480,8 @@ a.skip-link:focus{top:0}
         <div class="path-step">
           <div class="path-num" style="background:linear-gradient(135deg,#d4af37,#f59e0b);">3</div>
           <div>
-            <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Pro Track — AI & Automation</div>
-            <div style="font-size:13px;color:#6b7280;line-height:1.6;">AI agents, automation, SaaS. Get job-ready or launch your own product. From ₦10,000.</div>
+            <div style="font-weight:700;color:#e2e8f0;margin-bottom:4px;">Pro Track — AI, Cloud & Business</div>
+            <div style="font-size:13px;color:#6b7280;line-height:1.6;">AI agents, cloud computing, cybersecurity, e-commerce, content creation. Get job-ready or launch your own business. From ₦10,000.</div>
           </div>
         </div>
       </div>
@@ -220,6 +495,25 @@ a.skip-link:focus{top:0}
 </section>
 
 <!-- COURSES GRID -->
+
+<!-- ===== Skill of the Day ===== -->
+<section id="skill-of-day" class="container" style="padding:0 24px 40px;position:relative;z-index:10;max-width:900px;margin:0 auto;">
+  <div class="sotd-banner">
+    <span>⭐ Skill of the Day</span>
+    <span id="sotd-date"></span>
+  </div>
+  <div class="sotd-content">
+    <div class="sotd-thumb" id="sotd-thumb"></div>
+    <div class="sotd-info">
+      <h3 id="sotd-title"></h3>
+      <p id="sotd-desc"></p>
+      <div class="sotd-meta" id="sotd-meta"></div>
+      <div class="sotd-income" id="sotd-income"></div>
+      <button class="sotd-cta" id="sotd-cta">Start Learning →</button>
+    </div>
+  </div>
+</section>
+
 <section id="courses" style="padding:0 24px 80px;position:relative;z-index:10;">
   <div class="max-w-7xl mx-auto">
     <div style="text-align:center;margin-bottom:40px;">
@@ -254,6 +548,48 @@ a.skip-link:focus{top:0}
         <div style="font-size:24px;margin-bottom:12px;">🎓</div>
         <p style="font-size:13px;color:#d1d5db;line-height:1.7;margin-bottom:16px;">"Got my certificate and used it in my CV. Got a junior developer role at a startup in Lagos. Emmanuel's teaching style is fire."</p>
         <div style="font-weight:700;font-size:12px;color:#34d399;">— Tobi K., Abuja</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY SKILLFORGE (Coursera-style value props) -->
+<section style="padding:80px 24px;position:relative;z-index:10;" class="reveal">
+  <div class="max-w-6xl mx-auto">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:12px;color:#8b5cf6;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;">Why SkillForge</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;">A Premium Learning <span class="grad-text">Experience</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;">
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🎯</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">Track Your Progress</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">Watch your growth with real-time progress bars, lesson completion tracking, and XP for every lesson you finish.</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🔥</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">Build a Streak</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">Learn daily and build streaks. The more you learn, the higher your level. Stay motivated and keep growing.</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🏆</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">Earn Achievements</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">Unlock badges for milestones — first lesson, quiz passes, streaks, and course completions. Show off your skills.</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🧠</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">Smart Quizzes</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">Every course includes quizzes to test your knowledge. Score 70%+ to unlock your certificate of completion.</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🎓</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">Real Certificates</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">Download shareable certificates for every course you complete. Add them to your CV, LinkedIn, or portfolio.</div>
+      </div>
+      <div class="glass card-float" style="border-radius:20px;padding:24px;">
+        <div style="font-size:28px;margin-bottom:12px;">🚀</div>
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:8px;font-size:14px;">What's Next</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.6;">After completing a course, get personalized recommendations for what to learn next and join the Erogian freelance network.</div>
       </div>
     </div>
   </div>
@@ -567,5 +903,36 @@ style.textContent='@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}';
 document.head.appendChild(style);
 </script>
 <script src="skillforge.js"></script>
+
+<!-- ===== FORGE AI Mentor Avatar ===== -->
+<div id="forge-avatar" onclick="toggleForge()">
+  <div class="forge-bubble" id="forge-bubble"></div>
+  <div class="forge-orb">🤖</div>
+</div>
+
+<div id="forge-panel">
+  <div class="forge-header">
+    <div class="forge-avatar-img">🤖</div>
+    <div>
+      <h3>FORGE</h3>
+      <p>Your AI Skill Mentor · Online</p>
+    </div>
+    <button class="forge-close" onclick="toggleForge()">✕</button>
+  </div>
+  <div class="forge-body" id="forge-body">
+    <div class="forge-streak">🔥 <span id="forge-streak-text">Welcome! You're on day 1 of your learning journey</span></div>
+    <div class="forge-message">
+      <strong>Hey! 👋 I'm FORGE</strong>, your AI mentor on SkillForge. I help you find the perfect skill to learn and guide you to earning with it.
+    </div>
+    <div class="forge-message">
+      Based on what's trending, here are <strong>skills that can earn you money this week:</strong>
+    </div>
+    <div id="forge-recommendations"></div>
+  </div>
+  <div class="forge-cta" onclick="document.getElementById('forge-panel').classList.remove('active'); document.getElementById('courses-section').scrollIntoView({behavior:'smooth'});">
+    🚀 Browse All 48+ Courses
+  </div>
+</div>
+
 </body>
 </html>

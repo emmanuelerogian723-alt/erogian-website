@@ -161,13 +161,14 @@ async function openPost(slug) {
   window.location.hash = '#/post/' + slug;
   document.getElementById('blog-list-view').classList.add('hidden');
   document.getElementById('blog-article-view').classList.remove('hidden');
-  document.getElementById('article-container').innerHTML = '<div class="text-center py-20 text-gray-500">Loading article...</div>';
+  document.getElementById('article-content-area').innerHTML = '<div class="text-center py-20 text-gray-500">Loading article...</div>';
   window.scrollTo(0, 0);
   try {
     var res = await fetch(BLOG_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'get', slug: slug }) });
     var data = await res.json();
-    if (data.status !== 'ok') { document.getElementById('article-container').innerHTML = '<div class="text-center py-20 text-gray-500">Article not found. <a href="blog.html" class="text-purple-400">Back to blog</a></div>'; return; }
+    if (data.status !== 'ok') { document.getElementById('article-content-area').innerHTML = '<div class="text-center py-20 text-gray-500">Article not found. <a href="blog.html" class="text-purple-400">Back to blog</a></div>'; return; }
     var p = data.post;
+    updateArticleSEO(p);
     var d = new Date(p.created_date).toLocaleDateString('en', { month:'long', day:'numeric', year:'numeric' });
     var tagArr = (p.tags || '').split(',').filter(function(t) { return t.trim(); });
     var coverHTML = p.cover_image
@@ -194,13 +195,80 @@ async function openPost(slug) {
       html += '</div></div>';
     }
     html += '<div class="glass glow-border rounded-2xl p-8 mt-12 text-center"><div class="text-2xl mb-3">🚀</div><h3 class="display text-xl font-bold mb-2">Need Help Building Your Project?</h3><p class="text-gray-400 text-sm mb-5">From AI agents to full websites — we make it happen.</p><a href="index.html#book" class="inline-block px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 transition">Book a Free Consultation</a></div></div>';
-    document.getElementById('article-container').innerHTML = html;
+    document.getElementById('article-content-area').innerHTML = html;
     window.scrollTo(0, 0);
-  } catch(e) { document.getElementById('article-container').innerHTML = '<div class="text-center py-20 text-gray-500">Failed to load. <a href="blog.html" class="text-purple-400">Back</a></div>'; }
+  } catch(e) { document.getElementById('article-content-area').innerHTML = '<div class="text-center py-20 text-gray-500">Failed to load. <a href="blog.html" class="text-purple-400">Back</a></div>'; }
 }
 
-function backToList() { window.location.hash=''; document.getElementById('blog-article-view').classList.add('hidden'); document.getElementById('blog-list-view').classList.remove('hidden'); window.scrollTo(0,0); }
+function backToList() { restoreBlogSEO(); window.location.hash=''; document.getElementById('blog-article-view').classList.add('hidden'); document.getElementById('blog-list-view').classList.remove('hidden'); window.scrollTo(0,0); }
 function copyLink(slug) { navigator.clipboard.writeText('https://erogian.vercel.app/blog.html#/post/' + slug).then(function(){ alert('Link copied!'); }); }
+
+
+/* ===== Dynamic SEO Meta Tags for Articles ===== */
+function updateArticleSEO(post) {
+  document.title = post.title + ' | EROGIAN Blog';
+  var metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute('content', (post.excerpt || post.title).substring(0, 160));
+  var ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute('content', post.title + ' | EROGIAN Blog');
+  var ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.setAttribute('content', (post.excerpt || post.title).substring(0, 160));
+  var ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute('content', 'https://erogian.vercel.app/blog.html#/post/' + post.slug);
+  var ogType = document.querySelector('meta[property="og:type"]');
+  if (ogType) ogType.setAttribute('content', 'article');
+  if (post.cover_image) {
+    var ogImg = document.querySelector('meta[property="og:image"]');
+    if (ogImg) ogImg.setAttribute('content', post.cover_image);
+  }
+  var twTitle = document.querySelector('meta[name="twitter:title"]');
+  if (twTitle) twTitle.setAttribute('content', post.title + ' | EROGIAN Blog');
+  var twDesc = document.querySelector('meta[name="twitter:description"]');
+  if (twDesc) twDesc.setAttribute('content', (post.excerpt || post.title).substring(0, 160));
+  if (post.cover_image) {
+    var twImg = document.querySelector('meta[name="twitter:image"]');
+    if (twImg) twImg.setAttribute('content', post.cover_image);
+  }
+  var existing = document.getElementById('article-schema');
+  if (existing) existing.remove();
+  var schema = document.createElement('script');
+  schema.type = 'application/ld+json';
+  schema.id = 'article-schema';
+  schema.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": (post.excerpt || post.title).substring(0, 160),
+    "image": post.cover_image || 'https://erogian.vercel.app/og-image.jpg',
+    "author": {"@type": "Person","name": post.author || "Emmanuel Ene Rejoice","url": "https://erogian.vercel.app"},
+    "publisher": {"@type": "Organization","name": "EROGIAN","logo": {"@type": "ImageObject","url": "https://erogian.vercel.app/og-image.jpg"}},
+    "datePublished": post.created_date,
+    "dateModified": post.updated_date || post.created_date,
+    "url": "https://erogian.vercel.app/blog.html#/post/" + post.slug,
+    "mainEntityOfPage": {"@type": "WebPage","@id": "https://erogian.vercel.app/blog.html#/post/" + post.slug},
+    "keywords": post.tags || post.category || "",
+    "articleSection": post.category || "Technology"
+  });
+  document.head.appendChild(schema);
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute('href', 'https://erogian.vercel.app/blog.html#/post/' + post.slug);
+}
+
+function restoreBlogSEO() {
+  document.title = 'EROGIAN Blog — Tech, AI & Digital Innovation from Nigeria';
+  var metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute('content', 'Insights on AI, software development, automation and digital innovation from EROGIAN — Nigeria\'s AI-first digital studio building the future.');
+  var ogType = document.querySelector('meta[property="og:type"]');
+  if (ogType) ogType.setAttribute('content', 'website');
+  var ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute('content', 'EROGIAN Blog — Tech, AI & Digital Innovation');
+  var ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute('content', 'https://erogian.vercel.app/blog');
+  var existing = document.getElementById('article-schema');
+  if (existing) existing.remove();
+  var canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute('href', 'https://erogian.vercel.app/blog');
+}
 
 /* ===== Admin / Writer Studio ===== */
 function openAdmin() { document.getElementById('modal-admin').classList.add('active'); if (localStorage.getItem('erogian_blog_key')) showAdminPanel(); }

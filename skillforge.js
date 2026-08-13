@@ -6,7 +6,7 @@ var _uploadedFiles = []; // track uploaded files
 var UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianUpload';
 var VIDEO_UPLOAD_URL = 'https://superagent-55bc0d3a.base44.app/functions/erogianVideoUpload';
 var ADMIN_KEY = 'erogian_skillforge_admin_2026';
-var UPLOAD_ADMIN_KEY = 'erogian_blog_admin_2026'; // shared upload utility uses the blog admin key
+var UPLOAD_ADMIN_KEY = 'erogian_blog_admin_2026';
 var WHATSAPP_NUMBER = '2347045560291';
 var CERTIFICATE_TEMPLATE = 'https://media.base44.com/images/public/6a37c01bd442f2d055bc0d3a/a13447e10_generated_image.png';
 var allCourses = [];
@@ -16,12 +16,88 @@ var uploadedVideoFileUrl = '';
 var cfQuizData = [];
 var cfLessons = [];
 var activeLessonIndex = 0;
-var currentEnrollment = null; // {id, name, email, course}
+var currentEnrollment = null;
 
 function esc(s) { return (s||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+/* ===== Progress Tracking (localStorage) ===== */
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('sf_progress') || '{}'); } catch(e) { return {}; }
+}
+function saveProgress(p) {
+  try { localStorage.setItem('sf_progress', JSON.stringify(p)); } catch(e) {}
+}
+function getCourseProgress(slug) {
+  var p = getProgress();
+  return p[slug] || { completedLessons: [], quizPassed: false, xp: 0 };
+}
+function markLessonComplete(slug, lessonIndex) {
+  var p = getProgress();
+  if (!p[slug]) p[slug] = { completedLessons: [], quizPassed: false, xp: 0 };
+  if (p[slug].completedLessons.indexOf(lessonIndex) === -1) {
+    p[slug].completedLessons.push(lessonIndex);
+    p[slug].xp = (p[slug].xp || 0) + 50;
+    saveProgress(p);
+    updateStreak();
+  }
+  return p[slug];
+}
+function getTotalXP() {
+  var p = getProgress();
+  var total = 0;
+  for (var slug in p) total += (p[slug].xp || 0);
+  return total;
+}
+function getCompletedCourses() {
+  var p = getProgress();
+  var count = 0;
+  for (var slug in p) {
+    if (p[slug].quizPassed) count++;
+  }
+  return count;
+}
 
+/* ===== Streak Tracking ===== */
+function updateStreak() {
+  var today = new Date().toDateString();
+  var streak = JSON.parse(localStorage.getItem('sf_streak') || '{"days":0,"lastDay":""}');
+  if (streak.lastDay !== today) {
+    var yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (streak.lastDay === yesterday) streak.days++;
+    else streak.days = 1;
+    streak.lastDay = today;
+    localStorage.setItem('sf_streak', JSON.stringify(streak));
+  }
+  return streak.days;
+}
+function getStreak() {
+  return JSON.parse(localStorage.getItem('sf_streak') || '{"days":0,"lastDay":""}').days;
+}
 
+/* ===== Achievement System ===== */
+function getAchievements() {
+  var xp = getTotalXP();
+  var completed = getCompletedCourses();
+  var streak = getStreak();
+  var achievements = [];
+  if (xp >= 50) achievements.push({ icon: '🌱', title: 'First Steps', desc: 'Completed your first lesson' });
+  if (streak >= 3) achievements.push({ icon: '🔥', title: '3-Day Streak', desc: 'Learned 3 days in a row' });
+  if (streak >= 7) achievements.push({ icon: '⚡', title: 'Week Warrior', desc: '7-day learning streak' });
+  if (completed >= 1) achievements.push({ icon: '🎓', title: 'Certified', desc: 'Passed your first quiz' });
+  if (completed >= 3) achievements.push({ icon: '🏆', title: 'Overachiever', desc: 'Completed 3 courses' });
+  if (xp >= 500) achievements.push({ icon: '💎', title: 'Diamond Mind', desc: 'Earned 500+ XP' });
+  if (xp >= 1000) achievements.push({ icon: '👑', title: 'Scholar', desc: 'Earned 1000+ XP' });
+  return achievements;
+}
+
+/* ===== Level System ===== */
+function getLevel() {
+  var xp = getTotalXP();
+  var level = Math.floor(xp / 200) + 1;
+  var nextLevelXP = level * 200;
+  var progress = (xp % 200) / 200 * 100;
+  return { level: level, xp: xp, nextXP: nextLevelXP, progress: progress, remaining: nextLevelXP - xp };
+}
 
 function toEmbedUrl(url) {
   if (!url) return '';
@@ -50,16 +126,44 @@ async function loadCourses() {
     allCourses = data.courses || [];
     renderChips();
     renderGrid();
+    updateStats();
   } catch (e) {
     grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float col-span-3"><div class="text-sm text-gray-500">Could not load classes right now. Try refreshing.</div></div>';
+  }
+}
+
+function updateStats() {
+  var statsEl = document.getElementById('sf-stats');
+  if (!statsEl) return;
+  var totalCourses = allCourses.length;
+  var totalEnrolled = allCourses.reduce(function(sum, c) { return sum + (c.enrolled_count || 0); }, 0);
+  var freeCount = allCourses.filter(function(c) { return c.is_free; }).length;
+  var paidCount = totalCourses - freeCount;
+  if (statsEl) {
+    statsEl.innerHTML =
+      '<div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;font-family:\'Space Grotesk\',sans-serif;" class="grad-text">'+totalCourses+'</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">Courses available</div></div>' +
+      '<div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;font-family:\'Space Grotesk\',sans-serif;color:#a78bfa;">'+totalEnrolled+'+</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">Students enrolled</div></div>' +
+      '<div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;font-family:\'Space Grotesk\',sans-serif;color:#34d399;">'+freeCount+' Free</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">'+paidCount+' premium tracks</div></div>' +
+      '<div style="text-align:center;"><div style="font-size:1.8rem;font-weight:800;font-family:\'Space Grotesk\',sans-serif;color:#60a5fa;">🎓</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">Certificates on completion</div></div>';
+  }
+  // Update streak/level display
+  var streakEl = document.getElementById('sf-streak-display');
+  if (streakEl) {
+    var streak = getStreak();
+    var lvl = getLevel();
+    streakEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;">' +
+      '<span style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fbbf24;">🔥 '+streak+'-day streak</span>' +
+      '<span style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#a78bfa;">⭐ Level '+lvl.level+' · '+lvl.xp+' XP</span>' +
+      '</div>';
   }
 }
 
 function renderChips() {
   var cats = ['all'].concat(Array.from(new Set(allCourses.map(function(c){ return c.category; }))));
   var el = document.getElementById('filter-chips');
+  if (!el) return;
   el.innerHTML = cats.map(function(c) {
-    return '<button class="chip ' + (c === currentFilter ? 'chip-active' : '') + '" onclick="filterCourses(\'' + c + '\')">' + (c === 'all' ? 'All Classes' : esc(c)) + '</button>';
+    return '<button class="chip ' + (c === currentFilter ? 'chip-active' : '') + '" onclick="filterCourses(\'' + esc(c) + '\')">' + (c === 'all' ? 'All Classes' : esc(c)) + '</button>';
   }).join('');
 }
 
@@ -67,6 +171,7 @@ function filterCourses(cat) { currentFilter = cat; renderChips(); renderGrid(); 
 
 function renderGrid() {
   var grid = document.getElementById('course-grid');
+  if (!grid) return;
   var list = currentFilter === 'all' ? allCourses : allCourses.filter(function(c){ return c.category === currentFilter; });
   if (!list.length) { grid.innerHTML = '<div class="glass rounded-2xl p-6 card-float col-span-3"><div class="text-sm text-gray-500">New classes coming soon.</div></div>'; return; }
   grid.innerHTML = list.map(function(c) {
@@ -74,13 +179,31 @@ function renderGrid() {
     var badge = c.is_free ? '<span class="badge-free text-xs px-3 py-1 rounded-full font-semibold">FREE</span>' : '<span class="badge-pro text-xs px-3 py-1 rounded-full font-semibold">₦'+Number(c.price_ngn||0).toLocaleString()+'</span>';
     var lock = c.is_free ? '' : '<div class="lock-overlay"><div class="text-3xl">🔒</div><div class="text-xs text-gray-300">Premium Class</div></div>';
     var hasQuiz = (function(){ try { return JSON.parse(c.quiz||'[]').length > 0; } catch(e){ return false; } })();
+    var lessons = getLessons(c);
+    var lessonCount = lessons.length;
+    var progress = getCourseProgress(c.slug);
+    var progressPct = lessons.length ? Math.round(progress.completedLessons.length / lessons.length * 100) : 0;
+    var progressBar = progressPct > 0 ? '<div class="progress-bar mt-2"><div class="progress-fill" style="width:'+progressPct+'%"></div></div><div style="font-size:10px;color:#6b7280;margin-top:3px;">'+progressPct+'% complete</div>' : '';
+    var stars = '<span style="color:#fbbf24;font-size:11px;">★★★★★</span>';
     return '<div class="glass rounded-2xl overflow-hidden card-float cursor-pointer group" onclick="openCourse(\''+esc(c.slug)+'\')">' +
       '<div class="relative">' + thumb + lock + '</div>' +
       '<div class="p-5">' +
       '<div class="flex items-center justify-between mb-2"><span class="text-xs text-purple-300">'+esc(c.category)+' · '+esc(c.level)+'</span>'+badge+'</div>' +
-      '<div class="font-semibold mb-2">'+esc(c.title)+'</div>' +
-      '<div class="text-xs text-gray-500 mb-3">'+esc((c.description||'').slice(0,90))+'...</div>' +
-      '<div class="text-xs text-gray-600">⏱ '+esc(c.duration||'')+' · '+ (c.enrolled_count||0) +' enrolled'+(hasQuiz?' · 🧠 Quiz + 🎓 Certificate':'')+'</div>' +
+      '<div class="font-semibold mb-2" style="font-size:14px;line-height:1.4;">'+esc(c.title)+'</div>' +
+      '<div class="text-xs text-gray-500 mb-2" style="line-height:1.5;">'+esc((c.description||'').slice(0,100))+'...</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">' +
+        '<span style="font-size:11px;color:#9ca3af;">👨‍🏫 '+esc(c.instructor||'EROGIAN')+'</span>' +
+        '<span style="font-size:11px;color:#6b7280;">·</span>' +
+        '<span style="font-size:11px;color:#9ca3af;">⏱ '+esc(c.duration||'')+'</span>' +
+        '<span style="font-size:11px;color:#6b7280;">·</span>' +
+        '<span style="font-size:11px;color:#9ca3af;">📖 '+lessonCount+' lesson'+(lessonCount>1?'s':'')+'</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+        stars +
+        '<span style="font-size:11px;color:#6b7280;">'+(c.enrolled_count||0)+' enrolled</span>' +
+        (hasQuiz ? '<span style="font-size:11px;color:#8b5cf6;">· 🧠 Quiz · 🎓 Certificate</span>' : '') +
+      '</div>' +
+      progressBar +
       '</div></div>';
   }).join('');
 }
@@ -90,8 +213,19 @@ function openCourse(slug) {
   if (!course) return;
   document.getElementById('enroll-title').textContent = course.title;
   var body = document.getElementById('enroll-body');
+  var lessons = getLessons(course);
+  var hasQuiz = (function(){ try { return JSON.parse(course.quiz||'[]').length > 0; } catch(e){ return false; } })();
+  var outcomes = course.outcomes ? course.outcomes : '';
+  var outcomesHTML = outcomes ? '<div class="glass rounded-xl p-4 mb-4"><div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;">🎯 What You\'ll Learn</div><div style="font-size:12px;color:#9ca3af;line-height:1.6;">'+esc(outcomes)+'</div></div>' : '';
   body.innerHTML =
-    '<p class="text-sm text-gray-400 mb-4">'+esc(course.description)+'</p>' +
+    '<p class="text-sm text-gray-400 mb-3">'+esc(course.description)+'</p>' +
+    outcomesHTML +
+    '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">' +
+      '<span style="font-size:11px;color:#9ca3af;">👨‍🏫 '+esc(course.instructor||'EROGIAN')+'</span>' +
+      '<span style="font-size:11px;color:#9ca3af;">⏱ '+esc(course.duration||'')+'</span>' +
+      '<span style="font-size:11px;color:#9ca3af;">📖 '+lessons.length+' lessons</span>' +
+      (hasQuiz ? '<span style="font-size:11px;color:#a78bfa;">🧠 Quiz + 🎓 Certificate</span>' : '') +
+    '</div>' +
     (course.is_free ? '' : '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate</div></div>') +
     '<div class="space-y-3 mb-4">' +
     '<input id="ef-name" placeholder="Your full name (for your certificate)" class="w-full rounded-xl px-4 py-3 text-sm">' +
@@ -115,35 +249,88 @@ async function startPaidClass(slug) {
   var info = validateEnrollForm();
   if (!info) return;
   var course = allCourses.find(function(c){ return c.slug === slug; });
+  
+  // Show payment loading
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div class="text-center py-8"><div style="font-size:3rem;margin-bottom:12px;">💳</div><div style="font-size:14px;color:#9ca3af;">Initializing secure payment...</div></div>';
+  
   try {
+    // Enroll the student first
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:false, amount_ngn: course.price_ngn }) });
     var data = await res.json();
     currentEnrollment = { id: data.enrollment ? data.enrollment.id : null, name: info.name, email: info.email, course: course };
   } catch(e) {}
-  var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge. My name: '+info.name+', email: '+info.email);
-  var body = document.getElementById('enroll-body');
-  body.innerHTML =
-    '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate on completion</div></div>' +
-    '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="block text-center w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Unlock on WhatsApp →</a>';
+  
+  // Initialize Paystack payment
+  try {
+    var payRes = await fetch('https://superagent-55bc0d3a.base44.app/functions/initPaystackPayment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: info.email,
+        amount: course.price_ngn,
+        course_slug: slug,
+        course_title: course.title,
+        student_name: info.name
+      })
+    });
+    var payData = await payRes.json();
+    
+    if (payData.status === 'ok' && payData.authorization_url) {
+      // Redirect to Paystack payment page
+      body.innerHTML = '<div class="text-center py-6">' +
+        '<div style="font-size:3rem;margin-bottom:12px;">🔒</div>' +
+        '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Secure Checkout</h3>' +
+        '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">'+esc(course.title)+'</div></div>' +
+        '<div style="font-size:11px;color:#9ca3af;margin-bottom:16px;">You\'ll be redirected to Paystack to complete your payment securely. Card, bank transfer, USSD & more supported.</div>' +
+        '<a href="'+payData.authorization_url+'" target="_blank" class="w-full py-3 rounded-full font-semibold inline-block text-center" style="background:linear-gradient(90deg,#00C896,#00A378);color:#fff;text-decoration:none;margin-bottom:8px;">💳 Pay with Paystack →</a>' +
+        '<button onclick="startFreeClass(\''+esc(slug)+'\')" style="width:100%;padding:10px;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#9ca3af;font-size:12px;cursor:pointer;">Preview first lesson free →</button>' +
+        '</div>';
+    } else {
+      throw new Error(payData.message || 'Payment failed');
+    }
+  } catch(e) {
+    // Fallback to WhatsApp payment
+    var msg = encodeURIComponent('Hi! I want to enroll in "'+course.title+'" (₦'+Number(course.price_ngn||0).toLocaleString()+') on SkillForge. My name: '+info.name+', email: '+info.email);
+    body.innerHTML = '<div class="text-center py-6">' +
+      '<div style="font-size:3rem;margin-bottom:12px;">💰</div>' +
+      '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Complete Your Payment</h3>' +
+      '<div class="glass rounded-xl p-4 mb-4 text-center"><div class="text-2xl font-bold grad-text">₦'+Number(course.price_ngn||0).toLocaleString()+'</div><div class="text-xs text-gray-500">One-time payment · Lifetime access + Certificate</div></div>' +
+      '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text='+msg+'" target="_blank" class="w-full py-3 rounded-full font-semibold inline-block text-center" style="background:#25D366;color:#fff;text-decoration:none;margin-bottom:8px;">💬 Pay via WhatsApp →</a>' +
+      '<div style="font-size:11px;color:#6b7280;">Send the WhatsApp message and we\'ll confirm your payment and unlock the class immediately.</div>' +
+      '<button onclick="startFreeClass(\''+esc(slug)+'\')" style="width:100%;padding:10px;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#9ca3af;font-size:12px;cursor:pointer;">Preview first lesson free →</button>' +
+      '</div>';
+  }
 }
 
-async function startFreeClass(slug) {
+function startFreeClass(slug) {
   var info = validateEnrollForm();
   if (!info) return;
   var course = allCourses.find(function(c){ return c.slug === slug; });
-  var enrollmentId = null;
-  try {
-    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:true }) });
-    var data = await res.json();
-    if (data.enrollment) enrollmentId = data.enrollment.id;
-  } catch(e) {}
-  currentEnrollment = { id: enrollmentId, name: info.name, email: info.email, course: course };
+  fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'enroll', name:info.name, email:info.email, phone:info.phone, course_slug:slug, is_free:true }) })
+    .then(function(r){ return r.json(); })
+    .then(function(data){ var enrollmentId = data.enrollment ? data.enrollment.id : 'guest'; })
+    .catch(function(e){});
+  currentEnrollment = { id: 'guest', name: info.name, email: info.email, course: course };
+  document.getElementById('enroll-modal').classList.remove('active');
   renderVideoStep(course);
 }
 
 function getLessons(course) {
   var lessons = [];
   try { lessons = JSON.parse(course.lessons || '[]'); } catch(e) {}
+  if (lessons.length === 1 && typeof lessons[0] === 'string') {
+    // lessons field is a number string — generate placeholder lessons
+    try { var count = parseInt(course.lessons) || 1; } catch(e) { var count = 1; }
+    // Actually check if it's a number or array
+    if (typeof course.lessons === 'string' && !course.lessons.startsWith('[')) {
+      var num = parseInt(course.lessons) || 1;
+      lessons = [];
+      for (var i = 0; i < Math.min(num, 1); i++) {
+        lessons.push({ title: course.title, video_url: course.video_url, video_file_url: course.video_file_url });
+      }
+    }
+  }
   if (!lessons.length && (course.video_url || course.video_file_url)) {
     lessons = [{ title: course.title, video_url: course.video_url, video_file_url: course.video_file_url }];
   }
@@ -152,44 +339,107 @@ function getLessons(course) {
 
 function renderVideoStep(course, lessonIdx) {
   activeLessonIndex = lessonIdx || 0;
-  var body = document.getElementById('enroll-body');
+  var modal = document.getElementById('enroll-modal');
+  if (modal) modal.classList.remove('active');
   var lessons = getLessons(course);
   if (!lessons.length) {
-    body.innerHTML = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">This class video is being added soon! We\'ll notify you on WhatsApp the moment it\'s live. <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline block mt-2">Message us</a></div>';
+    var body = document.getElementById('enroll-body') || document.getElementById('course-modal-body');
+    if (body) body.innerHTML = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">This class video is being added soon! We\'ll notify you on WhatsApp the moment it\'s live. <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline block mt-2">Message us</a></div>';
     return;
   }
   var lesson = lessons[activeLessonIndex] || lessons[0];
+
+  // Build player
   var player = '';
   if (lesson.video_file_url) {
     player = '<div class="rounded-xl overflow-hidden mb-3"><video src="'+esc(lesson.video_file_url)+'" controls class="w-full"></video></div>';
   } else {
     var embed = toEmbedUrl(lesson.video_url);
     if (embed) player = '<div class="aspect-video rounded-xl overflow-hidden mb-3"><iframe src="'+esc(embed)+'" class="w-full h-full" allowfullscreen frameborder="0"></iframe></div>';
+    else player = '<div class="glass rounded-xl p-6 text-center text-sm text-gray-400">Video coming soon.</div>';
   }
+
+  // Lesson navigation — Coursera style sidebar
   var lessonNav = '';
   if (lessons.length > 1) {
-    lessonNav = '<div class="flex flex-wrap gap-2 mb-3">' + lessons.map(function(l, i) {
-      return '<button onclick="renderVideoStep(currentEnrollment.course, ' + i + ')" class="chip ' + (i === activeLessonIndex ? 'chip-active' : '') + '">' + (i+1) + '. ' + esc(l.title || ('Lesson ' + (i+1))) + '</button>';
-    }).join('') + '</div>';
+    var progress = getCourseProgress(course.slug);
+    var completedHTML = lessons.map(function(l, i) {
+      var isCompleted = progress.completedLessons.indexOf(i) !== -1;
+      var isActive = i === activeLessonIndex;
+      var icon = isCompleted ? '✅' : (isActive ? '▶️' : '⭕');
+      var cls = isActive ? 'chip-active' : '';
+      return '<button onclick="renderVideoStep(currentEnrollment.course, ' + i + ')" class="chip ' + cls + '" style="text-align:left;display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start;">' + icon + ' ' + (i+1) + '. ' + esc((l.title || ('Lesson ' + (i+1))).slice(0, 35)) + '</button>';
+    }).join('');
+    
+    var progressPct = Math.round(progress.completedLessons.length / lessons.length * 100);
+    lessonNav = '<div class="glass rounded-xl p-4 mb-4">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;">📚 Course Content ('+lessons.length+' lessons)</div>' +
+      '<div class="progress-bar mb-2"><div class="progress-fill" style="width:'+progressPct+'%"></div></div>' +
+      '<div style="font-size:10px;color:#6b7280;margin-bottom:12px;">'+progressPct+'% complete · '+progress.completedLessons.length+' of '+lessons.length+' done</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">' + completedHTML + '</div>' +
+      '</div>';
   }
+
+  // Quiz button or completion
   var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
-  var quizBtn = quiz.length ? '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">✅ I\'ve watched ' + (lessons.length > 1 ? 'these lessons' : 'it') + ' — Take the Quiz (' + quiz.length + ' questions)</button>' :
+  var progress = getCourseProgress(course.slug);
+  var isLessonCompleted = progress.completedLessons.indexOf(activeLessonIndex) !== -1;
+  var markCompleteBtn = lessons.length > 1 ?
+    '<button onclick="markCompleteAndNext(\''+esc(course.slug)+'\','+activeLessonIndex+','+lessons.length+')" class="w-full py-3 rounded-full font-semibold mb-3" style="background:'+(isLessonCompleted ? 'rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);' : 'linear-gradient(90deg,#8b5cf6,#3b82f6);')+'">'+(isLessonCompleted ? '✅ Completed — Next Lesson →' : 'Mark as Complete & Continue →')+'</button>' : '';
+  
+  var quizBtn = quiz.length ? '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">✅ Take the Final Quiz (' + quiz.length + ' questions) →</button>' :
     '<div class="text-center text-xs text-gray-500">Enjoy the class! Have questions? <a href="https://wa.me/'+WHATSAPP_NUMBER+'" target="_blank" class="text-purple-300 underline">Message us on WhatsApp</a>.</div>';
-  body.innerHTML = lessonNav + player + quizBtn;
+
+  // What you'll learn in this lesson
+  var lessonInfo = '<div class="glass rounded-xl p-4 mb-3"><div style="font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">📖 '+esc(lesson.title || ('Lesson ' + (activeLessonIndex+1)))+'</div>' +
+    '<div style="font-size:11px;color:#6b7280;">Lesson '+(activeLessonIndex+1)+' of '+lessons.length+' · '+esc(course.instructor||'EROGIAN')+'</div></div>';
+
+  var body = document.getElementById('enroll-body');
+  if (!body) return;
+  body.innerHTML = lessonInfo + lessonNav + player + markCompleteBtn + quizBtn;
+  document.getElementById('enroll-modal').classList.add('active');
+  
+  // Scroll to top
+  document.getElementById('enroll-modal').scrollTop = 0;
+}
+
+function markCompleteAndNext(slug, lessonIdx, totalLessons) {
+  var progress = markLessonComplete(slug, lessonIdx);
+  if (lessonIdx < totalLessons - 1) {
+    renderVideoStep(currentEnrollment.course, lessonIdx + 1);
+  } else {
+    // All lessons done — prompt quiz
+    var body = document.getElementById('enroll-body');
+    body.innerHTML = '<div class="text-center py-8">' +
+      '<div style="font-size:3rem;margin-bottom:12px;">🎉</div>' +
+      '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">All Lessons Complete!</h3>' +
+      '<div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">You\'ve finished all '+totalLessons+' lessons. +'+(totalLessons*50)+' XP earned!</div>' +
+      '<button onclick="showQuiz()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🧠 Take the Final Quiz to Get Your Certificate →</button>' +
+      '</div>';
+    updateStats();
+  }
 }
 
 function showQuiz() {
   var course = currentEnrollment.course;
   var quiz = []; try { quiz = JSON.parse(course.quiz || '[]'); } catch(e) {}
+  if (!quiz.length) { alert('No quiz available for this course.'); return; }
   var body = document.getElementById('enroll-body');
-  body.innerHTML = '<div class="text-sm text-gray-400 mb-4">Answer these to confirm you understood the lesson. You need 70% to pass and unlock your certificate.</div>' +
+  body.innerHTML = '<div style="font-size:14px;font-weight:700;margin-bottom:8px;">🧠 Final Quiz — '+esc(course.title)+'</div>' +
+    '<div class="text-sm text-gray-400 mb-4">Answer these to confirm you understood the lessons. You need 70% to pass and unlock your certificate.</div>' +
     quiz.map(function(q, i) {
-      return '<div class="glass rounded-xl p-4 mb-3"><div class="font-semibold text-sm mb-2">'+(i+1)+'. '+esc(q.question)+'</div>' +
-        q.options.map(function(opt, oi) {
-          return '<label class="flex items-center gap-2 text-sm text-gray-300 mb-1 cursor-pointer"><input type="radio" name="quiz-q'+i+'" value="'+oi+'"> '+esc(opt)+'</label>';
-        }).join('') + '</div>';
+      var qText = q.question || q.q || '';
+      var opts = q.options || [];
+      return '<div class="glass rounded-xl p-4 mb-3">' +
+        '<div style="font-size:13px;font-weight:600;margin-bottom:10px;">' + (i+1) + '. ' + esc(qText) + '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        opts.map(function(opt, oi) {
+          return '<label class="flex items-center gap-2 text-sm text-gray-300 mb-1 cursor-pointer" style="padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);transition:background .2s;" onmouseover="this.style.background=\'rgba(139,92,246,.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,.03)\'"><input type="radio" name="quiz-q'+i+'" value="'+oi+'" style="accent-color:#8b5cf6;"> '+esc(opt)+'</label>';
+        }).join('') +
+        '</div></div>';
     }).join('') +
-    '<button onclick="submitQuiz()" class="w-full py-3 rounded-full font-semibold mt-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Submit Answers</button>';
+    '<button onclick="submitQuiz()" class="w-full py-3 rounded-full font-semibold mt-3" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">Submit Quiz →</button>';
+  document.getElementById('enroll-modal').scrollTop = 0;
 }
 
 async function submitQuiz() {
@@ -199,169 +449,300 @@ async function submitQuiz() {
     var checked = document.querySelector('input[name="quiz-q'+i+'"]:checked');
     return checked ? parseInt(checked.value) : -1;
   });
-  if (answers.indexOf(-1) !== -1) { alert('Please answer every question.'); return; }
-  var body = document.getElementById('enroll-body');
-  body.innerHTML = '<div class="text-center py-8 text-sm text-gray-400">Grading your answers...</div>';
+  if (answers.indexOf(-1) !== -1) { alert('Please answer all questions before submitting.'); return; }
+  var correct = 0;
+  quiz.forEach(function(q, i) {
+    var correctIdx = q.correct_index !== undefined ? q.correct_index : q.answer;
+    if (answers[i] === correctIdx) correct++;
+  });
+  var pct = Math.round(correct / quiz.length * 100);
+  var passed = pct >= 70;
+  
+  if (passed) {
+    var p = getProgress();
+    if (!p[course.slug]) p[course.slug] = { completedLessons: [], quizPassed: false, xp: 0 };
+    p[course.slug].quizPassed = true;
+    p[course.slug].xp = (p[course.slug].xp || 0) + 100;
+    saveProgress(p);
+    updateStreak();
+  }
+  
   try {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'submit_quiz', course_slug: course.slug, answers: answers, enrollment_id: currentEnrollment.id }) });
     var data = await res.json();
-    if (data.passed) {
-      body.innerHTML = '<div class="text-center py-6">' +
-        '<div class="text-4xl mb-3">🎉</div>' +
-        '<div class="font-bold text-lg mb-1">You passed! '+data.correct+'/'+data.total+'</div>' +
-        '<div class="text-sm text-gray-400 mb-5">Great job, '+esc(currentEnrollment.name)+'! Your certificate is ready.</div>' +
-        '<button onclick="downloadCertificate()" class="w-full py-3 rounded-full font-semibold" style="background:linear-gradient(90deg,#d4af37,#8b5cf6)">🎓 Download Your Certificate</button>' +
-        '</div>';
-    } else {
-      body.innerHTML = '<div class="text-center py-6">' +
-        '<div class="text-4xl mb-3">📚</div>' +
-        '<div class="font-bold text-lg mb-1">'+data.correct+'/'+data.total+' — Almost there!</div>' +
-        '<div class="text-sm text-gray-400 mb-5">Rewatch the video and try the quiz again to unlock your certificate.</div>' +
-        '<button onclick="renderVideoStep(currentEnrollment.course)" class="w-full py-3 rounded-full font-semibold glass">Rewatch & Retry</button>' +
-        '</div>';
-    }
-  } catch (e) {
-    body.innerHTML = '<div class="text-center py-8 text-sm text-red-400">Something went wrong grading your quiz. Please try again.</div>';
+  } catch(e) {}
+
+  var body = document.getElementById('enroll-body');
+  if (passed) {
+    var achievements = getAchievements();
+    var newAchievement = achievements.length > 0 ? achievements[achievements.length - 1] : null;
+    body.innerHTML = '<div class="text-center py-6">' +
+      '<div style="font-size:3rem;margin-bottom:8px;">🎉</div>' +
+      '<h3 style="font-size:1.2rem;font-weight:800;margin-bottom:6px;" class="grad-text">Quiz Passed! '+pct+'%</h3>' +
+      '<div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">'+correct+' of '+quiz.length+' correct · +100 XP earned!</div>' +
+      (newAchievement ? '<div style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:12px;padding:12px;margin-bottom:16px;">' +
+        '<div style="font-size:24px;">'+newAchievement.icon+'</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#a78bfa;margin-top:4px;">Achievement Unlocked: '+esc(newAchievement.title)+'</div>' +
+        '<div style="font-size:11px;color:#6b7280;">'+esc(newAchievement.desc)+'</div></div>' : '') +
+      '<button onclick="showCertificate()" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🎓 Download Your Certificate →</button>' +
+      '<button onclick="showPostCourse()" class="w-full py-2 rounded-full font-semibold" style="background:none;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">What\'s Next? →</button>' +
+      '</div>';
+    updateStats();
+  } else {
+    body.innerHTML = '<div class="text-center py-6">' +
+      '<div style="font-size:3rem;margin-bottom:8px;">📚</div>' +
+      '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">Almost There! '+pct+'%</h3>' +
+      '<div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">You need 70% to pass. You got '+correct+' of '+quiz.length+' correct.</div>' +
+      '<button onclick="renderVideoStep(currentEnrollment.course, 0)" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🔄 Rewatch Lessons & Retry →</button>' +
+      '<button onclick="showQuiz()" class="w-full py-2 rounded-full font-semibold" style="background:none;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">Try Quiz Again →</button>' +
+      '</div>';
   }
 }
 
-/* ===== Certificate generation (client-side canvas) ===== */
+/* ===== Post-Course Experience (Coursera-style "What's Next") ===== */
+function showPostCourse() {
+  var course = currentEnrollment.course;
+  var completedCount = getCompletedCourses();
+  var xp = getTotalXP();
+  var level = getLevel();
+  
+  // Suggest next courses in same category
+  var nextCourses = allCourses.filter(function(c) {
+    return c.slug !== course.slug && c.category === course.category;
+  }).slice(0, 3);
+  
+  var nextHTML = nextCourses.length ? nextCourses.map(function(c) {
+    return '<div class="glass rounded-xl p-3 cursor-pointer" onclick="openCourse(\''+esc(c.slug)+'\')" style="transition:all .3s;" onmouseover="this.style.borderColor=\'rgba(139,92,246,.4)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.07)\'">' +
+      '<div style="font-size:12px;font-weight:600;margin-bottom:4px;">'+esc(c.title)+'</div>' +
+      '<div style="font-size:10px;color:#6b7280;">'+esc(c.category)+' · '+(c.is_free ? 'FREE' : '₦'+Number(c.price_ngn||0).toLocaleString())+'</div>' +
+      '</div>';
+  }).join('') : '<div style="font-size:12px;color:#6b7280;">More courses coming soon!</div>';
+  
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div style="padding:20px 0;">' +
+    '<div style="text-align:center;margin-bottom:24px;">' +
+      '<div style="font-size:2.5rem;margin-bottom:8px;">🚀</div>' +
+      '<h3 style="font-size:1.1rem;font-weight:800;margin-bottom:6px;">Congratulations, '+esc(currentEnrollment.name)+'!</h3>' +
+      '<div style="font-size:13px;color:#9ca3af;">You completed <strong style="color:#a78bfa;">'+esc(course.title)+'</strong></div>' +
+    '</div>' +
+    
+    '<div class="glass rounded-xl p-4 mb-4">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:12px;">📊 Your Progress</div>' +
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+        '<div><div style="font-size:1.2rem;font-weight:800;color:#fbbf24;">⭐ Level '+level.level+'</div><div style="font-size:10px;color:#6b7280;">'+xp+' total XP</div></div>' +
+        '<div><div style="font-size:1.2rem;font-weight:800;color:#34d399;">🎓 '+completedCount+'</div><div style="font-size:10px;color:#6b7280;">Courses completed</div></div>' +
+        '<div><div style="font-size:1.2rem;font-weight:800;color:#f97316;">🔥 '+getStreak()+'</div><div style="font-size:10px;color:#6b7280;">Day streak</div></div>' +
+      '</div>' +
+      '<div class="progress-bar mt-3"><div class="progress-fill" style="width:'+level.progress+'%"></div></div>' +
+      '<div style="font-size:10px;color:#6b7280;margin-top:4px;">'+level.remaining+' XP to Level '+(level.level+1)+'</div>' +
+    '</div>' +
+    
+    '<div class="glass rounded-xl p-4 mb-4">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;">🎓 What You Learned</div>' +
+      '<div style="font-size:12px;color:#9ca3af;line-height:1.6;">'+esc(course.description)+'</div>' +
+    '</div>' +
+    
+    '<div style="margin-bottom:16px;">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;">🎯 Recommended Next Steps</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' + nextHTML + '</div>' +
+    '</div>' +
+    
+    '<div class="glass rounded-xl p-4 mb-4">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;">💪 Take Action</div>' +
+      '<div style="font-size:11px;color:#9ca3af;line-height:1.6;margin-bottom:10px;">Now that you\'ve completed this course, put your skills to work:</div>' +
+      '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text=I%20just%20completed%20'+encodeURIComponent(course.title)+'%20on%20SkillForge!%20I%20want%20to%20start%20earning%20with%20my%20new%20skills." target="_blank" style="display:block;padding:10px;background:#25D366;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:12px;font-weight:600;margin-bottom:6px;">💬 Join the Erogian Freelance Network →</a>' +
+      '<a href="https://wa.me/'+WHATSAPP_NUMBER+'?text=I%20just%20completed%20'+encodeURIComponent(course.title)+'%20and%20want%20to%20showcase%20my%20work" target="_blank" style="display:block;padding:10px;background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3);border-radius:10px;text-align:center;text-decoration:none;font-size:12px;font-weight:600;">🌐 Get Your Project Featured →</a>' +
+    '</div>' +
+    
+    '<button onclick="showCertificate()" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🎓 View Certificate Again →</button>' +
+    '<button onclick="document.getElementById(\'enroll-modal\').classList.remove(\'active\'); window.location.reload();" class="w-full py-2 rounded-full font-semibold" style="background:none;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">Back to All Courses →</button>' +
+    '</div>';
+}
+
+function showCertificate() {
+  var course = currentEnrollment.course;
+  var name = currentEnrollment.name || 'Student';
+  var date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  var body = document.getElementById('enroll-body');
+  body.innerHTML = '<div style="text-align:center;">' +
+    '<div style="background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(212,175,55,.05));border:2px solid rgba(139,92,246,.2);border-radius:20px;padding:32px;margin-bottom:16px;">' +
+    '<div style="font-size:11px;color:#6b7280;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;">Certificate of Completion</div>' +
+    '<div style="font-size:1.8rem;font-weight:800;margin-bottom:8px;" class="grad-text">'+esc(name)+'</div>' +
+    '<div style="font-size:12px;color:#9ca3af;margin-bottom:16px;">has successfully completed</div>' +
+    '<div style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#e2e8f0;">'+esc(course.title)+'</div>' +
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:20px;">'+date+' · SkillForge by EROGIAN</div>' +
+    '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:12px;">' +
+      '<span style="font-size:24px;">🏅</span>' +
+    '</div>' +
+    '<canvas id="cert-canvas" style="display:none;width:1200px;height:850px;"></canvas>' +
+    '</div>' +
+    '<button onclick="downloadCertificate()" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">⬇ Download Certificate (PNG) →</button>' +
+    '<button onclick="showPostCourse()" class="w-full py-2 rounded-full font-semibold" style="background:none;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">What\'s Next? →</button>' +
+    '</div>';
+}
+
 function downloadCertificate() {
-  var name = currentEnrollment.name;
-  var courseTitle = currentEnrollment.course.title;
-  var img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = function() {
-    var canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    var cx = canvas.width / 2;
-    ctx.textAlign = 'center';
-
-    // Student name — bold, dark navy, high contrast against the cream certificate background
-    ctx.fillStyle = '#12213f';
-    ctx.shadowColor = 'rgba(0,0,0,0.15)';
-    ctx.shadowBlur = 2;
-    ctx.font = '900 ' + Math.round(canvas.width * 0.042) + 'px Georgia, serif';
-    ctx.fillText(name, cx, canvas.height * 0.54);
-    ctx.shadowBlur = 0;
-
-    // Course title — deep bold gold, unique from name color
-    ctx.fillStyle = '#8a6a00';
-    ctx.font = 'bold ' + Math.round(canvas.width * 0.024) + 'px Georgia, serif';
-    wrapText(ctx, courseTitle, cx, canvas.height * 0.665, canvas.width * 0.7, canvas.width * 0.028);
-
-    // Date — placed on the dedicated "DATE" line near the signature/seal row, bold + dark for clarity
-    var today = new Date().toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#12213f';
-    ctx.font = 'bold ' + Math.round(canvas.width * 0.016) + 'px Georgia, serif';
-    ctx.fillText(today, canvas.width * 0.745, canvas.height * 0.718);
-
-    try {
-      var link = document.createElement('a');
-      link.download = 'SkillForge-Certificate-' + name.replace(/\s+/g,'-') + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (err) {
-      alert('Your browser blocked the certificate download. Please screenshot this page instead, or message us on WhatsApp and we\'ll send your certificate directly.');
-    }
-  };
-  img.onerror = function() {
-    alert('Could not load the certificate template. Please message us on WhatsApp and we\'ll send your certificate directly.');
-  };
-  img.src = CERTIFICATE_TEMPLATE;
+  var course = currentEnrollment.course;
+  var name = currentEnrollment.name || 'Student';
+  var date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  var canvas = document.getElementById('cert-canvas');
+  if (!canvas) return;
+  canvas.width = 1200; canvas.height = 850;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0a0a14'; ctx.fillRect(0, 0, 1200, 850);
+  var grad = ctx.createLinearGradient(0, 0, 1200, 850);
+  grad.addColorStop(0, '#1a1030'); grad.addColorStop(1, '#0a0a14');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, 1200, 850);
+  ctx.strokeStyle = 'rgba(139,92,246,.3)'; ctx.lineWidth = 3;
+  ctx.strokeRect(40, 40, 1120, 770);
+  ctx.strokeStyle = 'rgba(212,175,55,.15)'; ctx.lineWidth = 1;
+  ctx.strokeRect(60, 60, 1080, 730);
+  ctx.fillStyle = '#6b7280'; ctx.font = 'bold 14px Inter, sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText('CERTIFICATE OF COMPLETION', 600, 180);
+  ctx.fillStyle = '#f0f0f8'; ctx.font = 'bold 48px "Space Grotesk", sans-serif';
+  ctx.fillText(name, 600, 300);
+  ctx.fillStyle = '#9ca3af'; ctx.font = '16px Inter, sans-serif';
+  ctx.fillText('has successfully completed', 600, 360);
+  ctx.fillStyle = '#a78bfa'; ctx.font = 'bold 28px "Space Grotesk", sans-serif';
+  ctx.fillText(course.title, 600, 420);
+  ctx.fillStyle = '#6b7280'; ctx.font = '14px Inter, sans-serif';
+  ctx.fillText(date + ' · SkillForge by EROGIAN', 600, 520);
+  ctx.font = '40px serif'; ctx.fillText('🏅', 600, 620);
+  var link = document.createElement('a');
+  link.download = 'Erogian-' + course.slug + '-Certificate.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 
-function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-  var words = text.split(' ');
-  var line = '';
-  var lines = [];
-  for (var n = 0; n < words.length; n++) {
-    var testLine = line + words[n] + ' ';
-    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      lines.push(line);
-      line = words[n] + ' ';
-    } else {
-      line = testLine;
+/* ===== Dashboard ===== */
+function openDashboard() {
+  var body = document.getElementById('enroll-body');
+  document.getElementById('enroll-title').textContent = '🎓 My Learning Dashboard';
+  var xp = getTotalXP();
+  var level = getLevel();
+  var streak = getStreak();
+  var completed = getCompletedCourses();
+  var achievements = getAchievements();
+  var progress = getProgress();
+  var inProgress = [];
+  for (var slug in progress) {
+    var c = allCourses.find(function(c){ return c.slug === slug; });
+    if (c && !progress[slug].quizPassed) {
+      var lessons = getLessons(c);
+      var pct = lessons.length ? Math.round(progress[slug].completedLessons.length / lessons.length * 100) : 0;
+      inProgress.push({ course: c, pct: pct });
     }
   }
-  lines.push(line);
-  var startY = y - ((lines.length - 1) * lineHeight) / 2;
-  lines.forEach(function(l, i) { ctx.fillText(l.trim(), x, startY + i * lineHeight); });
+  
+  var achHTML = achievements.length ? achievements.map(function(a) {
+    return '<div style="display:flex;align-items:center;gap:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:10px 14px;"><div style="font-size:24px;">'+a.icon+'</div><div><div style="font-size:12px;font-weight:700;color:#a78bfa;">'+esc(a.title)+'</div><div style="font-size:10px;color:#6b7280;">'+esc(a.desc)+'</div></div></div>';
+  }).join('') : '<div style="font-size:12px;color:#6b7280;">Complete lessons and quizzes to unlock achievements!</div>';
+  
+  var inProgressHTML = inProgress.length ? inProgress.map(function(item) {
+    return '<div class="glass rounded-xl p-3 cursor-pointer" onclick="openCourse(\''+esc(item.course.slug)+'\')" style="margin-bottom:8px;">' +
+      '<div style="font-size:12px;font-weight:600;margin-bottom:4px;">'+esc(item.course.title)+'</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+item.pct+'%"></div></div>' +
+      '<div style="font-size:10px;color:#6b7280;margin-top:4px;">'+item.pct+'% complete</div>' +
+      '</div>';
+  }).join('') : '<div style="font-size:12px;color:#6b7280;">No courses in progress yet. Start one above!</div>';
+  
+  body.innerHTML = 
+    '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;">' +
+      '<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:16px;padding:16px 24px;text-align:center;">' +
+        '<div style="font-size:1.5rem;font-weight:800;color:#fbbf24;">🔥 '+streak+'</div>' +
+        '<div style="font-size:10px;color:#6b7280;">Day Streak</div>' +
+      '</div>' +
+      '<div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:16px 24px;text-align:center;">' +
+        '<div style="font-size:1.5rem;font-weight:800;color:#a78bfa;">⭐ '+level.level+'</div>' +
+        '<div style="font-size:10px;color:#6b7280;">Level · '+xp+' XP</div>' +
+      '</div>' +
+      '<div style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:16px;padding:16px 24px;text-align:center;">' +
+        '<div style="font-size:1.5rem;font-weight:800;color:#34d399;">🎓 '+completed+'</div>' +
+        '<div style="font-size:10px;color:#6b7280;">Courses Completed</div>' +
+      '</div>' +
+    '</div>' +
+    
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;">📈 Continue Learning</div>' +
+      inProgressHTML +
+    '</div>' +
+    
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:10px;">🏆 Achievements ('+achievements.length+')</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' + achHTML + '</div>' +
+    '</div>' +
+    
+    '<div class="glass rounded-xl p-4">' +
+      '<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;">⚡ Level '+level.level+' Progress</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+level.progress+'%"></div></div>' +
+      '<div style="font-size:10px;color:#6b7280;margin-top:6px;">'+level.remaining+' XP until Level '+(level.level+1)+'</div>' +
+    '</div>';
+  
+  document.getElementById('enroll-modal').classList.add('active');
 }
 
-function closeEnroll() { document.getElementById('enroll-modal').classList.remove('active'); }
-
-/* ===== Admin ===== */
+/* ===== ADMIN ===== */
 function openAdmin() { document.getElementById('admin-modal').classList.add('active'); }
 function closeAdminLogin() { document.getElementById('admin-modal').classList.remove('active'); }
+
 function checkAdminKey() {
   var key = document.getElementById('admin-key-input').value;
   if (key === ADMIN_KEY) {
-
     document.getElementById('admin-login').style.display='none'; document.getElementById('admin-panel').style.display='block';
-    cfLessons = [];
-    renderLessonsEditor();
     loadAdminCourses();
-    loadAdminEnrollments();
-  } else {
-    alert('Incorrect key.');
-  }
+  } else { alert('Invalid admin key.'); }
 }
 function closeAdminStudio() { document.getElementById('admin-modal').classList.remove('active'); }
 function adminLogin() { checkAdminKey(); }
 
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'cf-thumb-file') {
-    var file = e.target.files[0];
-    if (!file) return;
+function addLessonField() {
+  var idx = cfLessons.length;
+  cfLessons.push({ title: '', video_url: '', video_file_url: '' });
+  renderLessonFields();
+}
+function renderLessonFields() {
+  var el = document.getElementById('cf-lessons-list');
+  if (!el) return;
+  el.innerHTML = cfLessons.map(function(l, i) {
+    return '<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;font-weight:600;color:#9ca3af;">Lesson '+(i+1)+'</span>' +
+      (cfLessons.length > 1 ? '<button onclick="cfLessons.splice('+i+',1);renderLessonFields()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;">✕</button>' : '') +
+      '</div>' +
+      '<input id="cf-lesson-title-'+i+'" placeholder="Lesson title (e.g. Introduction to HTML)" class="w-full rounded-lg px-3 py-2 text-xs mb-2" value="'+esc(l.title||'')+'" oninput="cfLessons['+i+'].title=this.value">' +
+      '<input id="cf-lesson-url-'+i+'" placeholder="YouTube URL" class="w-full rounded-lg px-3 py-2 text-xs mb-1" value="'+esc(l.video_url||'')+'" oninput="cfLessons['+i+'].video_url=this.value;updateLessonPreview('+i+',this.value)">' +
+      '<div id="lesson-url-preview-'+i+'">'+getLessonPreviewHTML(l.video_url, i)+'</div>' +
+      '<input id="cf-lesson-file-'+i+'" type="file" accept="video/*" style="font-size:11px;margin-top:4px;" onchange="handleVideoUpload(event,'+i+')">' +
+      '</div>';
+  }).join('');
+}
+function handleVideoUpload(e, idx) {
+  var file = e.target && e.target.files && e.target.files[0];
+  if (!file) return;
+  if (file.size > 100 * 1024 * 1024) { alert('Max 100MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    cfLessons[idx].video_file_url = ev.target.result.substring(ev.target.result.indexOf(',') + 1);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleThumbUpload(e) {
+  var file = e.target && e.target.files && e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Max 5MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var base64 = ev.target.result;
+    uploadedThumbUrl = base64;
     var preview = document.getElementById('cf-thumb-preview');
-    preview.innerHTML = '<img src="'+URL.createObjectURL(file)+'" class="h-20 rounded-lg mb-1">';
-    var reader = new FileReader();
-    reader.onload = async function() {
-      try {
-        var base64 = reader.result.split(',')[1];
-        if (file.size > 5000000) { preview.innerHTML += '<div class="text-red-400">Image too large (max 5MB)</div>'; return; }
-        preview.innerHTML += '<div>Uploading...</div>';
-        var res = await fetch(UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, image:base64, filename:file.name, mime:file.type }) });
-        var data = await res.json();
-        if (data.status === 'ok') { uploadedThumbUrl = data.url; preview.innerHTML = '<img src="'+esc(data.url)+'" class="h-20 rounded-lg mb-1"><div class="text-green-400">Uploaded ✓</div>'; }
-        else { preview.innerHTML += '<div class="text-red-400">Upload failed: ' + (data.message||'') + '</div>'; }
-      } catch (err) {
-        preview.innerHTML += '<div class="text-red-400">Upload failed</div>';
-      }
-    };
-    reader.readAsDataURL(file);
-  }
+    if (preview) { preview.innerHTML = '<img src="'+base64+'" style="max-width:200px;border-radius:8px;">'; }
+  };
+  reader.readAsDataURL(file);
+}
 
-  if (e.target && e.target.id === 'cf-video-file') {
-    var vfile = e.target.files[0];
-    if (!vfile) return;
-    var vpreview = document.getElementById('cf-video-preview');
-    if (vfile.size > 20 * 1024 * 1024) { vpreview.innerHTML = '<div class="text-red-400">Video too large (max 20MB). For longer lessons, upload as Unlisted on YouTube and paste the link above instead.</div>'; return; }
-    vpreview.innerHTML = '<div>Uploading video... this may take a moment</div>';
-    var vreader = new FileReader();
-    vreader.onload = async function() {
-      try {
-        var vbase64 = vreader.result.split(',')[1];
-        var vres = await fetch(VIDEO_UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, video:vbase64, filename:vfile.name, mime:vfile.type }) });
-        var vdata = await vres.json();
-        if (vdata.status === 'ok') { uploadedVideoFileUrl = vdata.url; vpreview.innerHTML = '<div class="text-green-400">Video uploaded ✓ — will be used instead of the URL above</div>'; }
-        else { vpreview.innerHTML = '<div class="text-red-400">Upload failed: ' + (vdata.message||'') + '</div>'; }
-      } catch (err) {
-        vpreview.innerHTML = '<div class="text-red-400">Upload failed</div>';
-      }
-    };
-    vreader.readAsDataURL(vfile);
-  }
-});
-
-async function generateQuizFromVideo() {
-  var video = (cfLessons[0] && cfLessons[0].video_url) || '';
+async function generateQuiz() {
   var title = document.getElementById('cf-title').value.trim();
+  var video = (cfLessons[0] && cfLessons[0].video_url) || '';
   if (!video) { alert('Add a YouTube video link to Lesson 1 first.'); return; }
   var out = document.getElementById('cf-quiz-editor');
   out.innerHTML = '<div class="text-sm text-gray-400">🧠 Watching & analyzing the video, generating questions...</div>';
@@ -369,73 +750,36 @@ async function generateQuizFromVideo() {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'generate_quiz', admin_key:ADMIN_KEY, video_url:video, course_title:title }) });
     var data = await res.json();
     cfQuizData = data.quiz || [];
-    renderQuizEditor();
-  } catch (e) {
+    out.innerHTML = '<div style="color:#34d399;font-size:12px;margin-bottom:8px;">✅ '+cfQuizData.length+' questions generated!</div>' +
+      cfQuizData.map(function(q,i) {
+        return '<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:8px;margin-bottom:6px;">' +
+          '<div style="font-size:11px;font-weight:600;color:#d1d5db;">Q'+(i+1)+': '+esc(q.question||q.q)+'</div>' +
+          '<div style="font-size:10px;color:#6b7280;margin-top:4px;">'+(q.options||[]).length+' options · Answer: '+(q.correct_index!==undefined?q.correct_index:q.answer)+'</div>' +
+          '</div>';
+      }).join('');
+  } catch(e) {
     out.innerHTML = '<div class="text-sm text-red-400">Could not generate quiz. Try again.</div>';
   }
 }
 
-function renderQuizEditor() {
-  var out = document.getElementById('cf-quiz-editor');
-  if (!cfQuizData.length) { out.innerHTML = '<div class="text-sm text-gray-500">No quiz yet — generate one from the video above.</div>'; return; }
-  out.innerHTML = '<div class="text-xs text-gray-400 mb-2">Review the auto-generated quiz (correct answer highlighted). Regenerate if needed.</div>' +
-    cfQuizData.map(function(q, i) {
-      return '<div class="glass rounded-lg p-3 mb-2 text-sm"><div class="font-semibold mb-1">'+(i+1)+'. '+esc(q.question)+'</div>' +
-        q.options.map(function(opt, oi) {
-          return '<div class="'+(oi === q.correct_index ? 'text-green-400' : 'text-gray-400')+'">'+(oi === q.correct_index ? '✓ ' : '· ')+esc(opt)+'</div>';
-        }).join('') + '</div>';
-    }).join('');
+function resetCourseForm() {
+  cfLessons = [{ title: '', video_url: '', video_file_url: '' }];
+  cfQuizData = [];
+  uploadedThumbUrl = '';
+  var f = document.getElementById('cf-title'); if (f) f.value = '';
+  var d = document.getElementById('cf-description'); if (d) d.value = '';
+  var cat = document.getElementById('cf-category'); if (cat) cat.value = '';
+  var lvl = document.getElementById('cf-level'); if (lvl) lvl.value = 'Beginner';
+  var dur = document.getElementById('cf-duration'); if (dur) dur.value = '';
+  var isf = document.getElementById('cf-is-free'); if (isf) isf.checked = true;
+  var pr = document.getElementById('cf-price'); if (pr) pr.value = '0';
+  var out = document.getElementById('cf-quiz-editor'); if (out) out.innerHTML = 'No quiz yet.';
+  var prev = document.getElementById('cf-thumb-preview'); if (prev) prev.innerHTML = '';
+  var banner = document.getElementById('cf-editing-banner'); if (banner) banner.style.display = 'none';
+  renderLessonFields();
 }
 
-function addLessonRow(title, video_url, video_file_url) {
-  cfLessons.push({ title: title || ('Lesson ' + (cfLessons.length + 1)), video_url: video_url || '', video_file_url: video_file_url || '' });
-  renderLessonsEditor();
-}
-
-function removeLessonRow(idx) {
-  cfLessons.splice(idx, 1);
-  renderLessonsEditor();
-}
-
-function updateLessonField(idx, field, value) {
-  if (!cfLessons[idx]) return;
-  cfLessons[idx][field] = value;
-}
-
-function renderLessonsEditor() {
-  var el = document.getElementById('cf-lessons-list');
-  if (!cfLessons.length) addLessonRow();
-  el.innerHTML = cfLessons.map(function(l, i) {
-    return '<div class="glass rounded-lg p-3">' +
-      '<div class="flex justify-between items-center mb-2"><span class="text-xs font-semibold text-purple-300">Lesson ' + (i+1) + (i===0 ? ' (main preview)' : '') + '</span>' + (cfLessons.length > 1 ? '<button type="button" onclick="removeLessonRow(' + i + ')" class="text-red-400 text-xs">Remove</button>' : '') + '</div>' +
-      '<input value="' + esc(l.title) + '" oninput="updateLessonField(' + i + ',\'title\',this.value)" placeholder="Lesson title" class="w-full rounded-lg px-3 py-2 text-xs mb-2">' +
-      '<input value="' + esc(l.video_url) + '" oninput="updateLessonField(' + i + ',\'video_url\',this.value)" placeholder="YouTube URL" class="w-full rounded-lg px-3 py-2 text-xs mb-2">' +
-      '<input type="file" accept="video/*" onchange="uploadLessonVideo(' + i + ', this)" class="w-full rounded-lg px-3 py-2 text-xs">' +
-      '<div class="mt-1 text-xs text-gray-500" id="lesson-video-status-' + i + '">' + (l.video_file_url ? 'Video file uploaded ✓' : '') + '</div>' +
-      '</div>';
-  }).join('');
-}
-
-async function uploadLessonVideo(idx, inputEl) {
-  var file = inputEl.files[0];
-  if (!file) return;
-  var statusEl = document.getElementById('lesson-video-status-' + idx);
-  if (file.size > 20 * 1024 * 1024) { statusEl.textContent = 'Too large (max 20MB) — use a YouTube link instead.'; return; }
-  statusEl.textContent = 'Uploading...';
-  var reader = new FileReader();
-  reader.onload = async function() {
-    try {
-      var base64 = reader.result.split(',')[1];
-      var res = await fetch(VIDEO_UPLOAD_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ admin_key:UPLOAD_ADMIN_KEY, video:base64, filename:file.name, mime:file.type }) });
-      var data = await res.json();
-      if (data.status === 'ok') { cfLessons[idx].video_file_url = data.url; statusEl.textContent = 'Video uploaded ✓'; }
-      else { statusEl.textContent = 'Upload failed: ' + (data.message||''); }
-    } catch (err) { statusEl.textContent = 'Upload failed'; }
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveCourse() {
+async function publishCourse() {
   var title = document.getElementById('cf-title').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
   var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -444,23 +788,21 @@ async function saveCourse() {
   btn.textContent = isEditing ? 'Updating...' : 'Publishing...'; btn.disabled = true;
   var validLessons = cfLessons.filter(function(l){ return l.video_url || l.video_file_url; });
   var payload = {
-    action: isEditing ? 'update' : 'save',
-    admin_key: ADMIN_KEY,
-    title: title, slug: slug,
+    action: 'save', admin_key: ADMIN_KEY, title: title, slug: slug,
     description: document.getElementById('cf-description').value.trim(),
     category: document.getElementById('cf-category').value.trim() || 'General',
-    level: document.getElementById('cf-level').value,
     lessons: JSON.stringify(validLessons),
     thumbnail: uploadedThumbUrl,
     level: (document.getElementById('cf-level')||{value:''}).value,
-    duration: (document.getElementById('cf-duration')||{value:''}).value,
-    outcomes: (document.getElementById('cf-outcomes')||{value:''}).value,
-    requirements: (document.getElementById('cf-requirements')||{value:''}).value,
     duration: document.getElementById('cf-duration').value.trim(),
     is_free: document.getElementById('cf-is-free').checked,
     price_ngn: parseInt(document.getElementById('cf-price').value) || 0,
     quiz: JSON.stringify(cfQuizData),
-    status: 'published'
+    status: 'published',
+    instructor: (document.getElementById('cf-instructor')||{value:'EROGIAN'}).value,
+    outcomes: (document.getElementById('cf-outcomes')||{value:''}).value,
+    requirements: (document.getElementById('cf-requirements')||{value:''}).value,
+    tags: (document.getElementById('cf-tags')||{value:''}).value
   };
   if (isEditing) payload.id = cfEditingId;
   try {
@@ -480,539 +822,322 @@ async function loadAdminCourses() {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_list', admin_key:ADMIN_KEY }) });
     var data = await res.json();
     var list = document.getElementById('admin-course-list');
-    if (!list) return;
-    list.innerHTML = (data.courses||[]).map(function(c) {
+    var courses = data.courses || [];
+    list.innerHTML = courses.map(function(c) {
       var status = c.status || 'published';
       var statusBadge = status === 'published'
-        ? '<span style="color:#10b981;font-size:10px;background:rgba(16,185,129,.15);padding:2px 8px;border-radius:10px;">Published</span>'
-        : '<span style="color:#f59e0b;font-size:10px;background:rgba(245,158,11,.15);padding:2px 8px;border-radius:10px;">Draft</span>';
-      var priceLabel = c.is_free ? 'Free' : '₦' + (c.price_ngn || 0);
-      return '<div class="glass rounded-lg px-3 py-2 mb-2" style="border:1px solid rgba(255,255,255,.06);">'
-        + '<div class="flex justify-between items-center">'
-        + '<span style="font-size:13px;font-weight:600;">' + esc(c.title) + '</span>'
-        + statusBadge
-        + '</div>'
-        + '<div style="font-size:11px;color:#6b7280;margin-top:4px;">' + esc(c.category||'') + ' · ' + priceLabel + ' · ' + (c.enrolled_count||0) + ' students</div>'
-        + '<div style="display:flex;gap:6px;margin-top:8px;">'
-        + '<button onclick="editCourseFromAdmin(\''+c.id+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);cursor:pointer;">✏️ Edit</button>'
-        + '<button onclick="togglePublish(\''+c.id+'\',\''+status+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);cursor:pointer;">🔄 Toggle</button>'
-        + '<button onclick="deleteCourse(\''+c.id+'\')" style="font-size:11px;padding:4px 12px;border-radius:8px;background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);cursor:pointer;">🗑️ Delete</button>'
-        + '</div>'
-        + '</div>';
-    }).join('') || '<div class="text-gray-600 text-xs">No classes yet.</div>';
-  } catch (e) { console.error('loadAdminCourses error:', e); }
+        ? '<span style="color:#4ade80;font-size:10px;">● Published</span>'
+        : '<span style="color:#fbbf24;font-size:10px;">● Draft</span>';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,.02);border-radius:10px;margin-bottom:8px;">' +
+        '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(c.title)+'</div><div style="font-size:10px;color:#6b7280;">'+esc(c.category)+' · '+(c.is_free?'Free':'₦'+Number(c.price_ngn||0).toLocaleString())+' · '+(c.enrolled_count||0)+' enrolled</div></div>' +
+        '<div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">' +
+        statusBadge +
+        '<button onclick="editCourse(\''+c.id+'\')" style="padding:4px 10px;font-size:11px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;border-radius:6px;cursor:pointer;">Edit</button>' +
+        '<button onclick="toggleStatus(\''+c.id+'\',\''+status+'\')" style="padding:4px 10px;font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#9ca3af;border-radius:6px;cursor:pointer;">'+(status==='published'?'Unpublish':'Publish')+'</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) { document.getElementById('admin-course-list').innerHTML = '<div style="font-size:12px;color:#ef4444;">Failed to load courses.</div>'; }
 }
 
-async function loadAdminEnrollments() {
-  var el = document.getElementById('admin-enrollments-list');
-  if (!el) return;
-  try {
-    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_enrollments', admin_key:ADMIN_KEY }) });
-    var data = await res.json();
-    el.innerHTML = (data.enrollments||[]).slice(0,30).map(function(e) {
-      return '<div class="flex justify-between items-center glass rounded-lg px-3 py-2 text-xs"><span>'+esc(e.name)+' · '+esc(e.email)+' · '+esc(e.course_title)+'</span><span>'+(e.completed?'🎓 Completed':(e.quiz_total?e.quiz_score+'/'+e.quiz_total:'In progress'))+'</span></div>';
-    }).join('') || '<div class="text-gray-600 text-xs">No students yet.</div>';
-  } catch (e) {}
-}
-
-var cfEditingId = null;
-
-function resetCourseForm() {
-  cfEditingId = null;
-  document.getElementById('cf-title').value = '';
-  document.getElementById('cf-category').value = '';
-  document.getElementById('cf-level').value = 'Beginner';
-  document.getElementById('cf-duration').value = '';
-  document.getElementById('cf-description').value = '';
-  document.getElementById('cf-price').value = '';
-  document.getElementById('cf-is-free').checked = false;
-  cfLessons = []; cfQuizData = []; uploadedThumbUrl = '';
-  var lvl2 = document.getElementById('cf-level'); if(lvl2) lvl2.value='';
-  var dur2 = document.getElementById('cf-duration'); if(dur2) dur2.value='';
-  var out2 = document.getElementById('cf-outcomes'); if(out2) out2.value='';
-  var req2 = document.getElementById('cf-requirements'); if(req2) req2.value='';
-  renderLessonsEditor();
-  document.getElementById('cf-quiz-editor').innerHTML = 'No quiz yet.';
-  var btn = document.getElementById('cf-save-btn');
-  btn.textContent = 'Publish Class';
-  var banner = document.getElementById('cf-editing-banner');
-  if (banner) banner.classList.add('hidden');
-}
-
-function editCourse(c) {
-  cfEditingId = c.id;
-  document.getElementById('cf-title').value = c.title || '';
-  document.getElementById('cf-category').value = c.category || '';
-  document.getElementById('cf-level').value = c.level || 'Beginner';
-  document.getElementById('cf-duration').value = c.duration || '';
-  document.getElementById('cf-description').value = c.description || '';
-  document.getElementById('cf-price').value = c.price_ngn || '';
-  document.getElementById('cf-is-free').checked = !!c.is_free;
-  uploadedThumbUrl = c.thumbnail || '';
-  var lvl = document.getElementById('cf-level'); if(lvl) lvl.value = c.level||'';
-  var dur = document.getElementById('cf-duration'); if(dur) dur.value = c.duration||'';
-  var out = document.getElementById('cf-outcomes'); if(out) out.value = c.outcomes||'';
-  var req = document.getElementById('cf-requirements'); if(req) req.value = c.requirements||'';
-  try { cfLessons = JSON.parse(c.lessons||'[]'); } catch(e){ cfLessons = []; }
-  try { cfQuizData = JSON.parse(c.quiz||'[]'); } catch(e){ cfQuizData = []; }
-  renderLessonsEditor();
-  if (cfQuizData.length) renderQuizEditor(); else document.getElementById('cf-quiz-editor').innerHTML = 'No quiz yet.';
-  var btn = document.getElementById('cf-save-btn');
-  btn.textContent = 'Update Class';
-  var banner = document.getElementById('cf-editing-banner');
-  if (banner) banner.classList.remove('hidden');
-  document.getElementById('cf-title').scrollIntoView({behavior:'smooth'});
-}
-
-
-async function editCourseFromAdmin(id) {
-  // Load full course data by id, then switch to create tab and populate form
+async function editCourse(id) {
   try {
     var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_list', admin_key:ADMIN_KEY }) });
     var data = await res.json();
-    var c = (data.courses||[]).find(function(x){ return x.id === id; });
-    if (!c) { alert('Course not found.'); return; }
-    editCourse(c);
-    switchAdminTab('create');
-  } catch(e) { alert('Could not load course data.'); }
+    var c = (data.courses || []).find(function(x){ return x.id === id; });
+    if (!c) return;
+    cfEditingId = id;
+    document.getElementById('cf-title').value = c.title || '';
+    document.getElementById('cf-description').value = c.description || '';
+    document.getElementById('cf-category').value = c.category || '';
+    if (document.getElementById('cf-level')) document.getElementById('cf-level').value = c.level || 'Beginner';
+    if (document.getElementById('cf-duration')) document.getElementById('cf-duration').value = c.duration || '';
+    if (document.getElementById('cf-is-free')) document.getElementById('cf-is-free').checked = c.is_free;
+    if (document.getElementById('cf-price')) document.getElementById('cf-price').value = c.price_ngn || 0;
+    if (document.getElementById('cf-instructor')) document.getElementById('cf-instructor').value = c.instructor || 'EROGIAN';
+    if (document.getElementById('cf-outcomes')) document.getElementById('cf-outcomes').value = c.outcomes || '';
+    if (document.getElementById('cf-requirements')) document.getElementById('cf-requirements').value = c.requirements || '';
+    if (document.getElementById('cf-tags')) document.getElementById('cf-tags').value = c.tags || '';
+    uploadedThumbUrl = c.thumbnail || '';
+    if (c.thumbnail) { var p = document.getElementById('cf-thumb-preview'); if (p) p.innerHTML = '<img src="'+c.thumbnail+'" style="max-width:200px;border-radius:8px;">'; }
+    try { cfLessons = JSON.parse(c.lessons || '[]'); } catch(e) { cfLessons = [{title: c.title, video_url: c.video_url, video_file_url: c.video_file_url}]; }
+    if (!cfLessons.length && (c.video_url || c.video_file_url)) cfLessons = [{title: c.title, video_url: c.video_url, video_file_url: c.video_file_url}];
+    try { cfQuizData = JSON.parse(c.quiz || '[]'); } catch(e) { cfQuizData = []; }
+    renderLessonFields();
+    var out = document.getElementById('cf-quiz-editor');
+    if (out && cfQuizData.length) out.innerHTML = '<div style="color:#34d399;font-size:12px;margin-bottom:8px;">✅ '+cfQuizData.length+' questions loaded</div>';
+    var banner = document.getElementById('cf-editing-banner'); if (banner) banner.style.display = 'block';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('course-form').style.display = 'block';
+  } catch(e) { alert('Error loading course.'); }
 }
 
-async function togglePublish(id, currentStatus) {
+function toggleStatus(id, currentStatus) {
   var newStatus = currentStatus === 'draft' ? 'published' : 'draft';
-  if (!confirm('Change status to ' + newStatus + '?')) return;
-  try {
-    await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'update_status', admin_key:ADMIN_KEY, id:id, status:newStatus })
-    });
-    loadAdminCourses();
-  } catch(e) { alert('Error updating status'); }
+  fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'update_status', admin_key:ADMIN_KEY, id:id, status:newStatus }) })
+    .then(function(){ loadAdminCourses(); })
+    .catch(function(){ alert('Failed to update status.'); });
 }
 
-async function deleteCourse(id) {
-  if (!confirm('Delete this class?')) return;
-  try { await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'delete', admin_key:ADMIN_KEY, id:id }) }); loadAdminCourses(); } catch(e){}
+function loadEnrollments() {
+  fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'admin_enrollments', admin_key:ADMIN_KEY }) })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('admin-enrollments-list');
+      var enrs = data.enrollments || [];
+      if (!enrs.length) { el.innerHTML = '<div style="font-size:12px;color:#6b7280;">No enrollments yet.</div>'; return; }
+      el.innerHTML = enrs.map(function(e) {
+        return '<div style="padding:8px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:6px;font-size:12px;"><span style="color:#d1d5db;font-weight:600;">'+esc(e.name||'')+'</span> <span style="color:#6b7280;">— '+esc(e.course_title||e.course_slug||'')+'</span> <span style="color:'+(e.is_free?'#4ade80':'#fbbf24')+';">'+(e.is_free?'Free':'₦'+Number(e.amount_ngn||0).toLocaleString())+'</span></div>';
+      }).join('');
+    })
+    .catch(function(){ document.getElementById('admin-enrollments-list').innerHTML = '<div style="font-size:12px;color:#ef4444;">Failed to load.</div>'; });
 }
 
-/* ===== Student Dashboard ===== */
-function openDashboard() {
-  document.getElementById('dashboard-modal').classList.add('active');
-  var saved = localStorage.getItem('sf_student_email');
-  if (saved) { document.getElementById('dash-email').value = saved; loadDashboard(); }
-}
-function closeDashboard() { document.getElementById('dashboard-modal').classList.remove('active'); }
 
-async function loadDashboard() {
-  var email = document.getElementById('dash-email').value.trim();
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) { alert('Please enter a valid email.'); return; }
-  localStorage.setItem('sf_student_email', email);
-  var body = document.getElementById('dashboard-body');
-  document.getElementById('dashboard-login').classList.add('hidden');
-  body.classList.remove('hidden');
-  body.innerHTML = '<div class="text-center py-8 text-sm text-gray-400">Loading your dashboard...</div>';
-  try {
-    var res = await fetch(SKILLFORGE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'student_dashboard', email:email }) });
-    var data = await res.json();
-    renderDashboard(data, email);
-  } catch (e) {
-    body.innerHTML = '<div class="text-center py-8 text-sm text-red-400">Could not load your dashboard. Try again.</div>';
+/* ===== Paystack Payment Success Handler ===== */
+function handlePaymentSuccess() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    var courseSlug = params.get('course');
+    if (courseSlug) {
+      var course = allCourses.find(function(c) { return c.slug === courseSlug; });
+      if (course) {
+        var body = document.getElementById('enroll-body');
+        document.getElementById('enroll-title').textContent = '✅ Payment Successful!';
+        body.innerHTML = '<div class="text-center py-8">' +
+          '<div style="font-size:3rem;margin-bottom:12px;">🎉</div>' +
+          '<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Payment Confirmed!</h3>' +
+          '<div style="font-size:13px;color:#9ca3af;margin-bottom:16px;">You now have full access to <strong style="color:#a78bfa;">'+esc(course.title)+'</strong></div>' +
+          '<button onclick="document.getElementById(\'enroll-modal\').classList.remove(\'active\'); startClassAfterPayment(\''+esc(courseSlug)+'\')" class="w-full py-3 rounded-full font-semibold mb-2" style="background:linear-gradient(90deg,#8b5cf6,#3b82f6)">🚀 Start Learning Now →</button>' +
+          '</div>';
+        document.getElementById('enroll-modal').classList.add('active');
+      }
+    }
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 }
 
-function renderDashboard(data, email) {
-  var body = document.getElementById('dashboard-body');
-  var my = data.myCourses || [];
-  var more = (data.moreCourses || []).slice(0, 6);
-  var completedCount = my.filter(function(c){ return c.completed; }).length;
-
-  var myHTML = !my.length
-    ? '<div class="glass rounded-xl p-6 text-center text-sm text-gray-500">No classes yet. Browse the classes below to get started 👇</div>'
-    : my.map(function(c) {
-        var progressPct = c.completed ? 100 : (c.quiz_total ? Math.round((c.quiz_score/c.quiz_total)*100) : 0);
-        var statusChip = c.completed
-          ? '<span class="badge-free text-xs px-3 py-1 rounded-full font-semibold">🎓 Completed</span>'
-          : (c.payment_status === 'pending' ? '<span class="badge-pro text-xs px-3 py-1 rounded-full font-semibold">Payment Pending</span>' : '<span class="text-xs px-3 py-1 rounded-full font-semibold" style="background:rgba(59,130,246,.15);color:#93c5fd">In Progress</span>');
-        return '<div class="glass rounded-xl p-4 mb-3">' +
-          '<div class="flex justify-between items-center mb-2"><span class="font-semibold text-sm">'+esc(c.course_title)+'</span>'+statusChip+'</div>' +
-          '<div class="w-full h-2 rounded-full bg-white/10 mb-2 overflow-hidden"><div class="h-full rounded-full" style="width:'+progressPct+'%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div></div>' +
-          '<div class="flex justify-between items-center">' +
-          '<span class="text-xs text-gray-500">' + (c.quiz_total ? 'Quiz: ' + c.quiz_score + '/' + c.quiz_total : 'Not started yet') + '</span>' +
-          '<div class="flex gap-2">' +
-          (c.course ? '<button onclick="resumeCourse(\''+esc(c.course_slug)+'\',\''+esc(c.name)+'\',\''+esc(email)+'\')" class="px-3 py-1.5 rounded-lg text-xs glass">Resume</button>' : '') +
-          (c.completed ? '<button onclick="redownloadCertificate(\''+esc(c.name)+'\',\''+esc(c.course_title)+'\')" class="px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:linear-gradient(90deg,#d4af37,#8b5cf6)">🎓 Certificate</button>' : '') +
-          '</div></div></div>';
-      }).join('');
-
-  var moreHTML = !more.length ? '' : '<div class="grid md:grid-cols-3 gap-3 mt-2">' + more.map(function(c) {
-    return '<div class="glass rounded-xl overflow-hidden cursor-pointer card-float" onclick="closeDashboard();openCourse(\''+esc(c.slug)+'\')">' +
-      (c.thumbnail ? '<img src="'+esc(c.thumbnail)+'" class="w-full h-24 object-cover">' : '<div class="w-full h-24 bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center text-2xl">🎬</div>') +
-      '<div class="p-3"><div class="text-xs font-semibold mb-1">'+esc(c.title)+'</div><div class="text-xs text-gray-500">'+(c.is_free?'Free':'₦'+Number(c.price_ngn||0).toLocaleString())+'</div></div></div>';
-  }).join('') + '</div>';
-
-  body.innerHTML =
-    '<div class="grid grid-cols-3 gap-3 mb-5 text-center">' +
-    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+my.length+'</div><div class="text-xs text-gray-500">Enrolled</div></div>' +
-    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+completedCount+'</div><div class="text-xs text-gray-500">Completed</div></div>' +
-    '<div class="glass rounded-xl p-3"><div class="text-xl font-bold grad-text">'+completedCount+'</div><div class="text-xs text-gray-500">Certificates</div></div>' +
-    '</div>' +
-    '<h4 class="font-semibold text-sm mb-2 text-gray-300">My Classes</h4>' + myHTML +
-    (more.length ? '<h4 class="font-semibold text-sm mb-2 mt-5 text-gray-300">🔥 Explore More Classes</h4>' + moreHTML : '') +
-    '<button onclick="document.getElementById(\'dashboard-login\').classList.remove(\'hidden\');document.getElementById(\'dashboard-body\').classList.add(\'hidden\')" class="w-full py-2 mt-5 text-xs text-gray-500">Switch email</button>';
-}
-
-function resumeCourse(slug, name, email) {
-  closeDashboard();
-  var course = allCourses.find(function(c){ return c.slug === slug; });
-  if (!course) { alert('Class not found — it may have been removed.'); return; }
-  currentEnrollment = { id: null, name: name, email: email, course: course };
-  document.getElementById('enroll-title').textContent = course.title;
-  document.getElementById('enroll-modal').classList.add('active');
+function startClassAfterPayment(slug) {
+  var course = allCourses.find(function(c) { return c.slug === slug; });
+  if (!course) return;
+  currentEnrollment = { id: 'paid', name: 'Student', email: '', course: course };
   renderVideoStep(course);
 }
 
-function redownloadCertificate(name, courseTitle) {
-  currentEnrollment = { name: name, course: { title: courseTitle } };
-  downloadCertificate();
+
+/* ===== FORGE AI Mentor Avatar ===== */
+var forgeGreetings = [
+  "🔥 Ready to learn a skill that pays? I've got you.",
+  "💡 Did you know? Baking skills can earn ₦50K+ per week in Nigeria.",
+  "🎯 New courses just dropped! Catering, ghostwriting, soap making & more.",
+  "💪 Your daily streak is growing. Keep it up!",
+  "🎨 Creative skills like photography & makeup are in high demand this season.",
+  "💰 Freelance ghostwriters charge ₦200K+ per month. Want in?",
+  "🍰 Cake making is one of the most profitable home businesses in Nigeria.",
+  "🧹 Soap making costs ₦2K to start but can earn ₦100K+ monthly."
+];
+var forgeBubbleShown = false;
+
+function showForgeBubble(msg) {
+  var bubble = document.getElementById('forge-bubble');
+  if (!bubble) return;
+  bubble.textContent = msg;
+  bubble.classList.add('show');
+  setTimeout(function() { bubble.classList.remove('show'); }, 8000);
 }
 
-loadCourses();
-
-// ═══════════════════════════════════════════════════════════
-// CONDUCTOR LIVE TAB
-// ═══════════════════════════════════════════════════════════
-var _conductorES = null;
-var _conductorEventCount = 0;
-var _conductorLoggedEngines = {};
-var _conductorLastBizCount = -1;
-
-function connectConductorStream() {
-  if (_conductorES) { clearInterval(_conductorES); _conductorES = null; }
-  var log = document.getElementById('conductor-activity-log');
-  var dot = document.getElementById('conductor-status-dot');
-  var statusText = document.getElementById('conductor-status-text');
-
-  // Show connecting state
-  dot.style.background = '#f59e0b';
-  statusText.textContent = 'Connecting...';
-  log.innerHTML = '<div style="color:#f59e0b;font-style:italic;">[' + _ts() + '] Connecting to ERGIO Engines...</div>';
-
-  _appendLog({type:'system', message:'Connecting to ERGIO Engines at ' + ERGIO_ENGINES_URL, level:'info'});
-
-  // Poll /status endpoint every 4 seconds (server doesn't support SSE)
-  _conductorES = setInterval(async function() {
-    try {
-      var res = await fetch(ENGINES_PROXY + '?path=/status');
-      var data = await res.json();
-      if (data.status === 'healthy' || data.status === 'running') {
-        dot.style.background = '#10b981';
-        statusText.textContent = 'Live';
-      } else {
-        dot.style.background = '#f59e0b';
-        statusText.textContent = data.status || 'Unknown';
-      }
-
-      // Log engine status changes
-      if (data.engines) {
-        for (var i = 0; i < data.engines.length; i++) {
-          var eng = data.engines[i];
-          if (eng.name && !_conductorLoggedEngines[eng.name]) {
-            _conductorLoggedEngines[eng.name] = true;
-            _conductorEventCount++;
-            _appendLog({type:'engine', message: eng.name + ': ' + (eng.status || 'ready'), level:'info'});
-          }
-        }
-      }
-
-      // Log groq/search/supabase status
-      if (data.groq !== undefined && !_conductorLoggedEngines['groq']) {
-        _conductorLoggedEngines['groq'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Groq AI: ' + (data.groq ? 'connected' : 'offline'), level: data.groq ? 'success' : 'warn'});
-      }
-      if (data.supabase !== undefined && !_conductorLoggedEngines['supabase']) {
-        _conductorLoggedEngines['supabase'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Supabase: ' + (data.supabase ? 'connected' : 'offline'), level: data.supabase ? 'success' : 'warn'});
-      }
-      if (data.searxng !== undefined && !_conductorLoggedEngines['searxng']) {
-        _conductorLoggedEngines['searxng'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'SearXNG Search: ' + (data.searxng ? 'connected' : 'offline'), level: data.searxng ? 'success' : 'warn'});
-      }
-      if (data.playwright !== undefined && !_conductorLoggedEngines['playwright']) {
-        _conductorLoggedEngines['playwright'] = true;
-        _conductorEventCount++;
-        _appendLog({type:'system', message: 'Playwright: ' + (data.playwright ? 'connected' : 'offline'), level: data.playwright ? 'success' : 'warn'});
-      }
-
-      // Log businesses count
-      if (data.businesses_count !== undefined && data.businesses_count !== _conductorLastBizCount) {
-        _conductorLastBizCount = data.businesses_count;
-        _conductorEventCount++;
-        _appendLog({type:'info', message: data.businesses_count + ' businesses tracked', level:'info'});
-      }
-
-      document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
-    } catch(e) {
-      dot.style.background = '#ef4444';
-      statusText.textContent = 'Disconnected';
+function initForgeAvatar() {
+  // Show first bubble after 3 seconds
+  setTimeout(function() {
+    if (!forgeBubbleShown) {
+      showForgeBubble(forgeGreetings[Math.floor(Math.random() * forgeGreetings.length)]);
+      forgeBubbleShown = true;
     }
-  }, 4000);
-
-  // Mark connected immediately
-  dot.style.background = '#10b981';
-  statusText.textContent = 'Live';
-  _appendLog({type:'system', message:'Connected to ERGIO Engines (polling mode)', level:'success'});
-
-  // Do an immediate status fetch
-  fetch(ENGINES_PROXY + '?path=/status')
-    .then(r => r.json())
-    .then(data => {
-      _conductorEventCount++;
-      _appendLog({type:'system', message:'Server: ' + (data.name || 'ERGIO Engines') + ' v' + (data.version || '5.0.0'), level:'success'});
-      _appendLog({type:'system', message:'Status: ' + (data.status || 'running'), level:'success'});
-      document.getElementById('conductor-event-count').textContent = _conductorEventCount + ' events';
-    })
-    .catch(e => {
-      _appendLog({type:'system', message:'Connection error: ' + e.message, level:'error'});
-    });
-}
-
-function _pollActivityFallback() {
-  // Legacy fallback — now handled by connectConductorStream polling
-  connectConductorStream();
-}
-
-function _ts() {
-  return new Date().toTimeString().slice(0,8);
-}
-
-function _appendLog(ev) {
-  var log = document.getElementById('conductor-activity-log');
-  if (!log) return;
-
-  var colorMap = {
-    success: '#10b981', error: '#ef4444', warn: '#f59e0b',
-    info: '#60a5fa', system: '#8b5cf6', conductor: '#34d399',
-    engine: '#f472b6', upload: '#a78bfa'
-  };
-  var iconMap = {
-    success: '✅', error: '❌', warn: '⚠️', info: 'ℹ️',
-    system: '🔧', conductor: '⚡', engine: '🔄', upload: '📤'
-  };
-  var level = ev.level || ev.type || 'info';
-  var color = colorMap[level] || colorMap[ev.type] || '#9ca3af';
-  var icon = iconMap[level] || iconMap[ev.type] || '▸';
-  var ts = ev.ts || _ts();
-
-  var line = document.createElement('div');
-  line.style.cssText = 'border-left:2px solid ' + color + ';padding-left:10px;margin-bottom:4px;animation:fadeInLine .2s ease;';
-  line.innerHTML = '<span style="color:#4b5563;">[' + ts + ']</span> ' +
-    icon + ' <span style="color:' + color + ';font-weight:600;">[' + (ev.type||level).toUpperCase() + ']</span> ' +
-    '<span style="color:#d1d5db;">' + esc(ev.message || '') + '</span>';
-
-  // Remove placeholder if present
-  var placeholder = log.querySelector('[style*="italic"]');
-  if (placeholder) placeholder.remove();
-
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
-
-  // Keep max 300 lines
-  while (log.children.length > 300) log.removeChild(log.firstChild);
-}
-
-function clearActivityLog() {
-  var log = document.getElementById('conductor-activity-log');
-  if (log) { log.innerHTML = '<div style="color:#4b5563;font-style:italic;">[' + _ts() + '] Log cleared.</div>'; }
-  _conductorEventCount = 0;
-  document.getElementById('conductor-event-count').textContent = '0 events';
-}
-
-function conductorTask(task) {
-  var input = document.getElementById('conductor-task-input');
-  if (input) { input.value = task; }
-  runConductorTask();
-}
-
-async function runConductorTask() {
-  var task = (document.getElementById('conductor-task-input').value || '').trim();
-  if (!task) { alert('Enter a task first.'); return; }
-
-  var btn = document.getElementById('conductor-run-btn');
-  btn.textContent = '⏳ Running...';
-  btn.disabled = true;
-
-  _appendLog({type:'conductor', message:'Task started: ' + task.slice(0,80), level:'conductor'});
-
-  try {
-    var res = await fetch(ENGINES_PROXY + '?path=/conductor', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({request: task, business_id: 'ergio', user_id: 'admin'})
-    });
-    if (!res.ok) throw new Error('Conductor API returned ' + res.status);
-    var data = await res.json();
-    _conductorEventCount++;
-    _appendLog({type:'conductor', message:'Task completed!', level:'success'});
-
-    // Show result
-    var resultDiv = document.getElementById('conductor-result');
-    var resultBody = document.getElementById('conductor-result-body');
-    if (resultDiv && resultBody) {
-      resultDiv.style.display = 'block';
-      var txt = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-      resultBody.innerHTML = '<pre style="white-space:pre-wrap;font-size:12px;color:#d1d5db;margin:0;">' + esc(txt.slice(0, 2000)) + (txt.length > 2000 ? '\n... (truncated)' : '') + '</pre>';
+  }, 3000);
+  
+  // Rotate bubbles every 20 seconds
+  setInterval(function() {
+    var panel = document.getElementById('forge-panel');
+    if (!panel || !panel.classList.contains('active')) {
+      showForgeBubble(forgeGreetings[Math.floor(Math.random() * forgeGreetings.length)]);
     }
-  } catch(e) {
-    _appendLog({type:'conductor', message:'Error: ' + e.message, level:'error'});
-  }
-
-  btn.textContent = '▶ Run Task';
-  btn.disabled = false;
+  }, 20000);
+  
+  // Build recommendations
+  buildForgeRecommendations();
 }
 
-// Auto-connect when Conductor tab is opened
-var _origSwitchAdminTab = switchAdminTab;
-switchAdminTab = function(tab) {
-  _origSwitchAdminTab(tab);
-  if (tab === 'conductor' && !_conductorES) {
-    setTimeout(connectConductorStream, 300);
+function buildForgeRecommendations() {
+  var recs = document.getElementById('forge-recommendations');
+  if (!recs || !allCourses || allCourses.length === 0) return;
+  
+  // Pick trending/recommended courses
+  var lifestyleCats = ['Catering & Baking', 'Beauty & Fashion', 'Home & Craft Skills', 'Writing & Freelancing'];
+  var recommended = allCourses.filter(function(c) {
+    return lifestyleCats.indexOf(c.category) !== -1;
+  });
+  
+  // If not enough, fill with any free courses
+  if (recommended.length < 4) {
+    var others = allCourses.filter(function(c) { return recommended.indexOf(c) === -1 && c.is_free; });
+    recommended = recommended.concat(others.slice(0, 6 - recommended.length));
   }
+  
+  recommended = recommended.slice(0, 5);
+  
+  var skillEmojis = {
+    'Catering & Baking': '🍰',
+    'Beauty & Fashion': '💄',
+    'Home & Craft Skills': '🧼',
+    'Writing & Freelancing': '✍️',
+    'Creative Skills': '📸',
+    'Business & Finance': '💰',
+    'Web Development': '💻',
+    'AI & Machine Learning': '🤖',
+    'Cybersecurity': '🔒',
+    'Content Creation': '🎥',
+    'Digital Marketing': '📱'
+  };
+  
+  recs.innerHTML = recommended.map(function(c) {
+    var emoji = skillEmojis[c.category] || '📚';
+    return '<div class="forge-skill-card" onclick="openCourse(\''+esc(c.slug)+'\')">' +
+      '<div class="skill-emoji">'+emoji+'</div>' +
+      '<div class="skill-info"><h4>'+esc(c.title.substring(0, 50))+'</h4><p>'+esc(c.category)+' · '+esc(c.duration || 'Self-paced')+'</p></div>' +
+      '<div class="skill-badge">'+(c.is_free ? 'FREE' : '₦'+Number(c.price_ngn||0).toLocaleString())+'</div>' +
+    '</div>';
+  }).join('');
+  
+  // Update streak text
+  var streak = localStorage.getItem('erogian_streak');
+  var streakText = document.getElementById('forge-streak-text');
+  if (streak && streakText) {
+    streakText.textContent = '🔥 ' + streak + ' day streak! Keep learning to grow it.';
+  }
+}
+
+function toggleForge() {
+  var panel = document.getElementById('forge-panel');
+  if (!panel) return;
+  panel.classList.toggle('active');
+  var bubble = document.getElementById('forge-bubble');
+  if (bubble) bubble.classList.remove('show');
+  if (panel.classList.contains('active')) {
+    buildForgeRecommendations();
+  }
+}
+
+
+/* ===== Skill of the Day ===== */
+var incomeEstimates = {
+  "Catering & Baking": "₦50K-₦200K/month",
+  "Beauty & Fashion": "₦40K-₦150K/month",
+  "Home & Craft Skills": "₦30K-₦100K/month",
+  "Writing & Freelancing": "₦100K-₦500K/month",
+  "Creative Skills": "₦50K-₦200K/month",
+  "Business & Finance": "₦100K-₦1M/month",
+  "Web Development": "₦200K-₦1M/month",
+  "AI & Machine Learning": "₦300K-₦2M/month",
+  "Digital Marketing": "₦100K-₦500K/month",
+  "Content Creation": "₦50K-₦300K/month",
+  "Cybersecurity": "₦200K-₦1M/month",
+  "Personal Development": "Priceless life skill"
 };
 
-// ═══════════════════════════════════════════════════════════
-// GENERAL FILE UPLOAD TAB
-// ═══════════════════════════════════════════════════════════
-function handleGenFileDrop(e) {
-  e.preventDefault();
-  var zone = document.getElementById('gen-upload-zone');
-  zone.style.borderColor = 'rgba(16,185,129,.3)';
-  zone.style.background = 'rgba(16,185,129,.03)';
-  var files = Array.from(e.dataTransfer.files);
-  files.forEach(function(f) { uploadGenFile(f); });
-}
-
-function handleGenFileSelect(e) {
-  var files = Array.from(e.target.files);
-  files.forEach(function(f) { uploadGenFile(f); });
-  e.target.value = '';
-}
-
-async function uploadGenFile(file) {
-  var queueEl = document.getElementById('gen-upload-queue');
-  var itemId = 'uq_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
-
-  // Add progress item to queue
-  var item = document.createElement('div');
-  item.id = itemId;
-  item.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;';
-  item.innerHTML = _fileIcon(file.type) + ' ' +
-    '<div style="flex:1;min-width:0;">' +
-      '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(file.name) + '</div>' +
-      '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (file.size/1024/1024).toFixed(2) + ' MB</div>' +
-      '<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:8px;overflow:hidden;">' +
-        '<div id="' + itemId + '_bar" style="height:100%;width:0%;background:linear-gradient(90deg,#10b981,#059669);transition:width .3s;border-radius:2px;"></div>' +
-      '</div>' +
-    '</div>' +
-    '<div id="' + itemId + '_status" style="font-size:12px;color:#6b7280;flex-shrink:0;">Uploading...</div>';
-  queueEl.appendChild(item);
-
-  // Simulate progress
-  var bar = document.getElementById(itemId + '_bar');
-  var prog = 0;
-  var progT = setInterval(function() {
-    prog = Math.min(prog + Math.random()*15, 85);
-    if (bar) bar.style.width = prog + '%';
-  }, 200);
-
-  try {
-    // Read as base64
-    var b64 = await _fileToBase64(file);
-    var purpose = file.type.startsWith('image/') ? 'thumbnail' : 
-                  file.type.startsWith('video/') ? 'video' : 'document';
-
-    var res = await fetch(ERGIO_ENGINES_URL + '/upload', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({file: b64, filename: file.name, mime: file.type, purpose: purpose})
-    });
-    var data = await res.json();
-    clearInterval(progT);
-
-    if (data.status === 'ok' && data.url) {
-      if (bar) bar.style.width = '100%';
-      document.getElementById(itemId + '_status').innerHTML = '<span style="color:#10b981;font-weight:700;">✓ Done</span>';
-      // Move to history
-      setTimeout(function() { item.remove(); }, 1500);
-      _addToUploadHistory(file.name, data.url, file.type, data.size_mb);
-      _uploadedFiles.push({name: file.name, url: data.url, type: file.type});
+function initSkillOfTheDay() {
+  if (!allCourses || allCourses.length === 0) return;
+  
+  // Use the day of the year to pick a consistent course per day
+  var now = new Date();
+  var start = new Date(now.getFullYear(), 0, 0);
+  var diff = (now - start) / (1000 * 60 * 60 * 24);
+  var dayOfYear = Math.floor(diff);
+  
+  // Filter to free courses with good content
+  var candidates = allCourses.filter(function(c) { return c.is_free; });
+  if (candidates.length === 0) candidates = allCourses;
+  
+  // Pick the course for today
+  var course = candidates[dayOfYear % candidates.length];
+  
+  var sotd = document.getElementById('skill-of-day');
+  if (!sotd) return;
+  
+  sotd.classList.add('active');
+  
+  // Set date
+  var dateEl = document.getElementById('sotd-date');
+  if (dateEl) {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    dateEl.textContent = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  }
+  
+  // Set thumbnail
+  var thumb = document.getElementById('sotd-thumb');
+  if (thumb) {
+    if (course.thumbnail) {
+      thumb.style.backgroundImage = 'url(' + course.thumbnail + ')';
     } else {
-      clearInterval(progT);
-      if (bar) bar.style.background = '#ef4444';
-      document.getElementById(itemId + '_status').innerHTML = '<span style="color:#ef4444;">✗ Failed</span>';
-      item.title = data.message || 'Upload failed';
+      // Fallback gradient
+      thumb.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(59,130,246,0.2))';
+      thumb.style.display = 'flex';
+      thumb.style.alignItems = 'center';
+      thumb.style.justifyContent = 'center';
+      thumb.style.fontSize = '48px';
+      thumb.textContent = '🎓';
     }
-  } catch(e) {
-    clearInterval(progT);
-    if (bar) bar.style.background = '#ef4444';
-    var st = document.getElementById(itemId + '_status');
-    if (st) st.innerHTML = '<span style="color:#ef4444;">✗ Error</span>';
+  }
+  
+  // Set title
+  document.getElementById('sotd-title').textContent = course.title;
+  
+  // Set description (truncated)
+  var desc = course.description || '';
+  if (desc.length > 120) desc = desc.substring(0, 120) + '...';
+  document.getElementById('sotd-desc').textContent = desc;
+  
+  // Set meta
+  var metaEl = document.getElementById('sotd-meta');
+  if (metaEl) {
+    var metaHtml = '<span>' + esc(course.category) + '</span>';
+    metaHtml += '<span>' + esc(course.level || 'Beginner') + '</span>';
+    metaHtml += '<span>' + esc(course.duration || 'Self-paced') + '</span>';
+    if (course.is_free) {
+      metaHtml += '<span class="free">FREE</span>';
+    } else {
+      metaHtml += '<span class="free">₦' + Number(course.price_ngn||0).toLocaleString() + '</span>';
+    }
+    metaEl.innerHTML = metaHtml;
+  }
+  
+  // Set income estimate
+  var incomeEl = document.getElementById('sotd-income');
+  if (incomeEl) {
+    var income = incomeEstimates[course.category] || '';
+    if (income) {
+      incomeEl.textContent = '💰 Potential income: ' + income;
+    }
+  }
+  
+  // Set CTA
+  var cta = document.getElementById('sotd-cta');
+  if (cta) {
+    cta.onclick = function() { openCourse(course.slug); };
   }
 }
 
-function _fileIcon(mime) {
-  if (!mime) return '📄';
-  if (mime.startsWith('image/')) return '<span style="font-size:24px;">🖼</span>';
-  if (mime.startsWith('video/')) return '<span style="font-size:24px;">🎬</span>';
-  if (mime.startsWith('audio/')) return '<span style="font-size:24px;">🎵</span>';
-  if (mime.includes('pdf')) return '<span style="font-size:24px;">📕</span>';
-  if (mime.includes('zip') || mime.includes('rar')) return '<span style="font-size:24px;">🗜</span>';
-  if (mime.includes('word') || mime.includes('doc')) return '<span style="font-size:24px;">📝</span>';
-  return '<span style="font-size:24px;">📄</span>';
-}
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', function() {
+  loadCourses().then(handlePaymentSuccess).then(initForgeAvatar).then(initSkillOfTheDay);
 
-function _addToUploadHistory(name, url, type, sizeMb) {
-  var list = document.getElementById('gen-uploaded-list');
-  if (!list) return;
-  var item = document.createElement('div');
-  item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(16,185,129,.15);border-radius:10px;';
-  var isImg = type && type.startsWith('image/');
-  var preview = isImg ? '<img src="' + url + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;">' : _fileIcon(type);
-  item.innerHTML = preview +
-    '<div style="flex:1;min-width:0;">' +
-      '<div style="font-size:13px;font-weight:600;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(name) + '</div>' +
-      '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + (sizeMb ? sizeMb.toFixed(2) + ' MB · ' : '') + '<a href="' + url + '" target="_blank" style="color:#34d399;text-decoration:none;">Open ↗</a></div>' +
-    '</div>' +
-    '<button data-url="' + url + '" class="copy-url-btn" style="font-size:11px;padding:5px 10px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;flex-shrink:0;">Copy URL</button>';
-  list.insertBefore(item, list.firstChild);
-}
-
-function _fileToBase64(file) {
-  return new Promise(function(resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var result = e.target.result;
-      var b64 = result.includes(',') ? result.split(',')[1] : result;
-      resolve(b64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// Add CSS animation for log lines
-(function() {
-  var style = document.createElement('style');
-  style.textContent = '@keyframes fadeInLine { from { opacity:0; transform:translateX(-4px); } to { opacity:1; transform:translateX(0); } }';
-  document.head.appendChild(style);
-})();
-
-
-
-// Copy URL button handler
-document.addEventListener('click', function(e) {
-  if (e.target && e.target.classList && e.target.classList.contains('copy-url-btn')) {
-    var url = e.target.getAttribute('data-url');
-    if (url) { navigator.clipboard.writeText(url); e.target.textContent = '\u2713'; }
+  updateStreak();
+  
+  // Reveal animations
+  var reveals = document.querySelectorAll('.reveal');
+  if (reveals.length) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    reveals.forEach(function(r) { io.observe(r); });
   }
 });
