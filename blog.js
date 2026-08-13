@@ -100,7 +100,7 @@ function renderFeatured() {
     '<div class="grid md:grid-cols-2 gap-0">' + coverHTML +
     '<div class="p-8 md:p-10">' +
     '<div class="flex items-center gap-3 mb-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300">Featured</span><span class="text-xs text-gray-500">' + esc(featured.category) + '</span></div>' +
-    '<h2 class="display text-2xl md:text-3xl font-bold mb-4 group-hover:grad-text transition">' + esc(featured.title) + '</h2>' +
+    '<h2 class="display text-2xl md:text-3xl font-bold mb-4 group-hover:grad-text transition"><a href="/blog/' + escAttr(featured.slug) + '" onclick="event.preventDefault();openPost(\'' + featured.slug + '\')" style="color:inherit;text-decoration:none">' + esc(featured.title) + '</a></h2>' +
     '<p class="text-gray-400 text-sm leading-relaxed mb-6">' + esc(featured.excerpt) + '</p>' +
     '<div class="flex items-center gap-4 text-xs text-gray-500"><span>By ' + esc(featured.author) + '</span><span>·</span><span>' + d + '</span><span>·</span><span>' + esc(featured.read_time) + '</span></div>' +
     '<div class="mt-6 text-sm font-semibold text-purple-400">Read article →</div></div></div></div>';
@@ -120,7 +120,7 @@ function renderGrid() {
       : '<div class="aspect-[16/9] bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center"><div class="text-4xl opacity-40">📄</div></div>';
     return '<div class="glass rounded-2xl overflow-hidden card-float cursor-pointer group" onclick="openPost(\'' + p.slug + '\')">' + coverHTML +
       '<div class="p-6"><div class="flex items-center gap-2 mb-3"><span class="px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300">' + esc(p.category) + '</span><span class="text-xs text-gray-600">' + esc(p.read_time) + '</span></div>' +
-      '<h3 class="font-semibold text-lg mb-2 group-hover:text-purple-300 transition">' + esc(p.title) + '</h3>' +
+      '<h3 class="font-semibold text-lg mb-2 group-hover:text-purple-300 transition"><a href="/blog/' + escAttr(p.slug) + '" onclick="event.preventDefault();openPost(\'' + p.slug + '\')" style="color:inherit;text-decoration:none">' + esc(p.title) + '</a></h3>' +
       '<p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-2">' + esc(p.excerpt) + '</p>' +
       '<div class="flex items-center justify-between text-xs text-gray-600"><span>' + d + '</span><span class="text-purple-400">Read →</span></div></div></div>';
   }).join('');
@@ -145,7 +145,7 @@ function searchPosts() {
         : '';
       return '<div class="glass rounded-2xl overflow-hidden card-float cursor-pointer group" onclick="openPost(\'' + p.slug + '\')">' + coverHTML +
         '<div class="p-6"><div class="flex items-center gap-2 mb-3"><span class="px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300">' + esc(p.category) + '</span></div>' +
-        '<h3 class="font-semibold text-lg mb-2 group-hover:text-purple-300 transition">' + esc(p.title) + '</h3>' +
+        '<h3 class="font-semibold text-lg mb-2 group-hover:text-purple-300 transition"><a href="/blog/' + escAttr(p.slug) + '" onclick="event.preventDefault();openPost(\'' + p.slug + '\')" style="color:inherit;text-decoration:none">' + esc(p.title) + '</a></h3>' +
         '<p class="text-sm text-gray-500 mb-3">' + esc(p.excerpt) + '</p>' +
         '<div class="text-xs text-gray-600">' + d + ' · ' + esc(p.read_time) + '</div></div></div>';
     }).join('');
