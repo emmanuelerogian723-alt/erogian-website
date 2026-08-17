@@ -68,7 +68,7 @@ h1,h2,h3,h4,.display{font-family:'Space Grotesk',sans-serif;}
 .fade-in{animation:fadeIn .5s ease both}@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 input,textarea,select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;font-family:'Inter',sans-serif;transition:border-color .3s;}
 input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.18);}
-input::placeholder,textarea::placeholder{color:#4b5563;}
+input::placeholder,textarea::placeholder{color:#9ca3af;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .modal-overlay.active{display:flex;}
 .modal-content{background:#070910;border:1px solid rgba(255,255,255,.1);border-radius:24px;max-width:780px;width:100%;max-height:88vh;overflow-y:auto;padding:36px;}
@@ -172,7 +172,7 @@ a.skip-link:focus{top:0}
     </p>
     <!-- SEARCH BAR -->
     <div style="max-width:500px;margin:0 auto;position:relative;">
-      <input id="search-input" type="text" placeholder="Search articles — AI, automation, web dev..." style="width:100%;border-radius:100px;padding:16px 56px 16px 24px;font-size:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);" onkeydown="if(event.key==='Enter')searchPosts()">
+      <input aria-label="Search articles — AI, automation, web dev..." id="search-input" type="text" placeholder="Search articles — AI, automation, web dev..." style="width:100%;border-radius:100px;padding:16px 56px 16px 24px;font-size:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);" onkeydown="if(event.key==='Enter')searchPosts()">
       <button onclick="searchPosts()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">🔍</button>
     </div>
   </div>
@@ -187,13 +187,13 @@ a.skip-link:focus{top:0}
         <div style="font-size:13px;color:#9ca3af;">Join 800+ readers getting AI &amp; tech insights weekly.</div>
       </div>
       <div style="display:flex;gap:8px;flex:1;min-width:260px;max-width:400px;">
-        <input id="blog-email" type="email" placeholder="your@email.com" style="flex:1;border-radius:12px;padding:12px 16px;font-size:13px;">
+        <input aria-label="your@email.com" id="blog-email" type="email" placeholder="your@email.com" style="flex:1;border-radius:12px;padding:12px 16px;font-size:13px;">
         <button onclick="blogSubscribe()" class="cta-btn" style="padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;position:relative;white-space:nowrap;">
           <span style="position:relative;z-index:1;">Subscribe 🔔</span>
         </button>
       </div>
     </div>
-    <div id="blog-sub-status" style="text-align:center;font-size:13px;color:#4b5563;margin-top:10px;"></div>
+    <div id="blog-sub-status" style="text-align:center;font-size:13px;color:#9ca3af;margin-top:10px;"></div>
   </div>
 </section>
 
@@ -284,7 +284,7 @@ a.skip-link:focus{top:0}
       <button onclick="closeAdmin()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:22px;">✕</button>
     </div>
     <div id="admin-login-view">
-      <input id="admin-key-input" type="password" placeholder="Admin key..." style="width:100%;border-radius:12px;padding:14px 18px;font-size:14px;display:block;margin-bottom:12px;">
+      <input aria-label="Admin key..." id="admin-key-input" type="password" placeholder="Admin key..." style="width:100%;border-radius:12px;padding:14px 18px;font-size:14px;display:block;margin-bottom:12px;">
       <button onclick="adminLogin()" class="cta-btn" style="padding:12px 28px;border-radius:12px;font-size:14px;font-weight:700;display:inline-block;position:relative;">
         <span style="position:relative;z-index:1;">Login →</span>
       </button>
@@ -301,18 +301,18 @@ a.skip-link:focus{top:0}
         <div style="display:grid;gap:14px;">
           <div>
             <label style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Topic / Title *</label>
-            <input id="ai-topic" placeholder="e.g. How to build a WhatsApp bot in Nigeria" style="width:100%;border-radius:10px;padding:12px 16px;font-size:14px;display:block;">
+            <input aria-label="e.g. How to build a WhatsApp bot in Nigeria" id="ai-topic" placeholder="e.g. How to build a WhatsApp bot in Nigeria" style="width:100%;border-radius:10px;padding:12px 16px;font-size:14px;display:block;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
             <div>
               <label style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Category</label>
-              <select id="ai-category" style="width:100%;border-radius:10px;padding:12px 14px;font-size:13px;display:block;">
+              <select aria-label="Ai Category" id="ai-category" style="width:100%;border-radius:10px;padding:12px 14px;font-size:13px;display:block;">
                 <option>AI</option><option>Web Dev</option><option>Automation</option><option>Business</option><option>Nigeria Tech</option><option>Design</option><option>Tutorial</option>
               </select>
             </div>
             <div>
               <label style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Style</label>
-              <select id="ai-style" style="width:100%;border-radius:10px;padding:12px 14px;font-size:13px;display:block;">
+              <select aria-label="Ai Style" id="ai-style" style="width:100%;border-radius:10px;padding:12px 14px;font-size:13px;display:block;">
                 <option>Professional</option><option>Conversational</option><option>Tutorial</option><option>Listicle</option><option>Opinion</option>
               </select>
             </div>
@@ -328,13 +328,13 @@ a.skip-link:focus{top:0}
         <!-- Edit area -->
         <div id="edit-area" class="hidden" style="margin-top:20px;">
           <div style="display:grid;gap:12px;">
-            <input id="edit-title" placeholder="Post title" style="width:100%;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;display:block;">
-            <textarea id="edit-excerpt" rows="2" placeholder="Short excerpt / summary" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;resize:vertical;"></textarea>
+            <input aria-label="Post title" id="edit-title" placeholder="Post title" style="width:100%;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;display:block;">
+            <textarea aria-label="Short excerpt / summary" id="edit-excerpt" rows="2" placeholder="Short excerpt / summary" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;resize:vertical;"></textarea>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <input id="edit-category" placeholder="Category" style="border-radius:10px;padding:12px 16px;font-size:13px;display:block;width:100%;">
-              <input id="edit-tags" placeholder="Tags (comma-separated)" style="border-radius:10px;padding:12px 16px;font-size:13px;display:block;width:100%;">
+              <input aria-label="Category" id="edit-category" placeholder="Category" style="border-radius:10px;padding:12px 16px;font-size:13px;display:block;width:100%;">
+              <input aria-label="Tags (comma-separated)" id="edit-tags" placeholder="Tags (comma-separated)" style="border-radius:10px;padding:12px 16px;font-size:13px;display:block;width:100%;">
             </div>
-            <input id="edit-meta-desc" placeholder="SEO meta description (optional)" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
+            <input aria-label="SEO meta description (optional)" id="edit-meta-desc" placeholder="SEO meta description (optional)" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;">
 
             <!-- Cover image -->
             <div>
@@ -344,15 +344,15 @@ a.skip-link:focus{top:0}
                 <label style="padding:8px 16px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd;cursor:pointer;font-size:12px;font-weight:700;">📁 Upload Image<input type="file" accept="image/*" style="display:none;" onchange="uploadImageFile(this)"></label>
                 <label style="padding:8px 16px;border-radius:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#4ade80;cursor:pointer;font-size:12px;font-weight:700;">🖼 Insert into Article<input type="file" accept="image/*" style="display:none;" onchange="insertImageIntoContent(this)"></label>
               </div>
-              <input id="edit-cover" placeholder="Or paste image URL" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;margin-bottom:8px;" oninput="previewCover(this.value)">
-              <div id="cover-preview" style="height:140px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:13px;">No cover image set</div>
+              <input aria-label="Or paste image URL" id="edit-cover" placeholder="Or paste image URL" style="width:100%;border-radius:10px;padding:12px 16px;font-size:13px;display:block;margin-bottom:8px;" oninput="previewCover(this.value)">
+              <div id="cover-preview" style="height:140px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;">No cover image set</div>
               <div id="upload-status" class="hidden" style="font-size:12px;color:#9ca3af;margin-top:6px;"></div>
             </div>
 
-            <textarea id="edit-content" rows="14" placeholder="Write in Markdown... # Heading, **bold**, *italic*, `code`, ![img](url)" style="width:100%;border-radius:10px;padding:14px 16px;font-size:13px;display:block;resize:vertical;font-family:'JetBrains Mono',monospace;line-height:1.6;"></textarea>
+            <textarea aria-label="Write in Markdown... # Heading, **bold**, *italic*, `code`, ![img](url)" id="edit-content" rows="14" placeholder="Write in Markdown... # Heading, **bold**, *italic*, `code`, ![img](url)" style="width:100%;border-radius:10px;padding:14px 16px;font-size:13px;display:block;resize:vertical;font-family:'JetBrains Mono',monospace;line-height:1.6;"></textarea>
 
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <input id="edit-featured" type="checkbox" style="width:18px;height:18px;accent-color:#8b5cf6;cursor:pointer;">
+              <input aria-label="Edit Featured" id="edit-featured" type="checkbox" style="width:18px;height:18px;accent-color:#8b5cf6;cursor:pointer;">
               <label for="edit-featured" style="font-size:13px;color:#d1d5db;cursor:pointer;font-weight:600;">⭐ Feature this post (shows at top)</label>
             </div>
 

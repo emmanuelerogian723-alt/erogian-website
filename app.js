@@ -294,6 +294,19 @@ if(firstChip) firstChip.click();
 updEst();
 
 /* ===== Payment Modal ===== */
+var _paystackLoading = null;
+function loadPaystackScript(){
+  if(typeof PaystackPop !== 'undefined') return Promise.resolve();
+  if(_paystackLoading) return _paystackLoading;
+  _paystackLoading = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = 'https://js.paystack.co/v1/inline.js';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.body.appendChild(s);
+  });
+  return _paystackLoading;
+}
 function openPaymentModal(plan, amount){
   document.getElementById('modal-plan').textContent = plan;
   document.getElementById('modal-amount').textContent = '₦' + amount.toLocaleString();
@@ -301,6 +314,7 @@ function openPaymentModal(plan, amount){
   document.getElementById('modal-plan-val').value = plan;
   var overlay = document.getElementById('payment-modal-overlay');
   if(overlay){ overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
+  loadPaystackScript().catch(function(){});
 }
 var pmClose = document.getElementById('pm-close');
 if(pmClose) pmClose.addEventListener('click', function(){
