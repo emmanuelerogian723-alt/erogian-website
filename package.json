@@ -2,5 +2,8 @@
   "name": "erogian-website",
   "version": "1.0.0",
   "type": "module",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
 }
